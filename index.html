@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-<meta name="theme-color" content="#05060f" />
+<meta name="theme-color" content="#0a0b10" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="SYSTEM" />
@@ -13,887 +13,1041 @@
 <title>THE SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#05060f; --bg2:#0a0f24; --panel:rgba(14,22,52,0.72); --panel-solid:#0c1126;
-  --cyan:#46d2ff; --cyan-dim:#1d6e8c; --blue:#3a7bff; --purple:#8c6eff;
-  --gold:#ffd34d; --green:#42e2a0; --red:#ff5d6c; --txt:#dCEBFF; --muted:#7f93c4;
-  --line:rgba(70,210,255,0.28); --glow:0 0 14px rgba(70,210,255,0.55);
+  --bg:#0a0b10; --bg2:#0e1018; --surface:rgba(255,255,255,0.038); --surface2:rgba(255,255,255,0.055);
+  --line:rgba(255,255,255,0.085); --line2:rgba(141,162,255,0.22);
+  --accent:#8ea2ff; --accent2:#b79dff; --accent-d:#5a6bce;
+  --gold:#e6c179; --green:#7fe0b0; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0;
+  --txt:#eceef5; --txt2:#c3c8da; --muted:#888fa6;
+  --glow:0 0 0 1px rgba(141,162,255,.15), 0 8px 30px rgba(90,107,206,.18);
   --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
-  font-family:'Rajdhani','Segoe UI',system-ui,sans-serif;overscroll-behavior-y:contain;}
-body{min-height:100vh;
+  font-family:'Sora',-apple-system,system-ui,sans-serif;overscroll-behavior-y:contain;font-size:15px;}
+body{min-height:100vh;line-height:1.45;
   background:
-   radial-gradient(1200px 600px at 50% -10%, rgba(58,123,255,0.18), transparent 60%),
-   radial-gradient(900px 500px at 90% 110%, rgba(140,110,255,0.14), transparent 60%),
-   linear-gradient(180deg,#05060f 0%, #070a18 100%);
+   radial-gradient(900px 520px at 50% -8%, rgba(141,162,255,.10), transparent 60%),
+   radial-gradient(700px 420px at 88% 108%, rgba(183,157,255,.08), transparent 60%),
+   var(--bg);
   background-attachment:fixed;}
-h1,h2,h3,.font-d{font-family:'Orbitron',sans-serif;letter-spacing:1px;}
+h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;}
 .hidden{display:none !important;}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
 ::-webkit-scrollbar{width:0;height:0;}
+.num{font-family:'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums;}
 
-/* ---- App shell ---- */
-#app{max-width:520px;margin:0 auto;padding:calc(var(--safe-top) + 8px) 14px calc(86px + var(--safe-bot)) 14px;min-height:100vh;}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.brand{display:flex;align-items:center;gap:9px;}
-.brand .mark{width:26px;height:26px;filter:drop-shadow(0 0 6px rgba(70,210,255,.8));}
-.brand b{font-family:'Orbitron';font-size:15px;letter-spacing:3px;color:#eaf4ff;}
-.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
-  background:rgba(20,30,66,.5);display:grid;place-items:center;font-size:17px;color:var(--cyan);}
+#app{max-width:520px;margin:0 auto;padding:calc(var(--safe-top) + 14px) 16px calc(94px + var(--safe-bot)) 16px;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .mark{width:26px;height:26px;border-radius:7px;filter:drop-shadow(0 0 5px rgba(141,162,255,.5));}
+.brand b{font-family:'Space Grotesk';font-size:14px;letter-spacing:4px;color:#f3f4fa;font-weight:600;}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface);display:grid;place-items:center;font-size:17px;color:var(--txt2);}
 
-/* ---- panels ---- */
-.panel{position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:14px;padding:14px;margin-bottom:13px;backdrop-filter:blur(6px);
-  box-shadow:0 0 0 1px rgba(70,210,255,.05), inset 0 0 24px rgba(58,123,255,.06);}
-.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--cyan);opacity:.65;}
-.panel::before{top:-1px;left:-1px;border-right:none;border-bottom:none;border-radius:4px 0 0 0;}
-.panel::after{bottom:-1px;right:-1px;border-left:none;border-top:none;border-radius:0 0 4px 0;}
-.panel-title{font-family:'Orbitron';font-size:12px;letter-spacing:2px;color:var(--cyan);
-  text-transform:uppercase;margin:0 0 10px;display:flex;align-items:center;gap:8px;}
-.panel-title:before{content:"◆";font-size:9px;color:var(--purple);}
+.panel{position:relative;background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;padding:17px;margin-bottom:14px;backdrop-filter:blur(8px);}
+.panel-title{font-family:'Space Grotesk';font-size:11px;letter-spacing:2.5px;color:var(--muted);
+  text-transform:uppercase;margin:0 0 13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.panel-title .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
 
-/* ---- player header ---- */
-.hero{background:linear-gradient(135deg, rgba(20,32,78,.85), rgba(10,14,38,.9));}
-.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-.rankbadge{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.rankbadge .r{font-family:'Orbitron';font-weight:900;font-size:30px;line-height:1;
-  width:58px;height:58px;border-radius:12px;display:grid;place-items:center;
-  border:1.5px solid var(--cyan);color:#eafaff;background:radial-gradient(circle at 50% 30%, rgba(70,210,255,.35), rgba(10,16,40,.6));
+/* hero */
+.hero{background:linear-gradient(150deg, rgba(141,162,255,.10), rgba(183,157,255,.05) 60%, transparent);
+  border-color:var(--line2);}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.rankbadge{flex:none;text-align:center;}
+.rankbadge .r{font-family:'Space Grotesk';font-weight:700;font-size:26px;line-height:1;
+  width:54px;height:54px;border-radius:15px;display:grid;place-items:center;
+  border:1px solid var(--line2);color:#fff;background:linear-gradient(160deg, rgba(141,162,255,.28), rgba(183,157,255,.12));
   box-shadow:var(--glow);}
-.rankbadge small{font-size:9px;letter-spacing:2px;color:var(--muted);}
-.hero-name{font-family:'Orbitron';font-size:17px;color:#fff;margin:0;}
-.hero-title{font-size:13px;color:var(--cyan);font-weight:600;margin-top:2px;}
-.hero-level{font-size:12px;color:var(--muted);margin-top:4px;}
-.lvlnum{color:var(--gold);font-weight:700;font-family:'Orbitron';}
-.xpwrap{margin-top:12px;}
-.barlabel{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:1px;}
-.bar{height:11px;border-radius:8px;background:rgba(5,10,28,.8);border:1px solid var(--line);overflow:hidden;position:relative;}
-.bar>i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--blue),var(--cyan));
-  box-shadow:0 0 10px rgba(70,210,255,.7);transition:width .5s cubic-bezier(.2,.8,.2,1);}
-.hero-stats{display:flex;gap:10px;margin-top:13px;}
-.chip{flex:1;text-align:center;background:rgba(7,12,32,.7);border:1px solid var(--line);border-radius:10px;padding:8px 4px;}
-.chip b{display:block;font-family:'Orbitron';font-size:16px;}
-.chip span{font-size:10px;color:var(--muted);letter-spacing:1px;}
-.chip.gold b{color:var(--gold);} .chip.streak b{color:var(--red);} .chip.done b{color:var(--green);}
+.rankbadge small{font-size:9px;letter-spacing:2px;color:var(--muted);display:block;margin-top:5px;}
+.hero-name{font-family:'Space Grotesk';font-size:19px;color:#fff;margin:0;font-weight:600;}
+.hero-title{font-size:13px;color:var(--accent);font-weight:500;margin-top:1px;}
+.hero-level{font-size:12px;color:var(--muted);margin-top:5px;}
+.lvlnum{color:var(--gold);font-weight:600;font-family:'Space Grotesk';}
+.xpwrap{margin-top:15px;}
+.barlabel{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.5px;}
+.bar{height:8px;border-radius:6px;background:rgba(0,0,0,.28);overflow:hidden;position:relative;}
+.bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent-d),var(--accent));transition:width .5s cubic-bezier(.2,.8,.2,1);}
+.hero-stats{display:flex;gap:9px;margin-top:15px;}
+.chip{flex:1;text-align:center;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:13px;padding:10px 4px;}
+.chip b{display:block;font-family:'Space Grotesk';font-size:18px;font-weight:600;}
+.chip span{font-size:9.5px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
+.chip.gold b{color:var(--gold);} .chip.streak b{color:var(--orange);} .chip.done b{color:var(--green);}
 
-/* ---- quests ---- */
-.q-head{display:flex;justify-content:space-between;align-items:center;}
-.q-progress{font-size:11px;color:var(--muted);letter-spacing:1px;}
-.quest{display:flex;align-items:flex-start;gap:11px;padding:11px 4px;border-bottom:1px dashed rgba(70,210,255,.14);}
-.quest:last-child{border-bottom:none;}
-.qcheck{flex:none;width:26px;height:26px;border-radius:7px;border:1.5px solid var(--cyan-dim);
-  background:rgba(7,12,32,.6);display:grid;place-items:center;font-size:15px;color:transparent;
-  transition:all .18s;margin-top:1px;}
-.quest.done .qcheck{background:linear-gradient(135deg,var(--blue),var(--cyan));border-color:var(--cyan);color:#04122a;box-shadow:var(--glow);}
+/* quests */
+.q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.q-progress{font-size:11px;color:var(--muted);letter-spacing:.5px;}
+.greet{font-size:12.5px;color:var(--accent2);margin:6px 0 10px;line-height:1.4;}
+.quest{display:flex;align-items:flex-start;gap:13px;padding:13px 2px;border-top:1px solid var(--line);}
+.quest:first-of-type{border-top:none;}
+.qcheck{flex:none;width:25px;height:25px;border-radius:8px;border:1.5px solid var(--line2);
+  background:rgba(0,0,0,.2);display:grid;place-items:center;font-size:14px;color:transparent;transition:.18s;margin-top:1px;}
+.quest.done .qcheck{background:linear-gradient(150deg,var(--accent),var(--accent2));border-color:transparent;color:#0a0b10;box-shadow:0 4px 14px rgba(141,162,255,.35);}
 .qbody{flex:1;min-width:0;}
-.qtitle{font-size:15px;font-weight:600;line-height:1.2;}
-.quest.done .qtitle{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(127,147,196,.5);}
-.qmeta{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.35;}
-.qtags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.tag{font-size:9.5px;letter-spacing:1px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--cyan);background:rgba(70,210,255,.08);}
-.tag.xp{color:var(--gold);border-color:rgba(255,211,77,.4);background:rgba(255,211,77,.08);}
-.tag.mand{color:var(--red);border-color:rgba(255,93,108,.4);background:rgba(255,93,108,.08);}
-.tag.stat{color:var(--purple);border-color:rgba(140,110,255,.4);background:rgba(140,110,255,.08);}
-.qexp{font-size:12px;color:#a9c0ee;margin-top:7px;line-height:1.45;padding:9px 11px;background:rgba(5,10,28,.55);border-left:2px solid var(--purple);border-radius:0 8px 8px 0;white-space:pre-line;}
-.expbtn{font-size:11px;color:var(--cyan);margin-top:5px;letter-spacing:1px;}
+.qtitle{font-size:15px;font-weight:500;line-height:1.3;}
+.quest.done .qtitle{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(136,143,166,.5);}
+.qsub{font-size:12px;color:var(--txt2);margin-top:3px;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.quest.done .qsub{color:var(--muted);}
+.qtags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center;}
+.tag{font-size:9.5px;letter-spacing:.8px;padding:3px 8px;border-radius:20px;border:1px solid var(--line);color:var(--muted);font-weight:500;}
+.tag.xp{color:var(--accent);border-color:var(--line2);}
+.tag.gold{color:var(--gold);border-color:rgba(230,193,121,.3);}
+.tag.mand{color:var(--red);border-color:rgba(255,143,160,.3);}
+.tag.phase{color:var(--accent2);border-color:rgba(183,157,255,.3);}
+.qexp{font-size:12.5px;color:var(--txt2);margin-top:10px;line-height:1.55;padding:11px 13px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:12px;white-space:pre-line;}
+.expbtn{font-size:11px;color:var(--accent);margin-top:7px;letter-spacing:.5px;}
 
-/* ---- stat bars ---- */
-.statrow{margin-bottom:13px;}
-.statrow .barlabel b{color:var(--txt);font-family:'Orbitron';font-size:12px;}
-.statrow .barlabel .v{color:var(--cyan);font-family:'Orbitron';}
-.stat-desc{font-size:10.5px;color:var(--muted);margin-top:3px;}
-.bar.str>i{background:linear-gradient(90deg,#ff7a45,#ffb13d);box-shadow:0 0 10px rgba(255,140,60,.6);}
-.bar.vit>i{background:linear-gradient(90deg,#ff5d6c,#ff95a6);box-shadow:0 0 10px rgba(255,93,108,.6);}
-.bar.agi>i{background:linear-gradient(90deg,#42e2a0,#9affd0);box-shadow:0 0 10px rgba(66,226,160,.6);}
-.bar.int>i{background:linear-gradient(90deg,#3a7bff,#46d2ff);box-shadow:0 0 10px rgba(70,210,255,.6);}
-.bar.per>i{background:linear-gradient(90deg,#8c6eff,#c3b2ff);box-shadow:0 0 10px rgba(140,110,255,.6);}
-.bar.sen>i{background:linear-gradient(90deg,#ffd34d,#fff0b0);box-shadow:0 0 10px rgba(255,211,77,.6);}
+/* stat bars */
+.statrow{margin-bottom:15px;}
+.statrow .barlabel b{color:var(--txt);font-family:'Space Grotesk';font-size:12px;font-weight:600;}
+.statrow .barlabel .v{color:var(--accent);font-family:'Space Grotesk';}
+.stat-desc{font-size:10.5px;color:var(--muted);margin-top:4px;}
+.bar.str>i{background:linear-gradient(90deg,#e08a5a,var(--orange));}
+.bar.vit>i{background:linear-gradient(90deg,#d96a78,var(--red));}
+.bar.agi>i{background:linear-gradient(90deg,#4fb89a,var(--green));}
+.bar.int>i{background:linear-gradient(90deg,var(--accent-d),var(--accent));}
+.bar.per>i{background:linear-gradient(90deg,#7d68d6,var(--accent2));}
+.bar.sen>i{background:linear-gradient(90deg,#5bb8b0,var(--teal));}
+.bar.wlt>i{background:linear-gradient(90deg,#c9a85e,var(--gold));}
 
-/* ---- shop ---- */
-.reward{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:rgba(7,12,32,.5);}
-.reward .ic{font-size:24px;width:42px;height:42px;display:grid;place-items:center;border-radius:10px;background:rgba(70,210,255,.08);border:1px solid var(--line);}
+/* shop */
+.reward{display:flex;align-items:center;gap:13px;padding:13px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:rgba(0,0,0,.16);}
+.reward .ic{font-size:22px;width:42px;height:42px;display:grid;place-items:center;border-radius:11px;background:var(--surface2);}
 .reward .info{flex:1;min-width:0;}
-.reward .rn{font-size:15px;font-weight:600;}
-.reward .rc{font-size:12px;color:var(--gold);font-family:'Orbitron';margin-top:2px;}
-.redeem{padding:8px 14px;border-radius:9px;font-family:'Orbitron';font-size:11px;letter-spacing:1px;
-  border:1px solid var(--cyan);color:var(--cyan);background:rgba(70,210,255,.1);}
-.redeem:disabled{opacity:.35;border-color:var(--muted);color:var(--muted);}
-.reward .del{color:var(--red);font-size:18px;padding:4px;}
+.reward .rn{font-size:14.5px;font-weight:500;}
+.reward .rc{font-size:12px;color:var(--gold);font-family:'Space Grotesk';margin-top:2px;}
+.redeem{padding:9px 14px;border-radius:11px;font-size:11px;letter-spacing:.5px;font-weight:600;
+  border:1px solid var(--line2);color:var(--accent);background:rgba(141,162,255,.08);}
+.redeem:disabled{opacity:.35;border-color:var(--line);color:var(--muted);background:none;}
+.reward .del{color:var(--red);font-size:16px;padding:4px;opacity:.7;}
 
-/* ---- buttons ---- */
-.btn{display:block;width:100%;text-align:center;padding:13px;border-radius:11px;font-family:'Orbitron';
-  font-size:13px;letter-spacing:1px;border:1px solid var(--cyan);color:#eafaff;
-  background:linear-gradient(135deg,rgba(58,123,255,.35),rgba(70,210,255,.2));box-shadow:var(--glow);}
-.btn.ghost{background:rgba(10,16,40,.5);box-shadow:none;border-color:var(--line);color:var(--cyan);}
-.btn.danger{border-color:var(--red);color:var(--red);background:rgba(255,93,108,.08);box-shadow:none;}
-.btn.sm{padding:9px;font-size:11px;}
+/* buttons */
+.btn{display:block;width:100%;text-align:center;padding:14px;border-radius:14px;font-family:'Space Grotesk';
+  font-size:13px;letter-spacing:.5px;font-weight:600;border:1px solid transparent;color:#0a0b10;
+  background:linear-gradient(150deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(141,162,255,.25);}
+.btn.ghost{background:var(--surface);color:var(--accent);border-color:var(--line2);box-shadow:none;}
+.btn.danger{background:rgba(255,143,160,.08);color:var(--red);border-color:rgba(255,143,160,.3);box-shadow:none;}
+.btn.sm{padding:11px;font-size:11px;}
 
-/* ---- log / calendar ---- */
+/* money / vault */
+.money-hero{text-align:center;background:linear-gradient(150deg, rgba(230,193,121,.10), transparent 70%);border-color:rgba(230,193,121,.2);}
+.big-num{font-family:'Space Grotesk';font-size:30px;font-weight:700;margin:4px 0;}
+.mgrid{display:flex;gap:9px;margin-top:14px;}
+.mcard{flex:1;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:13px;padding:11px 8px;text-align:center;}
+.mcard b{display:block;font-family:'Space Grotesk';font-size:15px;}
+.mcard span{font-size:9.5px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;}
+.catrow{margin-bottom:14px;}
+.catrow .cl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.catrow .cl .cv{font-family:'Space Grotesk';color:var(--txt2);font-size:12px;}
+.bar.over>i{background:linear-gradient(90deg,#d96a78,var(--red)) !important;}
+.fixed-row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line);}
+.fixed-row:first-child{border-top:none;}
+.fixed-row .amt{font-family:'Space Grotesk';color:var(--txt2);}
+.fixed-row .sv{color:var(--green);font-size:10px;border:1px solid rgba(127,224,176,.3);border-radius:10px;padding:1px 7px;margin-left:6px;}
+.spend-item{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;color:var(--txt2);}
+.spend-item .sa{font-family:'Space Grotesk';color:var(--red);}
+
+/* log / calendar */
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px;}
-.cal .dow{text-align:center;font-size:9px;color:var(--muted);letter-spacing:1px;}
-.cell{aspect-ratio:1;border-radius:7px;border:1px solid rgba(70,210,255,.14);display:grid;place-items:center;
-  font-size:10px;color:var(--muted);background:rgba(7,12,32,.4);position:relative;}
-.cell.full{background:linear-gradient(135deg,rgba(58,123,255,.5),rgba(70,210,255,.35));color:#eafaff;border-color:var(--cyan);box-shadow:0 0 6px rgba(70,210,255,.4);}
-.cell.partial{background:rgba(140,110,255,.18);border-color:rgba(140,110,255,.4);color:#cdbcff;}
-.cell.today{outline:2px solid var(--gold);outline-offset:1px;}
-.wlog{display:flex;gap:8px;margin-top:8px;}
-.wlog input{flex:1;}
-.input,input,select,textarea{width:100%;padding:11px;border-radius:10px;background:rgba(5,10,28,.7);
+.cal .dow{text-align:center;font-size:9px;color:var(--muted);letter-spacing:.5px;}
+.cell{aspect-ratio:1;border-radius:9px;border:1px solid var(--line);display:grid;place-items:center;
+  font-size:10px;color:var(--muted);background:rgba(0,0,0,.14);}
+.cell.full{background:linear-gradient(150deg,var(--accent),var(--accent2));color:#0a0b10;border-color:transparent;font-weight:600;}
+.cell.partial{background:rgba(183,157,255,.16);border-color:var(--line2);color:var(--txt2);}
+.cell.today{outline:1.5px solid var(--gold);outline-offset:1px;}
+.wlog{display:flex;gap:9px;margin-top:10px;}
+.input,input,select,textarea{width:100%;padding:12px;border-radius:12px;background:rgba(0,0,0,.25);
   border:1px solid var(--line);color:var(--txt);font-family:inherit;font-size:15px;outline:none;}
-input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:var(--glow);}
-label{font-size:11px;color:var(--muted);letter-spacing:1px;display:block;margin:10px 0 4px;text-transform:uppercase;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margin:12px 0 5px;text-transform:uppercase;}
 .row2{display:flex;gap:10px;} .row2>*{flex:1;}
 
-/* ---- codex ---- */
-.codex-tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:4px;}
-.codex-tabs button{flex:none;padding:8px 13px;border-radius:20px;font-size:11px;letter-spacing:1px;
-  border:1px solid var(--line);color:var(--muted);background:rgba(7,12,32,.5);font-family:'Orbitron';}
-.codex-tabs button.active{color:#04122a;background:linear-gradient(135deg,var(--blue),var(--cyan));border-color:var(--cyan);}
-.cx h4{font-family:'Orbitron';font-size:13px;color:var(--cyan);margin:16px 0 7px;letter-spacing:1px;}
+/* codex */
+.codex-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;}
+.codex-tabs button{flex:none;padding:9px 14px;border-radius:22px;font-size:11px;letter-spacing:.5px;font-weight:600;
+  border:1px solid var(--line);color:var(--muted);background:var(--surface);}
+.codex-tabs button.active{color:#0a0b10;background:linear-gradient(150deg,var(--accent),var(--accent2));border-color:transparent;}
+.cx h4{font-family:'Space Grotesk';font-size:14px;color:var(--txt);margin:18px 0 8px;font-weight:600;}
 .cx h4:first-child{margin-top:2px;}
-.cx p,.cx li{font-size:13.5px;line-height:1.55;color:#c2d4f5;}
-.cx ul{margin:5px 0;padding-left:18px;} .cx li{margin-bottom:4px;}
-.cx b{color:#eaf4ff;} .cx .hl{color:var(--gold);}
-.cx .note{font-size:12px;color:var(--muted);background:rgba(255,93,108,.07);border:1px solid rgba(255,93,108,.25);
-  border-radius:9px;padding:9px 11px;margin:9px 0;}
-.cx table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px;}
-.cx td,.cx th{border:1px solid var(--line);padding:6px 8px;text-align:left;}
-.cx th{color:var(--cyan);font-family:'Orbitron';font-size:10px;letter-spacing:1px;}
+.cx p,.cx li{font-size:13.5px;line-height:1.6;color:var(--txt2);}
+.cx ul,.cx ol{margin:6px 0;padding-left:19px;} .cx li{margin-bottom:5px;}
+.cx b{color:var(--txt);font-weight:600;} .cx .hl{color:var(--gold);}
+.cx .note{font-size:12px;color:var(--txt2);background:rgba(255,143,160,.06);border:1px solid rgba(255,143,160,.2);border-radius:12px;padding:11px 13px;margin:11px 0;}
+.cx table{width:100%;border-collapse:collapse;margin:9px 0;font-size:12.5px;}
+.cx td,.cx th{border:1px solid var(--line);padding:7px 9px;text-align:left;}
+.cx th{color:var(--accent);font-family:'Space Grotesk';font-size:10px;letter-spacing:.5px;font-weight:600;}
 
-/* ---- bottom nav ---- */
+/* nav */
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;justify-content:center;
-  padding-bottom:var(--safe-bot);background:linear-gradient(180deg,transparent,#05060f 30%);}
-.nav-inner{display:flex;width:100%;max-width:520px;margin:0 14px;background:rgba(10,16,40,.92);
-  border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(10px);box-shadow:0 -2px 20px rgba(0,0,0,.5);}
-.nav button{flex:1;padding:10px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);}
-.nav button .ni{font-size:18px;line-height:1;}
-.nav button .nl{font-size:9px;letter-spacing:1px;font-family:'Orbitron';}
-.nav button.active{color:var(--cyan);}
-.nav button.active .ni{filter:drop-shadow(0 0 6px rgba(70,210,255,.9));}
+  padding-bottom:var(--safe-bot);background:linear-gradient(180deg,transparent,var(--bg) 40%);}
+.nav-inner{display:flex;width:100%;max-width:520px;margin:0 14px 12px;background:rgba(16,18,26,.86);
+  border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(16px);padding:5px;box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.nav button{flex:1;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);border-radius:14px;}
+.nav button .ni{font-size:17px;line-height:1;}
+.nav button .nl{font-size:8.5px;letter-spacing:.5px;font-weight:600;}
+.nav button.active{color:var(--accent);background:var(--surface);}
 
-/* ---- modal / system message ---- */
-.overlay{position:fixed;inset:0;z-index:100;background:rgba(2,4,12,.82);backdrop-filter:blur(4px);
-  display:grid;place-items:center;padding:22px;animation:fade .25s;}
+/* modal */
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,12,.7);backdrop-filter:blur(6px);
+  display:grid;place-items:center;padding:20px;animation:fade .2s;}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.sys{width:100%;max-width:440px;border:1.5px solid var(--cyan);border-radius:6px;
-  background:linear-gradient(180deg,rgba(8,14,38,.97),rgba(5,9,24,.98));
-  box-shadow:0 0 40px rgba(70,210,255,.4), inset 0 0 40px rgba(58,123,255,.08);
-  padding:22px;animation:pop .3s cubic-bezier(.2,1.3,.4,1);position:relative;max-height:86vh;overflow-y:auto;}
-@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-.sys::before,.sys::after{content:"";position:absolute;width:16px;height:16px;border:2px solid var(--cyan);}
-.sys::before{top:-2px;left:-2px;border-right:none;border-bottom:none;}
-.sys::after{bottom:-2px;right:-2px;border-left:none;border-top:none;}
-.sys-h{font-family:'Orbitron';text-align:center;color:var(--cyan);letter-spacing:3px;font-size:13px;
-  border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:14px;text-shadow:var(--glow);}
-.sys-big{font-family:'Orbitron';font-size:24px;text-align:center;color:#fff;text-shadow:0 0 18px rgba(70,210,255,.9);margin:8px 0;}
-.sys p{font-size:14px;line-height:1.55;color:#c8d8f7;}
-.sys .center{text-align:center;}
-.notif{position:fixed;left:50%;top:calc(var(--safe-top) + 14px);transform:translateX(-50%);z-index:120;
-  background:rgba(8,14,38,.96);border:1px solid var(--cyan);border-radius:10px;padding:11px 16px;
-  box-shadow:var(--glow);font-family:'Orbitron';font-size:12px;letter-spacing:1px;color:var(--cyan);
-  display:flex;align-items:center;gap:8px;animation:drop .4s, fade .3s;max-width:90vw;}
-@keyframes drop{from{transform:translate(-50%,-30px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
-.fade-up{animation:fade .3s;}
+.sys{width:100%;max-width:430px;border:1px solid var(--line2);border-radius:22px;
+  background:linear-gradient(170deg,#13151f,#0d0e15);box-shadow:0 20px 60px rgba(0,0,0,.55);
+  padding:22px;animation:pop .28s cubic-bezier(.2,1.1,.4,1);max-height:88vh;overflow-y:auto;}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.sys-h{font-family:'Space Grotesk';text-align:center;color:var(--accent);letter-spacing:3px;font-size:11px;
+  font-weight:600;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:16px;}
+.sys-big{font-family:'Space Grotesk';font-size:24px;text-align:center;color:#fff;margin:10px 0;font-weight:700;}
+.sys p{font-size:14px;line-height:1.6;color:var(--txt2);}
+.center{text-align:center;}
+.notif{position:fixed;left:50%;top:calc(var(--safe-top) + 16px);transform:translateX(-50%);z-index:120;
+  background:rgba(19,21,31,.96);border:1px solid var(--line2);border-radius:14px;padding:11px 18px;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:'Space Grotesk';font-size:12px;letter-spacing:.5px;color:var(--accent);
+  font-weight:600;animation:drop .35s;max-width:90vw;}
+@keyframes drop{from{transform:translate(-50%,-24px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:14px;}
-.tiny{font-size:11px;color:var(--muted);}
-.spark{display:flex;align-items:flex-end;gap:3px;height:60px;margin-top:8px;}
-.spark .b{flex:1;background:linear-gradient(180deg,var(--cyan),var(--blue));border-radius:3px 3px 0 0;min-height:3px;opacity:.85;}
+.tiny{font-size:11.5px;color:var(--muted);line-height:1.5;}
+.catbtn{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.catbtn button{padding:9px 13px;border-radius:11px;border:1px solid var(--line);font-size:12.5px;color:var(--txt2);background:var(--surface);}
+.catbtn button.sel{border-color:var(--accent);color:var(--accent);background:rgba(141,162,255,.1);}
 </style>
 </head>
 <body>
 <div id="notif-host"></div>
 <div id="app">
   <div class="topbar">
-    <div class="brand">
-      <img class="mark" src="icon-192.png" alt=""/>
-      <b>THE SYSTEM</b>
-    </div>
+    <div class="brand"><img class="mark" src="icon-192.png" alt=""/><b>THE SYSTEM</b></div>
     <button class="icon-btn" onclick="openSettings()">⚙</button>
   </div>
   <div id="view"></div>
 </div>
-
 <nav class="nav"><div class="nav-inner" id="nav">
-  <button data-t="home" class="active"><span class="ni">⬢</span><span class="nl">HOME</span></button>
+  <button data-t="home" class="active"><span class="ni">◇</span><span class="nl">HOME</span></button>
   <button data-t="stats"><span class="ni">▤</span><span class="nl">STATS</span></button>
+  <button data-t="money"><span class="ni">₹</span><span class="nl">VAULT</span></button>
   <button data-t="shop"><span class="ni">◈</span><span class="nl">SHOP</span></button>
   <button data-t="log"><span class="ni">▦</span><span class="nl">LOG</span></button>
   <button data-t="codex"><span class="ni">❖</span><span class="nl">CODEX</span></button>
 </div></nav>
-
 <div id="modal-host"></div>
 
 <script>
 /* ============================================================
-   THE SYSTEM — a Solo-Leveling life RPG  (single-file PWA)
+   THE SYSTEM — a Solo-Leveling life RPG (single-file PWA)
    ============================================================ */
-const $ = (s,el=document)=>el.querySelector(s);
-const STORE='system_save_v1';
+const $=(s,el=document)=>el.querySelector(s);
+const STORE='system_save_v2';
+const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
-const dow=()=>new Date().getDay(); // 0 Sun .. 6 Sat
-function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+const monthKey=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+const dow=()=>new Date().getDay();
+function daysBetween(a,b){return Math.round((parseD(b)-parseD(a))/86400000);}
 
-/* ---------- STAT DEFINITIONS ---------- */
+/* ---------- STATS ---------- */
 const STATS={
   STR:{name:'Strength', cls:'str', desc:'Resistance training — building the body.'},
-  VIT:{name:'Vitality', cls:'vit', desc:'Nutrition, hydration & sleep — fuelling the heal.'},
-  AGI:{name:'Agility',  cls:'agi', desc:'Cardio, steps & mobility — conditioning.'},
+  VIT:{name:'Vitality', cls:'vit', desc:'Nutrition, hydration & sleep.'},
+  AGI:{name:'Agility',  cls:'agi', desc:'Cardio, steps & mobility.'},
   INT:{name:'Intellect',cls:'int', desc:'Study — OSCP, bug bounty & AI security.'},
-  PER:{name:'Perception',cls:'per',desc:'Work mastery — becoming the best engineer.'},
-  SEN:{name:'Sense',    cls:'sen', desc:'Skincare, physio & recovery — self-care.'},
+  PER:{name:'Perception',cls:'per',desc:'Work mastery — the best engineer.'},
+  SEN:{name:'Sense',    cls:'sen', desc:'Skincare, physio & recovery.'},
+  WLT:{name:'Wealth',   cls:'wlt', desc:'Money discipline — spend less, invest more.'},
 };
 
-/* ---------- PROGRAM: workout split by weekday ---------- */
-/* shoulder-safe heal phase: lower body + core + low-impact cardio, NO pressing/overhead/planks */
-const WORKOUTS={
-  1:{key:'Lower A — Quad Focus',stat:'STR',xp:55,gold:35,
-     ex:`Leg Press — 4×10\nHack Squat / Machine Squat — 3×12\nLeg Extension — 3×15\nWalking Lunges (dumbbells at sides) — 3×12/leg\nSeated Calf Raise — 4×15\n\n⚠ Bar held low/at sides only. No front-rack, no overhead, no bar on upper back if it strains the shoulder — use the hack/leg-press machine instead.`},
-  2:{key:'Core + Zone-2 Cardio',stat:'AGI',xp:50,gold:30,
-     ex:`Stationary bike / incline walk — 30–40 min easy (can talk while doing it)\nLying leg raises — 3×15\nDead bug — 3×12/side\nMachine crunch (or cable crunch seated) — 3×15\nBicycle crunch — 3×20\n\n⚠ Skip planks & hanging leg raises for now (they load the shoulder).`},
-  3:{key:'Lower B — Posterior Chain',stat:'STR',xp:55,gold:35,
-     ex:`Hip Thrust (machine or barbell on hips) — 4×10\nSeated Leg Curl — 4×12\nMachine RDL / Light DB RDL — 3×12\nGlute Kickback (cable/machine) — 3×15/leg\nStanding Calf Raise (machine) — 4×15\n\n⚠ Keep RDL light; grip-only load is fine but stop if shoulder pulls.`},
-  4:{key:'Cardio + Mobility',stat:'AGI',xp:45,gold:30,
-     ex:`Incline treadmill walk — 35–45 min (incline 8–12, brisk)\nLower-body mobility / stretching — 10 min\nOptional easy cycle\n\nActive recovery day. Keep heart rate moderate, protect the shoulder.`},
-  5:{key:'Lower C — Full Legs',stat:'STR',xp:55,gold:35,
-     ex:`Leg Press — 4×12\nBulgarian Split Squat (DBs at sides) — 3×10/leg\nLeg Curl — 3×12\nLeg Extension — 3×15\nCalf Raise — 4×20`},
-  6:{key:'Long Walk / Active Recovery',stat:'AGI',xp:40,gold:25,
-     ex:`Outdoor walk 45–60 min OR easy cycle.\nGentle full-body stretch.\nGet sunlight — helps sleep + mood.`},
-  0:{key:'Rest + Weekly Review',stat:'SEN',xp:35,gold:25,
-     ex:`Full rest from training.\nDo your weekly review (see CODEX → Operating System).\nMeal-prep protein for the week.\nPlan next week's study targets.`},
+/* ============================================================
+   WORKOUT — 3 phases over the year (shoulder heal -> full)
+   ============================================================ */
+const REST={key:'Rest + Weekly Reset',stat:'SEN',xp:30,gold:20,
+  ex:`Full rest from training. Light walk + stretch if you like.\nDo your weekly review (CODEX → Operating System): re-read learnings, log weight, plan next week, money check, gentle physio.`};
+const WORKOUT_PHASES={
+ /* Phase A — weeks 1-8 — HEAL: lower body + core + cardio, NO shoulder load */
+ A:{
+  1:{key:'Lower A — Quads',stat:'STR',xp:55,gold:35,ex:`Leg Press 4×10\nHack / Machine Squat 3×12\nLeg Extension 3×15\nWalking Lunges (DBs at sides) 3×12/leg\nSeated Calf Raise 4×15\n\n⚠ Machines only. No bar on upper back / no overhead. Stop if the shoulder pulls.`},
+  2:{key:'Core + Zone-2 Cardio',stat:'AGI',xp:50,gold:30,ex:`Bike / incline walk 35 min easy\nLying Leg Raises 3×15\nDead Bug 3×12/side\nMachine Crunch 3×15\nBicycle Crunch 3×20\n\n⚠ No planks / hanging — they load the shoulder.`},
+  3:{key:'Lower B — Posterior',stat:'STR',xp:55,gold:35,ex:`Hip Thrust (machine) 4×10\nSeated Leg Curl 4×12\nMachine RDL / light DB RDL 3×12\nGlute Kickback 3×15/leg\nStanding Calf Raise 4×15`},
+  4:{key:'Cardio + Mobility',stat:'AGI',xp:45,gold:30,ex:`Incline treadmill walk 40 min (incline 8-12)\nLower-body mobility / stretch 10 min\nActive recovery — protect the shoulder.`},
+  5:{key:'Lower C — Full Legs',stat:'STR',xp:55,gold:35,ex:`Leg Press 4×12\nBulgarian Split Squat (DBs at sides) 3×10/leg\nLeg Curl 3×12\nLeg Extension 3×15\nCalf Raise 4×20`},
+  6:{key:'Long Walk / Active Recovery',stat:'AGI',xp:40,gold:25,ex:`Outdoor walk or easy cycle 45-60 min.\nFull lower-body stretch. Get some sunlight.`},
+  0:REST,
+ },
+ /* Phase B — weeks 9-16 — REINTRODUCE upper body LIGHT (physio-cleared) */
+ B:{
+  1:{key:'Lower — Quads',stat:'STR',xp:60,gold:38,ex:`Leg Press 4×10\nHack Squat 3×12\nLeg Extension 3×15\nWalking Lunges 3×12/leg\nCalf Raise 4×15`},
+  2:{key:'Upper — Light (rebuild)',stat:'STR',xp:60,gold:38,ex:`⚠ Only if physio-cleared & pain-free. Start LIGHT.\nMachine Chest Press 3×12 (light)\nSeated Cable Row 3×12\nLat Pulldown 3×12\nBand External Rotation 3×15 (shoulder health)\nFace Pulls 3×15\nBiceps Curl + Triceps Pushdown 2×15`},
+  3:{key:'Lower — Posterior',stat:'STR',xp:60,gold:38,ex:`Hip Thrust 4×10\nSeated Leg Curl 4×12\nRDL (moderate) 3×10\nGlute Kickback 3×15/leg\nCalf Raise 4×15`},
+  4:{key:'Cardio + Core',stat:'AGI',xp:45,gold:30,ex:`Incline walk / bike 35 min\nDead Bug 3×12 · Leg Raises 3×15 · Cable Crunch 3×15\nCan re-test light front plank if shoulder is solid.`},
+  5:{key:'Upper — Light v2',stat:'STR',xp:60,gold:38,ex:`Incline Machine Press 3×12 (light)\nChest-Supported Row 3×12\nLat Pulldown 3×12\nLateral Raise (light) 3×15\nRear-Delt Fly 3×15 · Face Pulls 3×15`},
+  6:{key:'Long Walk / Recovery',stat:'AGI',xp:40,gold:25,ex:`45-60 min walk or cycle + full stretch.`},
+  0:REST,
+ },
+ /* Phase C — weeks 17+ — FULL training (Push/Pull/Legs) */
+ C:{
+  1:{key:'Push — Chest/Shoulders/Tri',stat:'STR',xp:65,gold:42,ex:`Chest Press / Bench 4×8\nIncline DB Press 3×10\nShoulder Press 3×10\nLateral Raise 3×15\nTriceps Pushdown 3×12 · Overhead Triceps 3×12`},
+  2:{key:'Pull — Back/Biceps',stat:'STR',xp:65,gold:42,ex:`Pull-ups / Lat Pulldown 4×8-10\nBarbell / Machine Row 4×10\nSeated Cable Row 3×12\nRear-Delt Fly 3×15 · Face Pulls 3×15\nBiceps Curl 3×12 · Hammer Curl 3×12`},
+  3:{key:'Legs',stat:'STR',xp:65,gold:42,ex:`Squat / Leg Press 4×8\nRDL 3×10\nLeg Curl 3×12\nLeg Extension 3×15\nCalf Raise 4×15`},
+  4:{key:'Cardio + Core + Mobility',stat:'AGI',xp:50,gold:32,ex:`Zone-2 cardio 30-40 min\nHanging Leg Raise 3×12 · Cable Crunch 3×15 · Plank 3×45s\nFull mobility flow 10 min`},
+  5:{key:'Upper — Full',stat:'STR',xp:65,gold:42,ex:`Bench 4×8 · Row 4×10\nOverhead Press 3×10 · Lat Pulldown 3×12\nLateral Raise 3×15 · Arms superset 3×12`},
+  6:{key:'Legs / Glutes or Long Run',stat:'AGI',xp:55,gold:35,ex:`Hip Thrust 4×10 · Bulgarian Split Squat 3×10/leg · Leg Curl 3×12 · Calves 4×20\nOR a 5-6 km run if you prefer cardio.`},
+  0:REST,
+ },
 };
+function currentPhaseLetter(){const w=programWeek();return w<=8?'A':w<=16?'B':'C';}
+function currentWorkout(){return WORKOUT_PHASES[currentPhaseLetter()][dow()];}
 
-/* ---------- recurring daily quests ---------- */
-function studyBlock(week){
-  // week 1-4: OSCP intensive ; 5+ : bug bounty + AI security
-  if(week<=4){
-    const mins=[60,75,90,105][Math.min(week-1,3)];
-    return {title:`OSCP Lab Block — ${mins} min`,stat:'INT',xp:65,gold:45,mand:true,
-      exp:`OSCP month — your lab subscription is LIVE, so extract maximum value.\nToday: 1 PWK module/video → its exercises → then attack 1 lab box end-to-end.\nMethodology loop: enumerate (nmap -p- → service enum) → find a foothold → get a shell → privesc (linux & windows) → loot.\nKeep a notes file per box (Obsidian/CherryTree). This note-taking IS the skill.\nWeek focus: W1 enum+web foothold · W2 linux privesc · W3 windows privesc · W4 AD basics + revisit weak spots.`};
-  }
-  const mins = Math.min(60+ (week-5)*10, 120);
-  return {title:`Bug Bounty / AI-Sec — ${mins} min`,stat:'INT',xp:60,gold:40,mand:true,
-    exp:`Phase 2 — free & high-leverage.\nPrimary: PortSwigger Web Security Academy — finish one topic's labs (SQLi → XSS → access control → SSRF → auth → CSRF → SSTI...).\nThen: pick a public Bugcrowd/HackerOne program, do recon (subdomain enum, content discovery), hunt 30 min.\nWeekly: 1 session on AI/LLM security — OWASP LLM Top 10, prompt injection, testing AI features (your edge, since you love AI tools).\nLog every new concept in a "today I learned" note.`};
+/* ============================================================
+   STUDY — ~1 year concrete curriculum
+   ============================================================ */
+const CURR_GROUPS=[
+ /* ---- PHASE 1: OSCP (Month 1, while lab access is live) ---- */
+ {phase:'OSCP',topic:'OSCP · Setup & Recon',res:'OffSec PWK + live lab',items:[
+   'Connect the lab VPN. Set up Kali. Build a per-box note template in Obsidian/CherryTree (the note-taking IS the skill). Read PWK "Getting Started".',
+   'Information Gathering: passive recon — whois, DNS, theHarvester, Google dorking. Do the module exercises.',
+   'Active Information Gathering: DNS enum, host discovery. Exercises.',
+   'Nmap mastery: full TCP (-p- -sV -sC), UDP top ports, output formats. Scan 1 lab box and document every port/service.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Service Enumeration',res:'OffSec PWK + live lab',items:[
+   'Web enum: gobuster/feroxbuster dir+vhost brute, nikto, source review. Enumerate a web box fully.',
+   'SMB/NetBIOS: enum4linux-ng, smbclient, smbmap. Practice on a box, note shares/creds.',
+   'Other services: FTP, SSH, SMTP, SNMP, NFS — anonymous access + default creds checklist.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Web Footholds',res:'OffSec PWK + PortSwigger',items:[
+   'Directory traversal / LFI / RFI. Get a file read, then escalate toward code exec.',
+   'SQL injection foothold + sqlmap basics. Land access on a lab box via SQLi.',
+   'File upload → webshell → reverse shell. Catch a stable shell.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Exploitation & Shells',res:'OffSec PWK + live lab',items:[
+   'searchsploit + exploit-db: find, read, and MODIFY a public exploit to fit the target.',
+   'Shells: bind vs reverse, netcat, upgrade to a full TTY (python pty), stabilize with stty.',
+   'File transfers across OSes: wget/curl, scp, smbserver, certutil, base64.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Buffer Overflow',res:'OffSec PWK BO module',items:[
+   'BO theory: stack, EIP, fuzzing. Set up the practice target (vulnserver / PWK BO).',
+   'BO exploit: find offset → control EIP → bad chars → JMP ESP → shellcode → full working exploit.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Privilege Escalation',res:'OffSec PWK + live lab',items:[
+   'Linux privesc enum: linpeas + manual (sudo -l, SUID, cron, capabilities, writable paths).',
+   'Linux privesc: exploit a SUID/sudo/cron misconfig → root on a real box.',
+   'Windows privesc enum: winpeas, whoami /priv, services, registry, scheduled tasks.',
+   'Windows privesc: exploit (unquoted service path / token privilege / AlwaysInstallElevated) → SYSTEM.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Passwords, Pivoting, AD',res:'OffSec PWK + live lab',items:[
+   'Password attacks: hashcat, john, hydra — crack a captured hash, spray creds.',
+   'Pivoting/tunnelling: ssh -L/-R/-D, chisel, proxychains. Pivot through a box to a hidden subnet.',
+   'Active Directory 1: concepts + enum (BloodHound, ldapdomaindump, rpcclient).',
+   'Active Directory 2: Kerberoasting, AS-REP roasting, pass-the-hash.',
+   'Active Directory 3: lateral movement (evil-winrm, psexec, wmiexec) → domain admin.',
+ ]},
+ {phase:'OSCP',topic:'OSCP · Lab Boxes (apply it)',res:'Live lab access',items:[
+   'Pwn an EASY box end-to-end, timed. Write a report-style note (recon→foothold→privesc→loot).',
+   'MEDIUM box: foothold + privesc. Focus on enumeration you skipped last time.',
+   'Chain box: web foothold → Linux privesc.',
+   'Windows box with AD flavour.',
+   'Month review: redo the 2 boxes you struggled with. Decide: extend OSCP sub for the exam (~2-3 focused months) OR pivot to bug bounty + AI (Phase 2 begins tomorrow).',
+ ]},
+
+ /* ---- PHASE 2: Foundations ---- */
+ {phase:'FOUND',topic:'Web & Burp Foundations',res:'PortSwigger WSA + Burp docs',items:[
+   'How the web works: HTTP methods, status codes, headers, cookies, same-origin policy. Read + take notes.',
+   'Burp Suite: set up the proxy + browser, intercept, Repeater, Decoder. Replay a few requests.',
+   'Burp Intruder + Comparer + the target site map. Run a small fuzzing exercise.',
+   'PortSwigger "Essential skills": working with encodings, obfuscation, and the methodology mindset.',
+ ]},
+ {phase:'FOUND',topic:'Recon Toolkit',res:'subfinder, httpx, ffuf, nuclei',items:[
+   'Subdomain enum: subfinder + amass. Resolve live hosts with httpx. Build an asset list for a practice target.',
+   'Content discovery: ffuf / feroxbuster wordlists, recursive, extensions. Find hidden endpoints.',
+   'Wayback/gau + nuclei templates for quick wins. Save a repeatable recon one-liner.',
+ ]},
+
+ /* ---- PHASE 2: PortSwigger Web Security Academy (in path order) ---- */
+ {phase:'WEB',topic:'SQL Injection',res:'PortSwigger WSA → SQL injection',items:[
+   'Read the SQLi material. Lab: retrieving hidden data + login bypass.',
+   'UNION attacks: determine column count + which columns are text. Labs.',
+   'UNION data extraction: dump credentials from another table. Examine the DB (version/tables/columns).',
+   'Blind SQLi: conditional responses + conditional errors. Practitioner labs.',
+   'Blind SQLi: time delays + out-of-band (Burp Collaborator). Then run sqlmap to see automation.',
+ ]},
+ {phase:'WEB',topic:'Authentication',res:'PortSwigger WSA → Authentication',items:[
+   'Password-based flaws: username enum, brute-force, account lockout bypass. Labs.',
+   'Multi-factor + "stay logged in" cookie flaws. Labs.',
+   'Password reset & change logic flaws. Labs + note the patterns.',
+ ]},
+ {phase:'WEB',topic:'Access Control & IDOR',res:'PortSwigger WSA → Access control',items:[
+   'Vertical vs horizontal access control. Unprotected admin functionality. Labs.',
+   'IDOR: direct object references in params, URLs, JSON. Labs — this is a top real-world bounty.',
+   'Multi-step + referer-based + GraphQL access control. Practitioner labs.',
+ ]},
+ {phase:'WEB',topic:'Path Traversal',res:'PortSwigger WSA → Path traversal',items:[
+   'Read material. Labs: basic traversal + bypasses (absolute path, nested, null byte, extension).',
+ ]},
+ {phase:'WEB',topic:'OS Command Injection',res:'PortSwigger WSA → OS command injection',items:[
+   'Simple command injection. Labs.',
+   'Blind command injection: time delays, output redirection, OAST. Labs.',
+ ]},
+ {phase:'WEB',topic:'Business Logic Flaws',res:'PortSwigger WSA → Business logic',items:[
+   'Logic flaws: excessive trust in client, parameter tampering. Labs.',
+   'Flawed assumptions, abusing workflows, sequence bypass. Labs — high-value, often missed by scanners.',
+ ]},
+ {phase:'WEB',topic:'Information Disclosure',res:'PortSwigger WSA → Information disclosure',items:[
+   'Sources: errors, debug pages, backups, comments, version control. Labs + recon mindset.',
+ ]},
+ {phase:'WEB',topic:'File Upload Vulnerabilities',res:'PortSwigger WSA → File upload',items:[
+   'Web shells via upload, content-type/extension bypasses, polyglots. Labs.',
+ ]},
+ {phase:'WEB',topic:'SSRF',res:'PortSwigger WSA → SSRF',items:[
+   'Basic SSRF against the server + back-end systems. Labs.',
+   'SSRF filter bypasses + blind SSRF with OAST. Labs — huge in cloud/bug bounty.',
+ ]},
+ {phase:'WEB',topic:'XXE Injection',res:'PortSwigger WSA → XXE',items:[
+   'XXE file retrieval + SSRF via XXE. Labs.',
+   'Blind XXE (OAST + error-based) and XInclude/file-upload XXE. Labs.',
+ ]},
+ {phase:'WEB',topic:'Cross-Site Scripting (XSS)',res:'PortSwigger WSA → XSS',items:[
+   'Reflected XSS in various contexts (HTML, attribute, JS). Labs.',
+   'Stored XSS + DOM XSS sources/sinks. Labs.',
+   'XSS contexts & escaping, CSP basics, building a working exploit (cookie/credential steal). Labs.',
+   'XSS filter/WAF bypass + polyglots. Practitioner labs.',
+ ]},
+ {phase:'WEB',topic:'CSRF',res:'PortSwigger WSA → CSRF',items:[
+   'CSRF fundamentals + building a PoC. Token validation flaws. Labs.',
+   'SameSite bypasses, CSRF via XSS/CORS. Labs.',
+ ]},
+ {phase:'WEB',topic:'CORS',res:'PortSwigger WSA → CORS',items:[
+   'CORS misconfig: reflected origin, null origin, trust of subdomains. Labs.',
+ ]},
+ {phase:'WEB',topic:'Clickjacking',res:'PortSwigger WSA → Clickjacking',items:[
+   'Frame-based clickjacking + prefilled forms + bypassing frame busters. Labs.',
+ ]},
+ {phase:'WEB',topic:'DOM-Based Vulnerabilities',res:'PortSwigger WSA → DOM-based',items:[
+   'DOM XSS via various sources/sinks, open redirect, cookie manipulation. Labs.',
+   'DOM clobbering + advanced sinks. Labs.',
+ ]},
+ {phase:'WEB',topic:'WebSockets',res:'PortSwigger WSA → WebSockets',items:[
+   'Manipulating WebSocket messages + cross-site WebSocket hijacking. Labs.',
+ ]},
+ {phase:'WEB',topic:'Insecure Deserialization',res:'PortSwigger WSA → Deserialization',items:[
+   'Modifying serialized objects (PHP/Java). Labs.',
+   'Gadget chains + ysoserial, custom gadget discovery. Labs.',
+ ]},
+ {phase:'WEB',topic:'SSTI',res:'PortSwigger WSA → Server-side template injection',items:[
+   'Detect + identify the template engine. Labs.',
+   'Exploit SSTI to RCE across engines (Jinja2/Twig/Freemarker). Labs.',
+ ]},
+ {phase:'WEB',topic:'Web Cache Poisoning',res:'PortSwigger WSA → Web cache poisoning',items:[
+   'Unkeyed inputs, cache key manipulation. Labs.',
+   'Cache poisoning to deliver XSS + DoS + chaining. Labs.',
+ ]},
+ {phase:'WEB',topic:'HTTP Host Header Attacks',res:'PortSwigger WSA → Host header',items:[
+   'Password-reset poisoning, routing-based SSRF, host header auth bypass. Labs.',
+ ]},
+ {phase:'WEB',topic:'HTTP Request Smuggling',res:'PortSwigger WSA → Request smuggling',items:[
+   'CL.TE / TE.CL fundamentals + detection. Labs.',
+   'Exploiting smuggling: bypass front-end controls, capture requests, chain to XSS. Labs.',
+ ]},
+ {phase:'WEB',topic:'OAuth 2.0',res:'PortSwigger WSA → OAuth',items:[
+   'OAuth flows + common implementation flaws (redirect_uri, state). Labs.',
+   'OpenID, stealing tokens, account takeover via OAuth. Labs.',
+ ]},
+ {phase:'WEB',topic:'JWT Attacks',res:'PortSwigger WSA → JWT',items:[
+   'JWT signature flaws: none-alg, weak secret crack, header injection (jwk/kid). Labs.',
+   'Algorithm confusion (RS256→HS256). Labs.',
+ ]},
+ {phase:'WEB',topic:'API Testing',res:'PortSwigger WSA → API testing',items:[
+   'API recon, documentation discovery, mass assignment, method tampering. Labs.',
+   'Server-side parameter pollution + API-specific access control. Labs.',
+ ]},
+ {phase:'WEB',topic:'GraphQL',res:'PortSwigger WSA → GraphQL',items:[
+   'Introspection, suggestions, finding hidden queries/mutations. Labs.',
+   'GraphQL access control + injection + batching attacks. Labs.',
+ ]},
+ {phase:'WEB',topic:'Race Conditions',res:'PortSwigger WSA → Race conditions',items:[
+   'Limit-overrun + single-packet attack with Turbo Intruder. Labs.',
+   'Multi-endpoint + partial-construction race conditions. Labs.',
+ ]},
+ {phase:'WEB',topic:'NoSQL & Prototype Pollution',res:'PortSwigger WSA',items:[
+   'NoSQL injection: operator + syntax injection (MongoDB). Labs.',
+   'Prototype pollution: client-side + server-side, finding gadgets. Labs.',
+ ]},
+
+ /* ---- PHASE 2: AI / LLM Security (your edge) ---- */
+ {phase:'AI',topic:'AI Security · Foundations',res:'OWASP LLM Top 10',items:[
+   'Read the OWASP Top 10 for LLM Applications end-to-end. Note each risk + a real example.',
+   'How LLM apps are built: prompts, system prompts, RAG, tools/agents, where trust boundaries are.',
+ ]},
+ {phase:'AI',topic:'AI Security · Prompt Injection',res:'PortSwigger Web LLM attacks + research',items:[
+   'PortSwigger "Web LLM attacks": exploiting LLM APIs, functions, plugins. Labs.',
+   'Direct prompt injection: goal hijack, system-prompt leak, instruction override. Build payloads.',
+   'Indirect prompt injection: payloads via documents/web/email the model ingests (RAG poisoning).',
+ ]},
+ {phase:'AI',topic:'AI Security · Jailbreaks & Output',res:'OWASP LLM + red-team guides',items:[
+   'Jailbreak techniques + guardrail bypass. Test on a sandbox model. Document what works + why.',
+   'Insecure output handling: XSS/SQLi/SSRF when LLM output is trusted downstream. Find a chain.',
+   'Excessive agency + insecure tool/plugin use: an agent that can call dangerous functions.',
+ ]},
+ {phase:'AI',topic:'AI Security · Data & Supply Chain',res:'OWASP LLM + papers',items:[
+   'Sensitive info disclosure + training/RAG data leakage. How to test for it.',
+   'Model supply chain + poisoning + insecure plugin ecosystem. Threat-model an AI feature.',
+   'Build a mini AI-app red-team checklist you can reuse at Navi and in bounties.',
+ ]},
+];
+
+const ENDGAME=[
+ {phase:'HUNT',topic:'Recon Sweep',res:'Your recon toolkit',task:'Pick a public bug bounty program. Full recon: subdomain enum (subfinder/amass) → httpx → ports → content discovery (ffuf) → nuclei. Save the asset list.'},
+ {phase:'HUNT',topic:'Focused Hunt',res:'Burp Suite',task:'2-hour focused hunt on ONE feature of your program. Test access control/IDOR + injection. Log everything in Burp; note anything odd.'},
+ {phase:'READ',topic:'Disclosed Reports',res:'hackerone.com/hacktivity',task:'Read 3 disclosed reports in a category you want to master. Write the root cause + how it was found. Try to reproduce the idea in a lab.'},
+ {phase:'AI',topic:'AI Red Team',res:'OWASP LLM / your test app',task:'Red-team an LLM feature: prompt injection, jailbreak, data exfil, tool abuse. Document a working payload + the fix.'},
+ {phase:'WEB',topic:'Weak-Spot Drill',res:'PortSwigger WSA',task:'Redo the hardest (expert) labs from your weakest topic — from memory, no hints.'},
+ {phase:'HUNT',topic:'Automation Day',res:'Your scripts',task:'Improve your recon/hunting automation: write/refine a bash or python script that chains tools and flags new findings.'},
+ {phase:'CTF',topic:'CTF Challenge',res:'HackTheBox / PortSwigger mystery lab',task:'One web/AppSec challenge, time-boxed to 90 min. Note the trick you learned.'},
+ {phase:'AI',topic:'AI Depth',res:'OWASP LLM / research blogs',task:'Go deep on one AI-sec area: RAG leakage, agent tool-abuse, model supply chain, or guardrail bypass. Short write-up.'},
+ {phase:'WORK',topic:'Apply at Work',res:'Your job at Navi',task:'Map this week\'s learning to a Navi system. Propose or perform a small security improvement, or threat-model one feature.'},
+ {phase:'REPORT',topic:'Report Writing',res:'Your notes',task:'Write a clean PoC report for any finding (lab or real): summary, steps, impact, remediation. This skill is what earns bounties.'},
+];
+
+function buildCurriculum(){const f=[];CURR_GROUPS.forEach(g=>g.items.forEach(it=>f.push({phase:g.phase,topic:g.topic,res:g.res,task:it})));return f;}
+const CURRICULUM=buildCurriculum();
+function studyIndexFor(){
+  const start=parseD(S.profile.startDate), t=parseD(todayStr());
+  let idx=0; const d=new Date(start);
+  while(d<t){ if(d.getDay()!==0) idx++; d.setDate(d.getDate()+1); }
+  return idx;
+}
+function studyMins(w){ if(w<=4)return [60,75,90,105][Math.min(w-1,3)]; return Math.min(75+(w-5)*5,120); }
+function studyToday(){
+  if(dow()===0) return {id:'study',title:'Weekly Review & Plan',sub:'Sunday reset — re-read learnings, log weight, plan the week.',
+    stat:'INT',xp:50,gold:35,mand:true,phaseTag:'REVIEW',
+    exp:`Sunday reset:\n• Re-read this week's "today I learned" notes — feel the progress.\n• Pick next week's study target.\n• Log your weight (LOG tab).\n• Review the VAULT — did you stay on budget?\n• Plan dates/quality time with your GF.\n• 30-60 min on a startup idea if you want.`};
+  const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
+  const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
+  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, phaseTag:unit.phase,
+    exp:`${unit.task}\n\n📚 Resource: ${unit.res}\n⏱ Today: ~${mins} min.\n\nWhen done, write ONE "today I learned" note. That single habit, daily, is the cure for "I don't know anything" — in 90 days you'll have 90 receipts.`};
 }
 
-function buildDailyQuests(week){
+/* ---------- daily quests ---------- */
+function todaysQuests(){
+  const wk=currentWorkout();
   return [
-    {id:'sk_am',title:'Morning Skincare + SPF',stat:'SEN',xp:15,gold:10,mand:false,
-      exp:`Cleanser → moisturiser → sunscreen (SPF 50, reapply if outdoors).\n30 seconds. Sunscreen is the single highest-ROI skincare step — do it daily.`},
-    {id:'physio',title:'Physio — Shoulder Routine',stat:'SEN',xp:30,gold:20,mand:true,
-      exp:`Do the EXACT exercises your physio prescribed (pendulums, isometrics, ROM, band work as cleared).\nConsistency here = how fast you get back to heavy lifting. Never push into sharp pain.`},
-    {id:'protein',title:'Hit Protein + Stay in Deficit',stat:'VIT',xp:45,gold:30,mand:true,
-      exp:`Target ≈ 150 g protein, ≈ 1,800–2,000 kcal (calorie deficit for ~0.5 kg/week loss).\nEgg+veg sources: eggs/whites, paneer, curd/Greek yogurt, dal, rajma/chana, soya chunks, tofu, milk, whey.\nRule of thumb: palm of protein + half-plate veg each meal, limit fried/sugar/sweets.`},
-    {id:'water',title:'Drink 3 L Water',stat:'VIT',xp:15,gold:10,mand:false,
-      exp:`Carry a 1 L bottle, refill ×3. Helps appetite control, recovery and skin.`},
-    {id:'steps',title:'10,000 Steps',stat:'AGI',xp:30,gold:20,mand:true,
-      exp:`Walk after lunch at office + an evening walk. Steps are the easiest fat-loss lever and zero shoulder load.`},
-    {id:'work',title:'Deep Work + Log 1 Learning',stat:'PER',xp:45,gold:30,mand:true,
-      exp:`At work: one 60–90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned today. Do this daily and in 3 months you'll feel the opposite of "I don't know anything" — you'll have receipts.`},
-    {id:'sk_pm',title:'Night Skincare',stat:'SEN',xp:15,gold:10,mand:false,
-      exp:`Cleanser → (later add niacinamide / a gentle retinoid 2–3×/wk) → moisturiser.\nKeep it simple until it's a habit.`},
-    {id:'sleep',title:'Lights Out On Time',stat:'VIT',xp:30,gold:20,mand:true,
-      exp:`This week's target bedtime is shown in your status. We shift it ~20 min earlier each week toward ~12:30 am / 8 am wake.\nNo screens 30 min before bed. Sleep is when the shoulder heals and fat-loss hormones work.`},
+   {id:'sk_am',title:'Morning Skincare + SPF',sub:'Cleanser → moisturiser → SPF 50',stat:'SEN',xp:15,gold:10,mand:false,
+     exp:`Cleanser → moisturiser → sunscreen (SPF 50). 30 seconds.\nSunscreen daily is the single highest-ROI skincare step — even indoors near windows.`},
+   {id:'physio',title:'Physio — Shoulder Routine',sub:'Your prescribed exercises, 1-2× today',stat:'SEN',xp:30,gold:20,mand:true,
+     exp:`Do the EXACT exercises your physio prescribed.\nConsistency here decides how fast you return to heavy lifting. Never push into sharp pain.`},
+   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~150 g protein · ~1,800-2,000 kcal',stat:'VIT',xp:45,gold:30,mand:true,
+     exp:`Target ≈ 150 g protein, ≈ 1,800-2,000 kcal (deficit ≈ 0.5 kg/week loss).\nEgg+veg sources: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nPalm of protein + half-plate veg each meal. Limit fried/sugar/sweets.`},
+   {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:10,mand:false,
+     exp:`Carry a 1 L bottle, refill ×3. Helps appetite, recovery and skin.`},
+   {id:'workout',title:wk.key,sub:'Tap for today\'s exact exercises',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
+   {id:'steps',title:'10,000 Steps',sub:'Walk after lunch + an evening walk',stat:'AGI',xp:30,gold:20,mand:true,
+     exp:`Steps are the easiest fat-loss lever and zero shoulder load. Walk after the office lunch, again in the evening.`},
+   {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:true,
+     exp:`At work: one 60-90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built.`},
+   studyToday(),
+   {id:'spend',title:'Track Spends + Stay on Budget',sub:'Log today\'s spends in the VAULT (20s)',stat:'WLT',xp:25,gold:15,mand:false,
+     exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your ₹50k investment stays intact.`},
+   {id:'sk_pm',title:'Night Skincare',sub:'Cleanser → treatment → moisturiser',stat:'SEN',xp:15,gold:10,mand:false,
+     exp:`Cleanser → (after 2-3 weeks add niacinamide + a gentle retinoid 2-3×/wk) → moisturiser.\nKeep it simple until it's automatic. Good cue to start winding down for sleep.`},
+   {id:'sleep',title:'Lights Out On Time',sub:'Target this week: '+bedtimeTarget(),stat:'VIT',xp:30,gold:20,mand:true,
+     exp:`This week's bedtime target: ${bedtimeTarget()}. We shift ~20 min earlier each week toward 12:30 am / 8 am wake.\nNo screens 30 min before bed. Sleep heals the shoulder and runs your fat-loss hormones.`},
   ];
 }
 
 /* ---------- leveling ---------- */
-function xpForLevel(l){ return 80 + (l-1)*60; }            // xp needed to clear level l
-function levelInfo(totalXp){
-  let l=1, rem=totalXp;
-  while(rem>=xpForLevel(l)){ rem-=xpForLevel(l); l++; }
-  return {level:l, into:rem, need:xpForLevel(l)};
-}
-function rankFor(l){
-  if(l>=50)return 'S'; if(l>=35)return 'A'; if(l>=20)return 'B';
-  if(l>=10)return 'C'; if(l>=5)return 'D'; return 'E';
-}
-function titleFor(l){
-  if(l>=50)return 'Sovereign'; if(l>=35)return 'Shadow Monarch';
-  if(l>=20)return 'Elite Hunter'; if(l>=10)return 'Awakened';
-  if(l>=5)return 'Rising Hunter'; return 'Player';
-}
+function xpForLevel(l){return 80+(l-1)*60;}
+function levelInfo(t){let l=1,rem=t;while(rem>=xpForLevel(l)){rem-=xpForLevel(l);l++;}return{level:l,into:rem,need:xpForLevel(l)};}
+function rankFor(l){return l>=50?'S':l>=35?'A':l>=20?'B':l>=10?'C':l>=5?'D':'E';}
+function titleFor(l){return l>=50?'Sovereign':l>=35?'Shadow Monarch':l>=20?'Elite Hunter':l>=10?'Awakened':l>=5?'Rising Hunter':'Player';}
 
 /* ---------- state ---------- */
 let S=load();
-function defaultState(){
-  return {
-    profile:{name:'HARSH', startDate:todayStr(), goalWeight:78, height:183},
-    totalXp:0, gold:0,
-    stats:{STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0},
-    totalCompleted:0,
-    history:{},                 // date -> {done:[ids], full:bool}
-    weights:[],                 // {date, kg}
-    rewards:[
-      {id:'r1',ic:'🍔',name:'Guilt-free cheat meal',cost:200},
-      {id:'r2',ic:'🎮',name:'2 hrs gaming / Netflix',cost:120},
-      {id:'r3',ic:'😴',name:'One sleep-in morning',cost:150},
-      {id:'r4',ic:'🛍️',name:'Buy something you want',cost:600},
-      {id:'r5',ic:'☕',name:'Fancy coffee / dessert out',cost:90},
+function defaultState(){return{
+  profile:{name:'HARSH',startDate:todayStr(),goalWeight:78,height:183},
+  totalXp:0,gold:0,
+  stats:{STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0,WLT:0},
+  totalCompleted:0,history:{},weights:[],
+  finance:{
+    income:250000,
+    fixed:[
+      {name:'Rent',amt:25000,type:'expense'},
+      {name:'Car EMI',amt:35000,type:'expense'},
+      {name:'Petrol',amt:12000,type:'expense'},
+      {name:'Personal loan EMI',amt:10000,type:'expense',until:'2026-12'},
+      {name:'Phone EMI',amt:17000,type:'expense',from:'2026-07',until:'2026-12'},
+      {name:'Joint savings (GF)',amt:30000,type:'savings'},
+      {name:'Mom savings',amt:15000,type:'savings'},
     ],
-    redeemed:[],
-    seenIntro:false,
-    lastOpen:todayStr(),
-  };
+    investTarget:50000,
+    budgets:[
+      {cat:'Food & groceries',amt:18000},
+      {cat:'Dates & outings',amt:22000},
+      {cat:'Shopping & personal',amt:8000},
+      {cat:'Misc & buffer',amt:8000},
+    ],
+    spends:{},
+  },
+  rewards:[
+    {id:'r1',ic:'🍔',name:'Guilt-free cheat meal',cost:200},
+    {id:'r2',ic:'🎮',name:'2 hrs gaming / Netflix',cost:120},
+    {id:'r3',ic:'😴',name:'One sleep-in morning',cost:150},
+    {id:'r4',ic:'💖',name:'Plan a nice date',cost:180},
+    {id:'r5',ic:'🛍️',name:'Buy something you want',cost:600},
+  ],
+  redeemed:[],seenIntro:false,lastOpen:todayStr(),
+};}
+function migrate(s){
+  if(!s.stats.WLT)s.stats.WLT=0;
+  if(!s.finance)s.finance=defaultState().finance;
+  return s;
 }
-function load(){ try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?r:defaultState();}catch(e){return defaultState();} }
-function save(){ localStorage.setItem(STORE, JSON.stringify(S)); }
+function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
+function save(){localStorage.setItem(STORE,JSON.stringify(S));}
 
-/* current program week (1-based) from start date */
-function programWeek(){ return Math.floor(daysBetween(S.profile.startDate, todayStr())/7)+1; }
+function programWeek(){return Math.floor(daysBetween(S.profile.startDate,todayStr())/7)+1;}
 function bedtimeTarget(){
-  const w=programWeek();
-  const base=2*60+30;            // 2:30 am in minutes
-  const t=Math.max(0*60+30, base-(w-1)*20); // shift 20 min earlier per week, floor 12:30
-  let h=Math.floor(t/60), m=t%60; const ap=h>=12&&h<24?'am':'am';
-  let hh=h%24; let disp=hh===0?12:(hh>12?hh-12:hh);
+  const w=programWeek(); const t=Math.max(30, 150-(w-1)*20); // 2:30am=150 -> floor 12:30am=30
+  let h=Math.floor(t/60),m=t%60; let disp=h===0?12:h;
   return `${disp}:${String(m).padStart(2,'0')} am`;
 }
 
-/* today's full quest list */
-function todaysQuests(){
-  const w=programWeek();
-  const list=[...buildDailyQuests(w)];
-  list.splice(6,0, {id:'study', ...studyBlock(w)});  // study after work-log
-  const wk=WORKOUTS[dow()];
-  list.splice(4,0, {id:'workout', title:wk.key, stat:wk.stat, xp:wk.xp, gold:wk.gold, mand:dow()!==0, exp:wk.ex});
-  // attach level reference for sleep quest text
-  return list;
-}
-
-function dayRecord(d=todayStr()){ if(!S.history[d])S.history[d]={done:[],full:false}; return S.history[d]; }
-function isDone(id){ return dayRecord().done.includes(id); }
-
-/* ---------- quest toggle ---------- */
+function dayRecord(d=todayStr()){if(!S.history[d])S.history[d]={done:[],full:false};return S.history[d];}
 function toggleQuest(q){
-  const rec=dayRecord();
-  const i=rec.done.indexOf(q.id);
-  if(i>=0){ // un-complete
-    rec.done.splice(i,1);
-    S.totalXp=Math.max(0,S.totalXp-q.xp);
-    S.gold=Math.max(0,S.gold-q.gold);
-    S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);
-    S.totalCompleted=Math.max(0,S.totalCompleted-1);
-    recomputeFull();
-    save(); render();
-  } else {
+  const rec=dayRecord(),i=rec.done.indexOf(q.id);
+  if(i>=0){rec.done.splice(i,1);S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
+    S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);recomputeFull();save();render();
+  }else{
     const before=levelInfo(S.totalXp).level;
-    rec.done.push(q.id);
-    S.totalXp+=q.xp; S.gold+=q.gold; S.stats[q.stat]+=1; S.totalCompleted+=1;
-    recomputeFull();
-    save();
-    if(navigator.vibrate)navigator.vibrate(15);
+    rec.done.push(q.id);S.totalXp+=q.xp;S.gold+=q.gold;S.stats[q.stat]+=1;S.totalCompleted+=1;recomputeFull();save();
+    if(navigator.vibrate)navigator.vibrate(12);
     const after=levelInfo(S.totalXp).level;
-    if(after>before){ render(); levelUpMsg(after); }
-    else { toast(`+${q.xp} XP  ·  +${q.gold} G`); render(); }
+    if(after>before){render();levelUpMsg(after);}else{toast(`+${q.xp} XP · +${q.gold} G`);render();}
     checkDayComplete();
   }
 }
-function recomputeFull(){
-  const qs=todaysQuests().filter(q=>q.mand);
-  const rec=dayRecord();
-  rec.full = qs.every(q=>rec.done.includes(q.id));
-}
+function recomputeFull(){const qs=todaysQuests().filter(q=>q.mand);dayRecord().full=qs.every(q=>dayRecord().done.includes(q.id));}
 function checkDayComplete(){
-  if(dayRecord().full){
-    const todays=todaysQuests();
-    // bonus only once
-    if(!dayRecord().bonus){
-      dayRecord().bonus=true; S.totalXp+=50; S.gold+=40; save();
-      sysModal('DAILY QUEST COMPLETE',
-        `<div class="sys-big">ALL CLEAR</div>
-         <p class="center">All mandatory quests for today are complete.<br>
-         <span class="hl" style="color:var(--gold)">Bonus: +50 XP · +40 Gold</span></p>
-         <p class="center tiny">Streak protected. The penalty zone stays shut. Rest well, Hunter.</p>`,
-        'CLOSE');
-      render();
-    }
-  }
+  const rec=dayRecord();
+  if(rec.full&&!rec.bonus){rec.bonus=true;S.totalXp+=50;S.gold+=40;save();
+    sysModal('DAILY QUEST COMPLETE',`<div class="sys-big">ALL CLEAR</div><p class="center">Every mandatory quest cleared.<br><span class="hl">Bonus: +50 XP · +40 Gold</span></p><p class="center tiny">Streak protected. Rest well, Hunter.</p>`,'CLOSE');
+    render();}
 }
-
-/* ---------- streaks (recomputed from history) ---------- */
 function streakInfo(){
-  // count consecutive days up to today (or yesterday) that were "full"
-  let cur=0; let d=new Date();
-  // if today not full yet, start from yesterday so streak isn't shown broken mid-day
-  if(!(S.history[todayStr()]&&S.history[todayStr()].full)) d.setDate(d.getDate()-1);
-  while(true){
-    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if(S.history[ds]&&S.history[ds].full){cur++; d.setDate(d.getDate()-1);} else break;
-  }
-  // longest
-  let longest=0,run=0;
-  const dates=Object.keys(S.history).sort();
-  let prev=null;
-  for(const ds of dates){
+  let cur=0,d=new Date();
+  if(!(S.history[todayStr()]&&S.history[todayStr()].full))d.setDate(d.getDate()-1);
+  while(true){const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(S.history[ds]&&S.history[ds].full){cur++;d.setDate(d.getDate()-1);}else break;}
+  let longest=0,run=0,prev=null;
+  for(const ds of Object.keys(S.history).sort()){
     if(!S.history[ds].full){run=0;prev=ds;continue;}
-    if(prev && daysBetween(prev,ds)===1 && S.history[prev].full) run++; else run=1;
-    longest=Math.max(longest,run); prev=ds;
-  }
-  return {cur,longest:Math.max(longest,cur)};
+    if(prev&&daysBetween(prev,ds)===1&&S.history[prev].full)run++;else run=1;
+    longest=Math.max(longest,run);prev=ds;}
+  return{cur,longest:Math.max(longest,cur)};
 }
 
-/* ============================================================
-   RENDER
-   ============================================================ */
-let TAB='home';
-let CODEXTAB='os';
+/* ============================================================ RENDER */
+let TAB='home',CODEXTAB='os';
 function render(){
   const v=$('#view');
-  if(TAB==='home')v.innerHTML=viewHome();
-  else if(TAB==='stats')v.innerHTML=viewStats();
-  else if(TAB==='shop')v.innerHTML=viewShop();
-  else if(TAB==='log')v.innerHTML=viewLog();
-  else if(TAB==='codex')v.innerHTML=viewCodex();
+  v.innerHTML={home:viewHome,stats:viewStats,money:viewMoney,shop:viewShop,log:viewLog,codex:viewCodex}[TAB]();
   [...document.querySelectorAll('#nav button')].forEach(b=>b.classList.toggle('active',b.dataset.t===TAB));
   if(TAB==='log')drawWeightChart();
 }
-
 function heroHTML(){
-  const li=levelInfo(S.totalXp);
-  const rank=rankFor(li.level), st=streakInfo();
-  const pct=Math.round(li.into/li.need*100);
-  return `<div class="panel hero">
-    <div class="hero-top">
-      <div>
-        <h2 class="hero-name">${S.profile.name||'HUNTER'}</h2>
-        <div class="hero-title">${titleFor(li.level)}</div>
-        <div class="hero-level">LEVEL <span class="lvlnum">${li.level}</span> · Week ${programWeek()} of the Ascent</div>
-      </div>
-      <div class="rankbadge"><div class="r">${rank}</div><small>RANK</small></div>
-    </div>
-    <div class="xpwrap">
-      <div class="barlabel"><span>EXP</span><span>${li.into} / ${li.need}</span></div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
-    </div>
+  const li=levelInfo(S.totalXp),rank=rankFor(li.level),st=streakInfo(),pct=Math.round(li.into/li.need*100);
+  return `<div class="panel hero"><div class="hero-top"><div>
+    <h2 class="hero-name">${S.profile.name||'HUNTER'}</h2>
+    <div class="hero-title">${titleFor(li.level)}</div>
+    <div class="hero-level">Level <span class="lvlnum">${li.level}</span> · Week ${programWeek()} of the Ascent</div>
+    </div><div class="rankbadge"><div class="r">${rank}</div><small>RANK</small></div></div>
+    <div class="xpwrap"><div class="barlabel"><span>EXP</span><span class="num">${li.into} / ${li.need}</span></div>
+    <div class="bar"><i style="width:${pct}%"></i></div></div>
     <div class="hero-stats">
-      <div class="chip gold"><b>${S.gold}</b><span>GOLD</span></div>
-      <div class="chip streak"><b>${st.cur}🔥</b><span>STREAK</span></div>
-      <div class="chip done"><b>${S.totalCompleted}</b><span>CLEARED</span></div>
-    </div>
-  </div>`;
-}
-
-function viewHome(){
-  const qs=todaysQuests();
-  const rec=dayRecord();
-  const doneN=qs.filter(q=>rec.done.includes(q.id)).length;
-  const mandLeft=qs.filter(q=>q.mand&&!rec.done.includes(q.id)).length;
-  const greet=systemGreeting(doneN,qs.length,mandLeft);
-  return heroHTML()+`
-  <div class="panel">
-    <div class="q-head">
-      <div class="panel-title" style="margin:0">⚔ Daily Quest</div>
-      <div class="q-progress">${doneN}/${qs.length} CLEARED</div>
-    </div>
-    <p class="tiny" style="margin:8px 0 4px;color:var(--cyan)">${greet}</p>
-    ${qs.map(q=>questHTML(q,rec)).join('')}
-  </div>
-  <div class="panel" style="text-align:center">
-    <div class="tiny">Bedtime target this week: <b style="color:var(--gold)">${bedtimeTarget()}</b> · Goal weight: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
-  </div>`;
-}
-function systemGreeting(d,t,m){
-  if(d===0)return 'A new day has begun. The System has prepared your quests.';
-  if(m===0&&d<t)return 'All mandatory quests cleared — bonus objectives remain.';
-  if(d>=t)return 'Perfect clear. You grow stronger.';
-  if(m<=2)return `Almost there — ${m} mandatory quest${m>1?'s':''} remain before the penalty zone closes.`;
-  return 'Keep moving, Hunter. Each cleared quest is a level toward who you want to be.';
+      <div class="chip gold"><b class="num">${S.gold}</b><span>Gold</span></div>
+      <div class="chip streak"><b class="num">${st.cur}</b><span>Streak 🔥</span></div>
+      <div class="chip done"><b class="num">${S.totalCompleted}</b><span>Cleared</span></div>
+    </div></div>`;
 }
 function questHTML(q,rec){
   const done=rec.done.includes(q.id);
-  return `<div class="quest ${done?'done':''}" id="q_${q.id}">
+  return `<div class="quest ${done?'done':''}">
     <button class="qcheck" onclick="qtap('${q.id}')">✓</button>
     <div class="qbody" onclick="qexp('${q.id}')">
       <div class="qtitle">${q.title}</div>
+      ${q.sub?`<div class="qsub">${q.sub}</div>`:''}
       <div class="qtags">
-        <span class="tag stat">${q.stat}</span>
+        <span class="tag">${q.stat}</span>
+        ${q.phaseTag?`<span class="tag phase">${q.phaseTag}</span>`:''}
         <span class="tag xp">+${q.xp} XP</span>
-        <span class="tag">+${q.gold} G</span>
-        ${q.mand?'<span class="tag mand">MANDATORY</span>':''}
+        <span class="tag gold">+${q.gold} G</span>
+        ${q.mand?'<span class="tag mand">CORE</span>':''}
       </div>
       <div class="qexp hidden" id="exp_${q.id}">${q.exp||''}</div>
       <div class="expbtn" id="eb_${q.id}">▾ details</div>
-    </div>
-  </div>`;
+    </div></div>`;
 }
-function qtap(id){ const q=todaysQuests().find(x=>x.id===id); if(q)toggleQuest(q); }
-function qexp(id){
-  const e=$('#exp_'+id), b=$('#eb_'+id); if(!e)return;
-  const h=e.classList.toggle('hidden'); if(b)b.textContent=h?'▾ details':'▴ hide';
+function viewHome(){
+  const qs=todaysQuests(),rec=dayRecord();
+  const doneN=qs.filter(q=>rec.done.includes(q.id)).length;
+  const mandLeft=qs.filter(q=>q.mand&&!rec.done.includes(q.id)).length;
+  let greet;
+  if(doneN===0)greet='A new day. The System has issued your quests.';
+  else if(mandLeft===0&&doneN<qs.length)greet='All core quests cleared — bonus objectives remain.';
+  else if(doneN>=qs.length)greet='Perfect clear. You grow stronger.';
+  else if(mandLeft<=2)greet=`Almost there — ${mandLeft} core quest${mandLeft>1?'s':''} left before the penalty zone closes.`;
+  else greet='Each cleared quest is a step toward who you want to be.';
+  return heroHTML()+`<div class="panel">
+    <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
+    <div class="q-progress num">${doneN}/${qs.length} cleared</div></div>
+    <div class="greet">${greet}</div>
+    ${qs.map(q=>questHTML(q,rec)).join('')}</div>`;
 }
+function qtap(id){const q=todaysQuests().find(x=>x.id===id);if(q)toggleQuest(q);}
+function qexp(id){const e=$('#exp_'+id),b=$('#eb_'+id);if(!e)return;const h=e.classList.toggle('hidden');if(b)b.textContent=h?'▾ details':'▴ hide';}
 
 function viewStats(){
-  const li=levelInfo(S.totalXp);
-  const max=Math.max(10,...Object.values(S.stats));
-  const bars=Object.entries(STATS).map(([k,m])=>{
-    const v=S.stats[k]; const pct=Math.round(v/max*100);
-    return `<div class="statrow">
-      <div class="barlabel"><b>${k} · ${m.name}</b><span class="v">${v}</span></div>
-      <div class="bar ${m.cls}"><i style="width:${pct}%"></i></div>
-      <div class="stat-desc">${m.desc}</div>
-    </div>`;
-  }).join('');
-  const st=streakInfo();
-  return heroHTML()+`
-  <div class="panel"><div class="panel-title">Hunter Stats</div>${bars}</div>
-  <div class="panel"><div class="panel-title">Records</div>
-    <div class="hero-stats">
-      <div class="chip"><b>${li.level}</b><span>LEVEL</span></div>
-      <div class="chip"><b>${S.totalCompleted}</b><span>QUESTS</span></div>
-      <div class="chip streak"><b>${st.longest}</b><span>BEST STREAK</span></div>
-    </div>
-    <p class="tiny" style="margin-top:12px;text-align:center">Every quest you clear permanently raises a stat. These numbers are proof of who you are becoming. They never lie, and they never go to zero on their own.</p>
-  </div>`;
+  const li=levelInfo(S.totalXp),max=Math.max(10,...Object.values(S.stats)),st=streakInfo();
+  const bars=Object.entries(STATS).map(([k,m])=>{const v=S.stats[k];return `<div class="statrow">
+    <div class="barlabel"><b>${k} · ${m.name}</b><span class="v num">${v}</span></div>
+    <div class="bar ${m.cls}"><i style="width:${Math.round(v/max*100)}%"></i></div>
+    <div class="stat-desc">${m.desc}</div></div>`;}).join('');
+  return heroHTML()+`<div class="panel"><div class="panel-title"><span class="dot"></span>Hunter Stats</div>${bars}</div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Records</div>
+    <div class="hero-stats"><div class="chip"><b class="num">${li.level}</b><span>Level</span></div>
+    <div class="chip"><b class="num">${S.totalCompleted}</b><span>Quests</span></div>
+    <div class="chip streak"><b class="num">${st.longest}</b><span>Best Streak</span></div></div>
+    <p class="tiny" style="margin-top:13px;text-align:center">Every quest you clear permanently raises a stat. These numbers are proof of who you're becoming — they don't lie.</p></div>`;
 }
 
-function viewShop(){
-  const cards=S.rewards.map(r=>`
-    <div class="reward">
-      <div class="ic">${r.ic||'🎁'}</div>
-      <div class="info"><div class="rn">${r.name}</div><div class="rc">${r.cost} GOLD</div></div>
-      <button class="redeem" ${S.gold<r.cost?'disabled':''} onclick="redeem('${r.id}')">REDEEM</button>
-      <button class="del" onclick="delReward('${r.id}')">✕</button>
-    </div>`).join('');
-  const recent=S.redeemed.slice(-5).reverse().map(r=>`<div class="tiny" style="padding:4px 0">✔ ${r.name} — ${r.cost}G <span style="float:right">${r.date}</span></div>`).join('')||'<div class="empty">No rewards claimed yet.</div>';
-  return `<div class="panel hero" style="text-align:center">
-      <div class="tiny">GOLD BALANCE</div>
-      <div class="sys-big" style="color:var(--gold);text-shadow:0 0 18px rgba(255,211,77,.7)">${S.gold} G</div>
-      <div class="tiny">Earn gold by clearing quests. Spend it guilt-free — rewards are part of the system.</div>
+/* ============================================================ MONEY / VAULT */
+function activeFixed(mk){return S.finance.fixed.filter(f=>(!f.from||f.from<=mk)&&(!f.until||mk<=f.until));}
+function financeSummary(mk){
+  const af=activeFixed(mk);
+  const fixedExp=af.filter(f=>f.type==='expense').reduce((a,b)=>a+b.amt,0);
+  const fixedSav=af.filter(f=>f.type==='savings').reduce((a,b)=>a+b.amt,0);
+  const invest=S.finance.investTarget||0;
+  const spendable=S.finance.income-fixedExp-fixedSav-invest;
+  const spends=S.finance.spends[mk]||[];
+  const spentTotal=spends.reduce((a,b)=>a+b.amt,0);
+  const byCat={};S.finance.budgets.forEach(b=>byCat[b.cat]=0);
+  spends.forEach(s=>byCat[s.cat]=(byCat[s.cat]||0)+s.amt);
+  const targetSav=fixedSav+invest;
+  const overspend=Math.max(0,spentTotal-spendable);
+  const projected=targetSav-overspend; // your plan, only drops if you blow past the spendable budget
+  return{af,fixedExp,fixedSav,invest,spendable,spends,spentTotal,byCat,projected,targetSav};
+}
+function viewMoney(){
+  const mk=monthKey(),f=financeSummary(mk);
+  const rate=Math.round(f.projected/S.finance.income*100);
+  const cats=S.finance.budgets.map(b=>{
+    const sp=f.byCat[b.cat]||0,pct=Math.min(100,Math.round(sp/b.amt*100)),over=sp>b.amt;
+    return `<div class="catrow"><div class="cl"><span>${b.cat}</span><span class="cv num">${fmt(sp)} / ${fmt(b.amt)}</span></div>
+      <div class="bar ${over?'over':''}"><i style="width:${pct}%"></i></div></div>`;}).join('');
+  const fixedList=f.af.map(x=>`<div class="fixed-row"><span>${x.name}${x.until?` <span class="tiny">(till ${x.until})</span>`:''}${x.type==='savings'?'<span class="sv">SAVES</span>':''}</span><span class="amt">${fmt(x.amt)}</span></div>`).join('');
+  const recent=(f.spends.slice(-6).reverse().map(s=>`<div class="spend-item"><span>${s.cat}${s.note?' · '+s.note:''} <span class="tiny">${s.date.slice(5)}</span></span><span class="sa">-${fmt(s.amt)}</span></div>`).join(''))||'<div class="empty">No spends logged this month.</div>';
+  const monthLeft=Math.max(0,f.spendable-f.spentTotal);
+  return `<div class="panel money-hero">
+    <div class="tiny">PROJECTED SAVINGS · ${mk}</div>
+    <div class="big-num" style="color:var(--gold)">${fmt(f.projected)}</div>
+    <div class="tiny">savings rate ≈ <b style="color:var(--gold)">${rate}%</b> of ₹${(S.finance.income/1000)}k income</div>
+    <div class="mgrid">
+      <div class="mcard"><b class="num" style="color:var(--green)">${fmt(f.fixedSav+f.invest)}</b><span>To Savings</span></div>
+      <div class="mcard"><b class="num">${fmt(f.spendable)}</b><span>Spendable</span></div>
+      <div class="mcard"><b class="num" style="color:${monthLeft>0?'var(--accent)':'var(--red)'}">${fmt(monthLeft)}</b><span>Left to Spend</span></div>
     </div>
-    <div class="panel"><div class="panel-title">◈ Reward Shop</div>${cards}
-      <button class="btn ghost sm" style="margin-top:6px" onclick="addReward()">+ ADD REWARD</button>
-    </div>
-    <div class="panel"><div class="panel-title">Recently Claimed</div>${recent}</div>`;
-}
-function redeem(id){
-  const r=S.rewards.find(x=>x.id===id); if(!r||S.gold<r.cost)return;
-  S.gold-=r.cost; S.redeemed.push({name:r.name,cost:r.cost,date:todayStr()}); save();
-  if(navigator.vibrate)navigator.vibrate([20,40,20]);
-  sysModal('REWARD UNLOCKED',`<div class="sys-big">${r.ic||'🎁'}</div><p class="center">You claimed <b>${r.name}</b> for <span class="hl" style="color:var(--gold)">${r.cost} gold</span>.<br>Enjoy it — you earned it.</p>`,'NICE');
-  render();
-}
-function delReward(id){ if(confirm('Remove this reward?')){S.rewards=S.rewards.filter(x=>x.id!==id);save();render();} }
-function addReward(){
-  const name=prompt('Reward name?'); if(!name)return;
-  const cost=parseInt(prompt('Cost in gold?','150'))||150;
-  const ic=prompt('An emoji icon? (optional)','🎁')||'🎁';
-  S.rewards.push({id:'r'+Date.now(),ic,name,cost}); save(); render();
-}
-
-function viewLog(){
-  // 5-week calendar
-  const cells=[]; const today=new Date();
-  const start=new Date(); start.setDate(start.getDate()-34);
-  // pad to start on Sunday
-  const dows=['S','M','T','W','T','F','S'];
-  let header=dows.map(d=>`<div class="dow">${d}</div>`).join('');
-  let pre=new Date(start); pre.setDate(pre.getDate()-pre.getDay());
-  for(let i=0;i<42;i++){
-    const d=new Date(pre); d.setDate(pre.getDate()+i);
-    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const rec=S.history[ds];
-    let cls='cell';
-    if(rec&&rec.full)cls+=' full'; else if(rec&&rec.done.length)cls+=' partial';
-    if(ds===todayStr())cls+=' today';
-    const future = d>today;
-    cells.push(`<div class="${cls}" style="${future?'opacity:.25':''}">${d.getDate()}</div>`);
-  }
-  const lastW=S.weights.slice(-1)[0];
-  return `<div class="panel"><div class="panel-title">▦ Quest Calendar</div>
-    <div class="cal">${header}${cells.join('')}</div>
-    <p class="tiny" style="margin-top:10px"><span style="color:var(--cyan)">■</span> full clear &nbsp; <span style="color:var(--purple)">■</span> partial &nbsp; <span style="color:var(--gold)">▢</span> today</p>
+    <button class="btn" style="margin-top:14px" onclick="logSpend()">+ LOG A SPEND</button>
   </div>
-  <div class="panel"><div class="panel-title">⚖ Weight Tracker</div>
-    <div class="tiny">Current: <b style="color:var(--cyan)">${lastW?lastW.kg+' kg':'—'}</b> · Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
-    <canvas id="wchart" height="120" style="width:100%;margin-top:8px"></canvas>
-    <div class="wlog">
-      <input id="wkg" type="number" inputmode="decimal" step="0.1" placeholder="today's weight (kg)"/>
-      <button class="btn sm" style="width:auto;padding:11px 16px" onclick="logWeight()">LOG</button>
-    </div>
-  </div>`;
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Spendable Budget — ${mk}</div>
+    ${cats}
+    <p class="tiny">Spent ${fmt(f.spentTotal)} of ${fmt(f.spendable)} this month. Overspending eats into your ₹${(f.invest/1000)}k investment.</p>
+  </div>
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Fixed Commitments</div>${fixedList}
+    <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
+  </div>
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Recent Spends</div>${recent}</div>
+  <div class="panel"><button class="btn ghost sm" onclick="editMoney()">⚙ EDIT INCOME · BUDGET · INVEST</button></div>`;
 }
-function logWeight(){
-  const v=parseFloat($('#wkg').value); if(!v)return;
-  const d=todayStr();
-  const ex=S.weights.find(w=>w.date===d); if(ex)ex.kg=v; else S.weights.push({date:d,kg:v});
-  S.weights.sort((a,b)=>a.date<b.date?-1:1); save();
-  toast('Weight logged'); render();
+let SPEND_CAT=null;
+function logSpend(){
+  SPEND_CAT=S.finance.budgets[0]?.cat||'Misc & buffer';
+  const cats=S.finance.budgets.map(b=>`<button onclick="selCat('${b.cat.replace(/'/g,"")}')" data-c="${b.cat}" class="${b.cat===SPEND_CAT?'sel':''}">${b.cat}</button>`).join('');
+  sysModal('LOG A SPEND',`
+    <label>Amount (₹)</label><input id="sp_amt" type="number" inputmode="numeric" placeholder="e.g. 450" autofocus>
+    <label>Category</label><div class="catbtn" id="sp_cats">${cats}</div>
+    <label>Note (optional)</label><input id="sp_note" placeholder="e.g. dinner, fuel, swiggy">
+    <button class="btn" style="margin-top:16px" onclick="saveSpend()">ADD SPEND</button>`,'CANCEL');
 }
-function drawWeightChart(){
-  const c=$('#wchart'); if(!c)return;
-  const dpr=window.devicePixelRatio||1; const w=c.clientWidth, h=120;
-  c.width=w*dpr; c.height=h*dpr; const x=c.getContext('2d'); x.scale(dpr,dpr);
-  const data=S.weights.slice(-30);
-  if(data.length<1){x.fillStyle='#7f93c4';x.font='12px Rajdhani';x.fillText('Log your weight to see the trend.',10,60);return;}
-  const ys=data.map(d=>d.kg).concat([S.profile.goalWeight]);
-  let mn=Math.min(...ys)-1, mx=Math.max(...ys)+1; if(mx-mn<2){mx+=1;mn-=1;}
-  const px=i=>data.length<2?w/2:10+i*(w-20)/(data.length-1);
-  const py=v=>10+(mx-v)/(mx-mn)*(h-20);
-  // goal line
-  x.strokeStyle='rgba(255,211,77,.5)';x.setLineDash([5,4]);x.beginPath();
-  x.moveTo(0,py(S.profile.goalWeight));x.lineTo(w,py(S.profile.goalWeight));x.stroke();x.setLineDash([]);
-  // line
-  x.strokeStyle='#46d2ff';x.lineWidth=2;x.beginPath();
-  data.forEach((d,i)=>{i?x.lineTo(px(i),py(d.kg)):x.moveTo(px(i),py(d.kg));});x.stroke();
-  x.fillStyle='#46d2ff';data.forEach((d,i)=>{x.beginPath();x.arc(px(i),py(d.kg),3,0,7);x.fill();});
+function selCat(c){SPEND_CAT=c;[...document.querySelectorAll('#sp_cats button')].forEach(b=>b.classList.toggle('sel',b.dataset.c===c));}
+function saveSpend(){
+  const amt=parseFloat($('#sp_amt').value);if(!amt||amt<=0){toast('Enter an amount');return;}
+  const note=$('#sp_note').value.trim(),mk=monthKey();
+  if(!S.finance.spends[mk])S.finance.spends[mk]=[];
+  S.finance.spends[mk].push({date:todayStr(),cat:SPEND_CAT,amt,note});
+  save();$('#modal-host').innerHTML='';toast('Spend logged');render();
+}
+function editMoney(){
+  const f=S.finance;
+  const budgetInputs=f.budgets.map((b,i)=>`<div class="row2" style="align-items:center;margin-top:6px"><input value="${b.cat}" id="bc_${i}"><input type="number" value="${b.amt}" id="ba_${i}" style="max-width:120px"></div>`).join('');
+  sysModal('EDIT FINANCES',`
+    <label>Monthly income (₹)</label><input id="fi_income" type="number" value="${f.income}">
+    <label>Monthly investment target (₹)</label><input id="fi_invest" type="number" value="${f.investTarget}">
+    <label>Spendable budget categories</label>${budgetInputs}
+    <button class="btn ghost sm" style="margin-top:8px" onclick="addBudgetCat()">+ ADD CATEGORY</button>
+    <p class="tiny" style="margin-top:8px">Fixed EMIs/rent/savings are pre-set with end dates (phone & loan end Dec 2026, freeing ₹27k → bump your investment then). Edit them in the code if they change.</p>
+    <button class="btn" style="margin-top:12px" onclick="saveMoney()">SAVE</button>`,'CLOSE');
+}
+function addBudgetCat(){S.finance.budgets.push({cat:'New category',amt:5000});save();editMoney();}
+function saveMoney(){
+  S.finance.income=parseFloat($('#fi_income').value)||S.finance.income;
+  S.finance.investTarget=parseFloat($('#fi_invest').value)||0;
+  S.finance.budgets.forEach((b,i)=>{const c=$('#bc_'+i),a=$('#ba_'+i);if(c)b.cat=c.value.trim()||b.cat;if(a)b.amt=parseFloat(a.value)||0;});
+  S.finance.budgets=S.finance.budgets.filter(b=>b.amt>0);
+  save();$('#modal-host').innerHTML='';render();toast('Finances updated');
 }
 
-/* ============================================================
-   CODEX  (the full plan / "tell me everything")
-   ============================================================ */
+/* ============================================================ SHOP */
+function viewShop(){
+  const cards=S.rewards.map(r=>`<div class="reward"><div class="ic">${r.ic||'🎁'}</div>
+    <div class="info"><div class="rn">${r.name}</div><div class="rc num">${r.cost} GOLD</div></div>
+    <button class="redeem" ${S.gold<r.cost?'disabled':''} onclick="redeem('${r.id}')">REDEEM</button>
+    <button class="del" onclick="delReward('${r.id}')">✕</button></div>`).join('');
+  const recent=S.redeemed.slice(-5).reverse().map(r=>`<div class="tiny" style="padding:5px 0">✔ ${r.name} — ${r.cost}G <span style="float:right">${r.date.slice(5)}</span></div>`).join('')||'<div class="empty">No rewards claimed yet.</div>';
+  return `<div class="panel money-hero" style="background:linear-gradient(150deg,rgba(230,193,121,.1),transparent 70%);border-color:rgba(230,193,121,.2)">
+    <div class="tiny">GOLD BALANCE</div><div class="big-num" style="color:var(--gold)">${S.gold} G</div>
+    <div class="tiny">Earn gold by clearing quests. Spend it guilt-free — rewards are fuel, not cheating.</div></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Reward Shop</div>${cards}
+    <button class="btn ghost sm" style="margin-top:6px" onclick="addReward()">+ ADD REWARD</button></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Recently Claimed</div>${recent}</div>`;
+}
+function redeem(id){const r=S.rewards.find(x=>x.id===id);if(!r||S.gold<r.cost)return;
+  S.gold-=r.cost;S.redeemed.push({name:r.name,cost:r.cost,date:todayStr()});save();
+  if(navigator.vibrate)navigator.vibrate([20,40,20]);
+  sysModal('REWARD UNLOCKED',`<div class="sys-big">${r.ic||'🎁'}</div><p class="center">You claimed <b>${r.name}</b> for <span class="hl">${r.cost} gold</span>.<br>Enjoy it — you earned it.</p>`,'NICE');render();}
+function delReward(id){if(confirm('Remove this reward?')){S.rewards=S.rewards.filter(x=>x.id!==id);save();render();}}
+function addReward(){const name=prompt('Reward name?');if(!name)return;const cost=parseInt(prompt('Cost in gold?','150'))||150;const ic=prompt('Emoji icon? (optional)','🎁')||'🎁';S.rewards.push({id:'r'+Date.now(),ic,name,cost});save();render();}
+
+/* ============================================================ LOG */
+function viewLog(){
+  const today=new Date();const dows=['S','M','T','W','T','F','S'];
+  let header=dows.map(d=>`<div class="dow">${d}</div>`).join('');
+  let pre=new Date();pre.setDate(pre.getDate()-34);pre.setDate(pre.getDate()-pre.getDay());
+  let cells='';
+  for(let i=0;i<42;i++){const d=new Date(pre);d.setDate(pre.getDate()+i);
+    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const rec=S.history[ds];let cls='cell';
+    if(rec&&rec.full)cls+=' full';else if(rec&&rec.done.length)cls+=' partial';
+    if(ds===todayStr())cls+=' today';
+    cells+=`<div class="${cls}" style="${d>today?'opacity:.25':''}">${d.getDate()}</div>`;}
+  const lastW=S.weights.slice(-1)[0];
+  return `<div class="panel"><div class="panel-title"><span class="dot"></span>Quest Calendar</div>
+    <div class="cal">${header}${cells}</div>
+    <p class="tiny" style="margin-top:11px"><span style="color:var(--accent)">■</span> full clear · <span style="color:var(--accent2)">■</span> partial · <span style="color:var(--gold)">▢</span> today</p></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Weight Tracker</div>
+    <div class="tiny">Current: <b style="color:var(--accent)">${lastW?lastW.kg+' kg':'—'}</b> · Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
+    <canvas id="wchart" height="120" style="width:100%;margin-top:10px"></canvas>
+    <div class="wlog"><input id="wkg" type="number" inputmode="decimal" step="0.1" placeholder="today's weight (kg)">
+    <button class="btn sm" style="width:auto;padding:12px 18px" onclick="logWeight()">LOG</button></div></div>`;
+}
+function logWeight(){const v=parseFloat($('#wkg').value);if(!v)return;const d=todayStr();
+  const ex=S.weights.find(w=>w.date===d);if(ex)ex.kg=v;else S.weights.push({date:d,kg:v});
+  S.weights.sort((a,b)=>a.date<b.date?-1:1);save();toast('Weight logged');render();}
+function drawWeightChart(){
+  const c=$('#wchart');if(!c)return;const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=120;
+  c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const data=S.weights.slice(-30);
+  if(!data.length){x.fillStyle='#888fa6';x.font='12px Sora';x.fillText('Log your weight to see the trend.',10,60);return;}
+  const ys=data.map(d=>d.kg).concat([S.profile.goalWeight]);let mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;if(mx-mn<2){mx+=1;mn-=1;}
+  const px=i=>data.length<2?w/2:10+i*(w-20)/(data.length-1),py=v=>10+(mx-v)/(mx-mn)*(h-20);
+  x.strokeStyle='rgba(230,193,121,.5)';x.setLineDash([5,4]);x.beginPath();x.moveTo(0,py(S.profile.goalWeight));x.lineTo(w,py(S.profile.goalWeight));x.stroke();x.setLineDash([]);
+  x.strokeStyle='#8ea2ff';x.lineWidth=2;x.beginPath();data.forEach((d,i)=>{i?x.lineTo(px(i),py(d.kg)):x.moveTo(px(i),py(d.kg));});x.stroke();
+  x.fillStyle='#8ea2ff';data.forEach((d,i)=>{x.beginPath();x.arc(px(i),py(d.kg),3,0,7);x.fill();});
+}
+
+/* ============================================================ CODEX */
 function viewCodex(){
-  const tabs=[['os','OPERATING SYSTEM'],['train','TRAINING'],['nutri','NUTRITION'],
-    ['recover','RECOVERY'],['skin','SKINCARE'],['study','STUDY PATH'],['work','WORK & MIND']];
-  const t=tabs.map(([k,l])=>`<button class="${CODEXTAB===k?'active':''}" onclick="setCodex('${k}')">${l}</button>`).join('');
-  return `<div class="codex-tabs">${t}</div><div class="panel cx">${CODEX[CODEXTAB]}</div>`;
+  const tabs=[['os','OPERATING SYSTEM'],['train','TRAINING'],['nutri','NUTRITION'],['recover','RECOVERY'],['skin','SKINCARE'],['study','STUDY PATH'],['money','MONEY'],['work','WORK & MIND']];
+  return `<div class="codex-tabs">${tabs.map(([k,l])=>`<button class="${CODEXTAB===k?'active':''}" onclick="setCodex('${k}')">${l}</button>`).join('')}</div><div class="panel cx">${CODEX[CODEXTAB]}</div>`;
 }
 function setCodex(k){CODEXTAB=k;render();}
-
 const CODEX={
 os:`<h4>The Operating System</h4>
-<p>You're not behind. You're 24, employed as a security engineer, and about to install a system that compounds. The feeling of "I don't know anything" is just the absence of <b>visible progress</b> — this app fixes that by making every day leave a mark.</p>
-<p><b>Daily rhythm</b> (built around your real schedule, nudging earlier over time):</p>
-<table>
-<tr><th>Time</th><th>Block</th></tr>
-<tr><td>Wake</td><td>Water + AM skincare + physio (10 min)</td></tr>
-<tr><td>11:00–19:00</td><td>Office. First meal ~12:30 (protein). 1 deep-work block. Walk after lunch. Log 1 learning.</td></tr>
-<tr><td>~19:30–20:30</td><td>Gym (shoulder-safe lower/core) or cardio per the day</td></tr>
+<p>You're not behind. You're 24, a security engineer with 3 years shipping, about to install a system that compounds. "I don't know anything" is the absence of <b>visible progress</b> — this app manufactures that proof daily.</p>
+<p><b>Daily rhythm</b> (built on your real schedule, nudging earlier over time):</p>
+<table><tr><th>Time</th><th>Block</th></tr>
+<tr><td>Wake</td><td>Water · AM skincare · physio (10 min)</td></tr>
+<tr><td>11:00–19:00</td><td>Office. Meal ~12:30 (protein). 1 deep-work block. Walk after lunch. Log 1 learning.</td></tr>
+<tr><td>~19:30–20:30</td><td>Gym (today's session) or cardio</td></tr>
 <tr><td>~21:00</td><td>Dinner (high protein)</td></tr>
-<tr><td>~21:30</td><td>Night skincare + physio</td></tr>
-<tr><td>~22:00–00:00</td><td><b>Study block</b> (OSCP → later bug bounty/AI). Your biggest lever.</td></tr>
-<tr><td>Bedtime</td><td>Shifts ~20 min earlier each week toward 12:30 am</td></tr>
-</table>
-<h4>The Three Laws</h4>
-<ul>
-<li><b>Clear the mandatory quests, every day.</b> They're the non-negotiables. Miss them and the streak breaks (the "penalty zone").</li>
-<li><b>Bonus quests are gravy.</b> Do them when you have energy; don't guilt over skipping.</li>
-<li><b>Spend your gold.</b> Rewards aren't cheating — they're fuel. A guilt-free cheat meal you <i>earned</i> beats a guilty one you didn't.</li>
-</ul>
-<h4>Weekly Review (Sundays)</h4>
-<ul>
-<li>Log your weight (track the trend, not the daily number).</li>
-<li>Read back your week's "today I learned" notes — feel the progress.</li>
-<li>Pick next week's study target.</li>
-<li>30–60 min on a startup/side idea if you want — explore, don't pressure.</li>
-</ul>
-<p class="note">This plan is a strong default, not medical advice. Clear all shoulder loading and any new exercise with your physio first. Stop anything that causes sharp pain.</p>`,
+<tr><td>~21:30</td><td>Night skincare · physio · log spends</td></tr>
+<tr><td>~22:00–00:00</td><td><b>Study block</b> — today's exact unit on Home</td></tr>
+<tr><td>Bedtime</td><td>Shifts ~20 min earlier each week toward 12:30 am</td></tr></table>
+<h4>The Laws</h4>
+<ul><li><b>Clear the CORE quests daily.</b> Miss them and the streak breaks (penalty zone).</li>
+<li><b>Bonus quests are gravy</b> — do them on good-energy days; don't guilt over skipping.</li>
+<li><b>Spend your gold.</b> Earned rewards beat guilty ones.</li>
+<li><b>Compare to last month's you</b>, not to Twitter experts.</li></ul>
+<h4>The Year, mapped</h4>
+<ul><li><b>Months 1–2:</b> heal the shoulder (lower/core/cardio), build the habit loop, OSCP month-1.</li>
+<li><b>Months 3–4:</b> reintroduce upper-body training; deep into web security (PortSwigger).</li>
+<li><b>Months 5–8:</b> full training; finish the web curriculum + AI security track.</li>
+<li><b>Months 9–12:</b> applied — live bug-bounty hunting, AI red-teaming, reports, CTFs.</li></ul>
+<p class="note">Strong default, not medical/financial advice. Clear shoulder loading & new exercises with your physio. Adjust the budget to your reality.</p>`,
 
-train:`<h4>Training — Heal Phase (next ~2 months)</h4>
-<p>Your shoulder ligament is healing, so we <b>protect it completely</b> and still get leaner and stronger using legs, core and cardio. No pressing, no overhead, no pull-ups/hangs, no planks or push-ups, no bar resting on the upper back if it strains the shoulder.</p>
-<h4>Weekly Split</h4>
-<table>
-<tr><th>Day</th><th>Session</th></tr>
-<tr><td>Mon</td><td>Lower A — quad focus</td></tr>
-<tr><td>Tue</td><td>Core + zone-2 cardio</td></tr>
-<tr><td>Wed</td><td>Lower B — posterior chain</td></tr>
-<tr><td>Thu</td><td>Cardio + mobility</td></tr>
-<tr><td>Fri</td><td>Lower C — full legs</td></tr>
-<tr><td>Sat</td><td>Long walk / active recovery</td></tr>
-<tr><td>Sun</td><td>Rest + weekly review</td></tr>
-</table>
-<p>Each day's exact exercises appear inside the <b>Workout quest</b> on the Home tab (tap "details"). Use machines (leg press, hack squat, leg curl/extension, hip thrust) — they let you train hard with zero shoulder involvement.</p>
-<h4>Progression</h4>
-<ul>
-<li>Add a little weight or 1–2 reps when a set feels easy. Slow and steady.</li>
-<li>Steps are king for fat loss: <b>10k/day</b>, zero shoulder cost.</li>
-</ul>
-<h4>After clearance (~Month 3)</h4>
-<p>Reintroduce upper body <i>gradually</i> — start with light machine rows/chest press and band work as your physio clears each movement, then build back to a full push/pull/legs split.</p>`,
+train:`<h4>Training — 3 phases across the year</h4>
+<p>The Home workout quest always shows <b>today's exact session</b> (tap "details" for the exercise list). It advances automatically by week.</p>
+<h4>Phase A · Weeks 1–8 — HEAL</h4>
+<p>Shoulder protected completely: legs, core & low-impact cardio, machines only. <b>No</b> pressing, overhead, pull-ups/hangs, planks or push-ups. You'll still lean out fast (deficit + steps do the heavy lifting).</p>
+<h4>Phase B · Weeks 9–16 — REINTRODUCE</h4>
+<p>Add <b>light</b> upper body — machine press/row, lat pulldown, and crucially <b>face pulls + band external rotation</b> for shoulder health. Upper/lower split. Only progress if pain-free and physio-cleared.</p>
+<h4>Phase C · Weeks 17+ — FULL</h4>
+<p>Full Push / Pull / Legs with real progression — strength + hypertrophy. By now the shoulder is rebuilt; train it smart.</p>
+<h4>Two rules that beat everything</h4>
+<ul><li><b>Progressive overload:</b> add a little weight or 1–2 reps when a set feels easy.</li>
+<li><b>10k steps daily</b> — zero shoulder cost, biggest fat-loss lever.</li></ul>`,
 
 nutri:`<h4>Nutrition — Lean Down (Egg + Veg)</h4>
-<p>At ~90 kg / 6 ft, a steady deficit drops fat without wrecking energy. Don't crash — aim for <b>~0.5 kg/week</b>.</p>
-<table>
-<tr><th>Target</th><th>Value</th></tr>
+<p>At ~90 kg / 6 ft, a steady deficit melts fat without killing energy. Aim <b>~0.5 kg/week</b> — don't crash.</p>
+<table><tr><th>Target</th><th>Value</th></tr>
 <tr><td>Calories</td><td>~1,800–2,000 kcal/day</td></tr>
-<tr><td>Protein</td><td>~150 g/day (key for fat loss + holding muscle)</td></tr>
-<tr><td>Water</td><td>3 L/day</td></tr>
-</table>
-<p>Your two-meal pattern (12:30 + 9) is basically intermittent fasting — great for a deficit. Just make both meals protein-forward.</p>
-<h4>Protein sources (egg + veg)</h4>
-<p>Eggs & whites, paneer, tofu, Greek yogurt/curd, dal, rajma, chana, soya chunks (huge protein), milk, whey shake. A scoop of whey + soya chunks makes hitting 150 g easy.</p>
-<h4>Plate rule (no counting needed to start)</h4>
-<ul>
-<li>½ plate veg/salad, ¼ protein, ¼ carbs (roti/rice — measured).</li>
-<li>Protein at <b>every</b> meal. A palm-sized+ portion.</li>
-<li>Limit: fried food, sweets, sugary drinks, late-night snacking.</li>
-<li>One earned cheat meal/week (buy it with gold).</li>
-</ul>
-<h4>Sample day (~1,900 kcal, ~150 g protein)</h4>
-<ul>
-<li><b>Meal 1 (12:30):</b> 3 eggs + 100 g paneer bhurji, 2 roti, big salad, bowl of curd.</li>
-<li><b>Snack:</b> whey shake + handful nuts (or fruit).</li>
-<li><b>Dinner (9):</b> 150 g soya/paneer or 4-egg dish + dal + 1 cup rice/2 roti + sabzi.</li>
-</ul>
-<p class="note">Adjust portions to the scale: if weight isn't trending down over 2 weeks, trim carbs/oil slightly. If you're exhausted, eat a bit more protein/veg, not sugar.</p>`,
+<tr><td>Protein</td><td>~150 g/day</td></tr>
+<tr><td>Water</td><td>3 L/day</td></tr></table>
+<p>Your two-meal pattern (12:30 + 9) is basically intermittent fasting — great for a deficit. Make both meals protein-forward.</p>
+<h4>Protein (egg + veg)</h4>
+<p>Eggs & whites, paneer, tofu, Greek yogurt/curd, dal, rajma, chana, <b>soya chunks</b> (protein bomb), milk, whey. A whey scoop + soya makes 150 g easy.</p>
+<h4>Plate rule (no counting to start)</h4>
+<ul><li>½ plate veg/salad · ¼ protein · ¼ carbs (measured roti/rice).</li>
+<li>Protein at <b>every</b> meal. Limit fried food, sweets, sugary drinks, late snacking.</li>
+<li>One earned cheat meal/week (buy it with gold).</li></ul>
+<h4>Sample day (~1,900 kcal · ~150 g protein)</h4>
+<ul><li><b>12:30:</b> 3 eggs + 100 g paneer bhurji, 2 roti, big salad, bowl of curd.</li>
+<li><b>Snack:</b> whey shake + handful of nuts.</li>
+<li><b>9 pm:</b> 150 g soya/paneer or 4-egg dish + dal + 1 cup rice/2 roti + sabzi.</li></ul>
+<p class="note">If the scale isn't trending down over 2 weeks, trim carbs/oil slightly. If exhausted, add protein/veg — never sugar.</p>`,
 
-recover:`<h4>Recovery — where the gains actually happen</h4>
+recover:`<h4>Recovery — where results actually happen</h4>
 <h4>Shoulder physio</h4>
-<ul>
-<li>Do your physio's prescribed routine <b>1–2×/day</b> — this is a mandatory quest.</li>
-<li>Typical early-stage work (only as your physio clears it): pendulum swings, isometric holds, assisted ROM, then light band ext. rotation.</li>
-<li><b>Never push into sharp pain.</b> Consistency &gt; intensity here. This is the fastest path back to heavy lifting.</li>
-</ul>
+<ul><li>Do your physio's routine <b>1–2×/day</b> (a core quest).</li>
+<li>Early-stage (only as cleared): pendulums, isometrics, assisted ROM → light band external rotation.</li>
+<li><b>Never push into sharp pain.</b> Consistency &gt; intensity. This is your fastest road back to heavy lifting.</li></ul>
 <h4>Sleep — the cheat code</h4>
-<p>You currently sleep ~2–3 am. We shift bedtime <b>~20 min earlier each week</b> toward ~12:30 am / 8 am wake. The app shows this week's target on Home.</p>
-<ul>
-<li>No screens 30 min before bed (the night-skincare quest is a good cue to start winding down).</li>
-<li>Dark, cool room. Same wake time daily — even weekends — anchors the rhythm.</li>
-<li>Sleep drives shoulder healing, fat-loss hormones, focus and mood. It's not optional.</li>
-</ul>`,
+<p>From ~2–3 am, we shift bedtime <b>~20 min earlier weekly</b> toward 12:30 am / 8 am wake. The Home sleep quest shows this week's target.</p>
+<ul><li>No screens 30 min before bed (night-skincare is your wind-down cue).</li>
+<li>Dark, cool room. Same wake time daily — even weekends.</li>
+<li>Sleep drives shoulder healing, fat-loss hormones, focus and mood. Non-negotiable.</li></ul>`,
 
 skin:`<h4>Skincare — simple, daily, high-ROI</h4>
-<p>Confidence isn't only the scale — clear skin and a routine you control compounds fast. Keep it minimal so you actually stick to it.</p>
+<p>A routine you control compounds into visible confidence. Keep it minimal so you actually stick to it.</p>
 <h4>Morning</h4>
-<ol><li>Gentle cleanser (splash of water is fine if in a rush)</li>
-<li>Lightweight moisturiser</li>
-<li><b>Sunscreen SPF 50</b> — the single best thing you can do for your skin. Daily, even indoors near windows.</li></ol>
+<ol><li>Gentle cleanser</li><li>Lightweight moisturiser</li><li><b>Sunscreen SPF 50</b> — the single best thing for your skin, daily.</li></ol>
 <h4>Night</h4>
-<ol><li>Cleanser (remove the day's oil/sweat)</li>
-<li>Treatment <i>(add after 2–3 weeks of habit):</i> niacinamide serum, and a gentle retinoid 2–3 nights/week for texture</li>
-<li>Moisturiser</li></ol>
-<h4>Basics that matter more than products</h4>
-<ul><li>Don't pick at skin. Clean pillowcase weekly. Hydrate (your 3 L quest).</li>
-<li>Sleep & lower sugar visibly improve skin — your other quests are doing double duty.</li></ul>`,
+<ol><li>Cleanser</li><li>Treatment <i>(add after 2–3 weeks):</i> niacinamide serum + a gentle retinoid 2–3 nights/week</li><li>Moisturiser</li></ol>
+<h4>Basics that matter most</h4>
+<ul><li>Don't pick. Clean pillowcase weekly. Hydrate (your 3 L quest).</li>
+<li>Sleep + less sugar visibly improve skin — your other quests do double duty here.</li></ul>`,
 
-study:`<h4>Study Path — your biggest lever against "I don't know anything"</h4>
-<p>Two phases. The app's <b>study quest auto-switches</b> based on your program week.</p>
-<h4>Phase 1 — Month 1: OSCP (subscription is LIVE — use it)</h4>
-<p>You paid for it and have ~1 month of lab access left. That access is the expensive part, so we extract maximum value now. You likely won't sit the exam this month — that's fine. The goal is to <b>burn through labs and build methodology</b>.</p>
-<ul>
-<li><b>Daily loop:</b> 1 PWK module/video → its exercises → attack 1 lab box end-to-end.</li>
-<li><b>Methodology:</b> full-port nmap → service enum → foothold → shell → privesc (Linux & Windows) → loot. Take detailed notes per box (this note-taking <i>is</i> the skill).</li>
-<li><b>Week focus:</b> W1 enum + web footholds · W2 Linux privesc · W3 Windows privesc · W4 Active Directory basics + revisit weak spots.</li>
-<li>If you fall in love with it, extend the sub later and target the exam properly (it needs ~2–3 focused months).</li>
-</ul>
-<h4>Phase 2 — Month 2+: Bug Bounty + AI Security (free & high-leverage)</h4>
-<ul>
-<li><b>PortSwigger Web Security Academy</b> (free, best-in-class): work topic by topic — SQLi → XSS → access control → SSRF → auth → CSRF → SSTI → deserialization. Do the labs, don't just read.</li>
-<li><b>Practice:</b> pick a public <b>HackerOne/Bugcrowd</b> program, learn recon (subdomain enum, content discovery with ffuf, Burp Suite), hunt 30 min/session. Read disclosed reports — they teach real patterns.</li>
-<li><b>AI / LLM security (your edge):</b> 1 session/week on the <b>OWASP LLM Top 10</b>, prompt injection, jailbreaks, and testing AI features in apps. You love AI tools — this is a fast-growing niche where you can stand out at Navi and in bounties.</li>
-</ul>
-<h4>The habit that beats talent</h4>
-<p class="note">Write ONE "today I learned" note every single day (the work quest). In 90 days you'll have 90 concrete things you didn't know before. That is the cure for feeling like you don't know anything — proof, not vibes.</p>`,
+study:`<h4>Study Path — the cure for "I don't know anything"</h4>
+<p>The Home study quest shows your <b>exact task every day</b> and advances through a full ~1-year curriculum. Sundays are review/plan days.</p>
+<h4>Phase 1 · Month 1 — OSCP (use the live lab!)</h4>
+<p>You paid for it; ~1 month of lab access remains. That access is the expensive part — extract maximum value. You likely won't sit the exam this month, and that's fine: the goal is <b>burning through labs + building methodology</b>. Daily loop: full nmap → enum → foothold → shell → privesc (Linux & Windows) → loot, with detailed per-box notes. Areas march in order: recon → enumeration → web footholds → exploitation → buffer overflow → privesc → passwords/pivoting/AD → lab boxes. If you fall for it, extend the sub later and target the exam (~2–3 focused months).</p>
+<h4>Phase 2 · Months 2+ — Bug Bounty + AI Security (free, high-leverage)</h4>
+<ul><li><b>PortSwigger Web Security Academy</b> — every topic in order (SQLi → auth → access control → XSS → SSRF → deserialization → SSTI → request smuggling → OAuth → JWT → API → GraphQL → race conditions → …). Do the labs, don't just read.</li>
+<li><b>Recon + real hunting:</b> subdomain enum, content discovery, Burp; hunt public HackerOne/Bugcrowd programs; read disclosed reports.</li>
+<li><b>AI / LLM security (your edge):</b> OWASP LLM Top 10, prompt injection (direct + indirect), jailbreaks, insecure output handling, agent/tool abuse, RAG leakage. A fast-growing niche where you can stand out at Navi and in bounties.</li></ul>
+<h4>Applied months — hunting for real</h4>
+<p>Once you've worked through the structured curriculum (go at your own depth — a hard lab can take more than a day), the study quest rotates through real practitioner work: recon sweeps, focused hunts, reading disclosed reports, AI red-teaming, CTFs, automation, and report writing. That rotation <i>is</i> how a working bug-bounty hunter spends their days — so every day of the year still hands you a concrete task.</p>
+<p class="note">The one habit that beats talent: write ONE "today I learned" note every single day. 90 days → 90 concrete proofs you didn't have before.</p>`,
 
-work:`<h4>Work & Mind — become the best security engineer</h4>
+money:`<h4>Money — Bangalore, ₹2.5L/month</h4>
+<p>Good income. The leaks are lifestyle creep, food delivery, impulse buys and unplanned dates. The VAULT tab tracks it; here's the plan it's built on.</p>
+<h4>Monthly map (Jul–Dec 2026 — tightest)</h4>
+<table><tr><th>Item</th><th>₹</th></tr>
+<tr><td>Income</td><td>2,50,000</td></tr>
+<tr><td>Rent</td><td>25,000</td></tr>
+<tr><td>Car EMI</td><td>35,000</td></tr>
+<tr><td>Petrol</td><td>12,000</td></tr>
+<tr><td>Personal loan EMI (till Dec)</td><td>10,000</td></tr>
+<tr><td>Phone EMI (Jul–Dec)</td><td>17,000</td></tr>
+<tr><td><b>Fixed expenses</b></td><td><b>99,000</b></td></tr>
+<tr><td>Joint savings (GF)</td><td>30,000</td></tr>
+<tr><td>Mom savings</td><td>15,000</td></tr>
+<tr><td><b>Auto-savings</b></td><td><b>45,000</b></td></tr>
+<tr><td>Investment target (NEW)</td><td>50,000</td></tr>
+<tr><td><b>Spendable on life</b></td><td><b>56,000</b></td></tr></table>
+<h4>The ₹56k "spendable" split</h4>
+<ul><li>Food & groceries — 18k</li><li>Dates & outings — 22k</li><li>Shopping & personal — 8k</li><li>Misc & buffer — 8k</li></ul>
+<p>Total saved/invested = 45k + 50k = <b class="hl">₹95k/month (~38%)</b>. That's a strong rate for 24.</p>
+<h4>After December — the jump</h4>
+<p>Personal loan (10k) and phone EMI (17k) <b>both end in Dec 2026</b> → ₹27k/month freed. Redirect ALL of it to investments: savings rate climbs toward <b class="hl">~49%</b> without changing your lifestyle. (Bump "investment target" in the VAULT then.)</p>
+<h4>Where to put the ₹50k+ invest</h4>
+<ul><li>Build a 6-month <b>emergency fund</b> first (liquid fund / sweep FD) ≈ ₹6L.</li>
+<li>Then SIPs into index funds (Nifty 50 + maybe a flexicap), and use your <b>80C</b> (ELSS/PPF) for tax.</li>
+<li>Keep the joint + mom transfers — they're already great habits.</li></ul>
+<h4>The habits that actually move it</h4>
+<ul><li><b>Log every spend</b> (daily quest). Awareness alone cuts ~15%.</li>
+<li><b>24-hour rule</b> on any non-essential buy.</li>
+<li><b>Automate</b> SIP + savings on salary day so you save before you spend.</li>
+<li>Dates: alternate big spends with cheap-but-thoughtful ones — she'll value effort over cost.</li></ul>
+<p class="note">Not financial advice — a sensible default. Adjust amounts in VAULT → Edit. Talk to a fee-only advisor before big moves.</p>`,
+
+work:`<h4>Work & Mind — best security engineer</h4>
 <h4>At the job</h4>
-<ul>
-<li><b>One deep-work block daily</b> (60–90 min, phone away) on your hardest/most important task. This is where reputation is built.</li>
-<li><b>Log 1 learning daily.</b> Over a quarter this becomes a visible body of knowledge — bring it to 1:1s and reviews.</li>
-<li>Volunteer for the scary task occasionally. Growth lives just past "I'm not sure I can."</li>
-<li>Connect your study to work: OSCP/bug-bounty skills → offer to help with internal pentests, threat modeling, or AI-feature security reviews.</li>
-</ul>
-<h4>On confidence</h4>
-<ul>
-<li>"I don't know anything" is impostor feeling, not fact — you have 3 years of shipping. The fix is <b>evidence</b>: stats going up, streaks, learning notes, weight trending down. This app manufactures that evidence daily.</li>
-<li>Compare yourself to last month's you, not to Twitter experts.</li>
-</ul>
+<ul><li><b>One deep-work block daily</b> (60–90 min, phone away) on your hardest task. Reputation is built here.</li>
+<li><b>Log 1 learning daily.</b> Over a quarter it's a visible body of work — bring it to 1:1s/reviews.</li>
+<li>Connect study to work: offer to help with internal pentests, threat modeling, or <b>AI-feature security reviews</b> (your growing edge).</li>
+<li>Volunteer for the occasional scary task. Growth lives just past "not sure I can."</li></ul>
+<h4>Confidence</h4>
+<ul><li>"I don't know anything" is impostor feeling, not fact. The fix is <b>evidence</b>: stats rising, streaks, learning notes, weight down, savings up. This app makes that evidence daily.</li></ul>
+<h4>Relationship & balance</h4>
+<ul><li>Protect <b>quality time</b> with your GF — schedule it like a quest. Presence &gt; spend.</li>
+<li>The Sunday review includes a quick "plan time together" prompt so it never gets crowded out.</li></ul>
 <h4>Startup / exploration</h4>
-<ul>
-<li>Keep it to a <b>weekly slot</b> (Sunday). Jot ideas, build tiny prototypes, talk to people. Don't let it crowd out the fundamentals you're building now.</li>
-<li>Security + AI is a great founder lane — the study path doubles as market research.</li>
-</ul>`,
+<ul><li>Keep it a <b>weekly Sunday slot</b>. Jot ideas, build tiny prototypes, talk to people. Security + AI is a great founder lane — your study doubles as market research. Don't let it crowd out the fundamentals you're compounding now.</li></ul>`,
 };
 
-/* ============================================================
-   MODALS / SETTINGS / NOTIFS
-   ============================================================ */
+/* ============================================================ MODALS */
 function sysModal(head,html,btn='OK',onClose){
-  const host=$('#modal-host');
-  host.innerHTML=`<div class="overlay" id="ov"><div class="sys">
-    <div class="sys-h">▌ SYSTEM ▐ ${head}</div>${html}
-    <button class="btn" style="margin-top:16px" id="ovbtn">${btn}</button>
-  </div></div>`;
-  $('#ovbtn').onclick=()=>{host.innerHTML='';if(onClose)onClose();};
+  $('#modal-host').innerHTML=`<div class="overlay" id="ov"><div class="sys"><div class="sys-h">SYSTEM · ${head}</div>${html}<button class="btn" style="margin-top:16px" id="ovbtn">${btn}</button></div></div>`;
+  $('#ovbtn').onclick=()=>{$('#modal-host').innerHTML='';if(onClose)onClose();};
 }
 function levelUpMsg(l){
-  sysModal('NOTIFICATION',
-    `<div class="center" style="color:var(--gold);letter-spacing:4px;font-family:Orbitron;font-size:12px">⟨ LEVEL UP ⟩</div>
-     <div class="sys-big">LEVEL ${l}</div>
-     <p class="center">Rank <b style="color:var(--cyan)">${rankFor(l)}</b> · ${titleFor(l)}<br>
-     You have grown stronger. The path continues.</p>`,'CONTINUE');
+  sysModal('NOTIFICATION',`<div class="center" style="color:var(--gold);letter-spacing:4px;font-family:Space Grotesk;font-size:11px;font-weight:600">⟨ LEVEL UP ⟩</div>
+   <div class="sys-big">LEVEL ${l}</div><p class="center">Rank <b style="color:var(--accent)">${rankFor(l)}</b> · ${titleFor(l)}<br>You've grown stronger. The path continues.</p>`,'CONTINUE');
   if(navigator.vibrate)navigator.vibrate([30,60,30,60,80]);
 }
-function toast(msg){
-  const h=$('#notif-host');
-  const el=document.createElement('div'); el.className='notif'; el.innerHTML='◆ '+msg;
-  h.appendChild(el);
-  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';},1300);
-  setTimeout(()=>el.remove(),1750);
-}
-function openSettings(){
-  const p=S.profile;
-  sysModal('SETTINGS',`
-    <label>Hunter name</label><input id="s_name" value="${p.name||''}">
-    <div class="row2">
-      <div><label>Goal weight (kg)</label><input id="s_goal" type="number" value="${p.goalWeight}"></div>
-      <div><label>Height (cm)</label><input id="s_h" type="number" value="${p.height}"></div>
-    </div>
+function toast(msg){const h=$('#notif-host');const el=document.createElement('div');el.className='notif';el.textContent='◆ '+msg;h.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';},1200);setTimeout(()=>el.remove(),1650);}
+function openSettings(){const p=S.profile;
+  sysModal('SETTINGS',`<label>Hunter name</label><input id="s_name" value="${p.name||''}">
+    <div class="row2"><div><label>Goal weight (kg)</label><input id="s_goal" type="number" value="${p.goalWeight}"></div>
+    <div><label>Height (cm)</label><input id="s_h" type="number" value="${p.height}"></div></div>
     <label>Program start date</label><input id="s_start" type="date" value="${p.startDate}">
-    <p class="tiny" style="margin-top:6px">Week ${programWeek()} · workout split & study phase advance automatically from this date.</p>
+    <p class="tiny" style="margin-top:6px">Week ${programWeek()} · ${currentPhaseLetter()==='A'?'Heal phase':currentPhaseLetter()==='B'?'Reintroduction phase':'Full-training phase'}. Workout split & study units advance from this date.</p>
     <button class="btn" style="margin-top:14px" onclick="saveSettings()">SAVE</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="exportData()">EXPORT BACKUP (JSON)</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="importData()">IMPORT BACKUP</button>
     <button class="btn danger sm" style="margin-top:8px" onclick="hardReset()">RESET ALL DATA</button>
-    <p class="tiny center" style="margin-top:12px">The System · your data stays on this device (localStorage). Export a backup before switching phones.</p>
-  `,'CLOSE');
-}
-function saveSettings(){
-  S.profile.name=$('#s_name').value.trim().toUpperCase()||'HUNTER';
-  S.profile.goalWeight=parseFloat($('#s_goal').value)||S.profile.goalWeight;
-  S.profile.height=parseInt($('#s_h').value)||S.profile.height;
-  S.profile.startDate=$('#s_start').value||S.profile.startDate;
-  save(); $('#modal-host').innerHTML=''; render(); toast('Settings saved');
-}
-function exportData(){
-  const blob=new Blob([JSON.stringify(S)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='system-backup-'+todayStr()+'.json'; a.click();
-}
-function importData(){
-  const i=document.createElement('input'); i.type='file'; i.accept='.json';
-  i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{try{S=JSON.parse(r.result);save();$('#modal-host').innerHTML='';render();toast('Backup restored');}catch(x){alert('Invalid file');}};r.readAsText(f);};
-  i.click();
-}
-function hardReset(){ if(confirm('Erase ALL progress? This cannot be undone.')){localStorage.removeItem(STORE);S=defaultState();save();$('#modal-host').innerHTML='';S.seenIntro=true;render();} }
+    <p class="tiny center" style="margin-top:12px">Your data lives only on this device. Export before switching phones.</p>`,'CLOSE');}
+function saveSettings(){S.profile.name=$('#s_name').value.trim().toUpperCase()||'HUNTER';
+  S.profile.goalWeight=parseFloat($('#s_goal').value)||S.profile.goalWeight;S.profile.height=parseInt($('#s_h').value)||S.profile.height;
+  S.profile.startDate=$('#s_start').value||S.profile.startDate;save();$('#modal-host').innerHTML='';render();toast('Settings saved');}
+function exportData(){const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='system-backup-'+todayStr()+'.json';a.click();}
+function importData(){const i=document.createElement('input');i.type='file';i.accept='.json';
+  i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=migrate(JSON.parse(r.result));save();$('#modal-host').innerHTML='';render();toast('Backup restored');}catch(x){alert('Invalid file');}};r.readAsText(f);};i.click();}
+function hardReset(){if(confirm('Erase ALL progress? This cannot be undone.')){localStorage.removeItem(STORE);S=defaultState();S.seenIntro=true;save();$('#modal-host').innerHTML='';render();}}
 
-/* first-run intro */
-function intro(){
-  sysModal('NOTIFICATION',
-   `<div class="center" style="font-size:34px">⬢</div>
-    <div class="sys-big" style="font-size:20px">YOU HAVE BEEN<br>SELECTED AS A PLAYER</div>
-    <p>You alone have the right to grow without limit. The System will issue <b>Daily Quests</b> across six domains — body, fuel, conditioning, intellect, work and self.</p>
-    <p>Clear them to earn <b style="color:var(--cyan)">EXP</b>, raise your <b style="color:var(--purple)">stats</b>, and spend <b style="color:var(--gold)">gold</b> on rewards you choose.</p>
-    <p class="center">Fail the mandatory quests and you enter the <b style="color:var(--red)">penalty zone</b> — your streak resets.</p>
-    <p class="center tiny">Read the full plan any time in the <b>CODEX</b> tab.<br>The Ascent begins now, Hunter.</p>`,
-   'ACCEPT THE SYSTEM', ()=>{S.seenIntro=true;save();});
-}
+function intro(){sysModal('NOTIFICATION',
+  `<div class="center" style="font-size:30px">◇</div><div class="sys-big" style="font-size:19px">YOU HAVE BEEN<br>SELECTED AS A PLAYER</div>
+   <p>You alone may grow without limit. The System issues <b>Daily Quests</b> across body, fuel, conditioning, intellect, work, self & wealth.</p>
+   <p>Clear them for <b style="color:var(--accent)">EXP</b>, raise your <b style="color:var(--accent2)">stats</b>, and earn <b style="color:var(--gold)">gold</b> for rewards you choose.</p>
+   <p class="center">Each day gives your <b>exact</b> workout & study task. Miss the core quests and you enter the <b style="color:var(--red)">penalty zone</b>.</p>
+   <p class="center tiny">The full plan lives in the <b>CODEX</b> tab. The Ascent begins now, Hunter.</p>`,
+  'ACCEPT THE SYSTEM',()=>{S.seenIntro=true;save();});}
 
-/* day rollover check */
-function rollover(){
-  const t=todayStr();
-  if(S.lastOpen!==t){ S.lastOpen=t; save(); }
-  recomputeFull(); save();
-}
-
-/* nav */
-document.querySelectorAll('#nav button').forEach(b=>{
-  b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};
-});
-
-/* boot */
-rollover();
-render();
+function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomputeFull();save();}
+document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
+rollover();render();
 if(!S.seenIntro)intro();
-
-/* service worker */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
