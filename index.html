@@ -614,11 +614,12 @@ function bedtimeTarget(){
 function dayRecord(d=todayStr()){if(!S.history[d])S.history[d]={done:[],full:false};return S.history[d];}
 function toggleQuest(q){
   const rec=dayRecord(),i=rec.done.indexOf(q.id);
-  if(i>=0){rec.done.splice(i,1);S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
+  if(i>=0){rec.done.splice(i,1);if(rec.meta)delete rec.meta[q.id];S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
     S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);recomputeFull();save();render();
   }else{
     const before=levelInfo(S.totalXp).level;
-    rec.done.push(q.id);S.totalXp+=q.xp;S.gold+=q.gold;S.stats[q.stat]+=1;S.totalCompleted+=1;recomputeFull();save();
+    rec.done.push(q.id);rec.meta=rec.meta||{};rec.meta[q.id]={t:q.title,s:q.stat,xp:q.xp,g:q.gold};
+    S.totalXp+=q.xp;S.gold+=q.gold;S.stats[q.stat]+=1;S.totalCompleted+=1;recomputeFull();save();
     if(navigator.vibrate)navigator.vibrate(12);
     const after=levelInfo(S.totalXp).level;
     if(after>before){render();levelUpMsg(after);}else{toast(`+${q.xp} XP · +${q.gold} G`);render();}
@@ -645,13 +646,65 @@ function streakInfo(){
   return{cur,longest:Math.max(longest,cur)};
 }
 
+/* ---------- history helpers ---------- */
+function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayXp(rec){if(!rec)return 0;if(rec.meta)return Object.values(rec.meta).reduce((a,b)=>a+(b.xp||0),0);return (rec.done?rec.done.length:0)*30;}
+const QLABELS={sk_am:'Morning Skincare',physio:'Physio',protein:'Protein + Deficit',water:'Water 3L',workout:'Workout',steps:'10k Steps',work:'Deep Work + Learning',study:'Study',spend:'Track Spends',sk_pm:'Night Skincare',sleep:'Sleep On Time'};
+function labelFor(id){return QLABELS[id]||id;}
+function prettyDate(ds){return parseD(ds).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
+function weekStats(){
+  let xp=0,cleared=0,perfect=0;const byStat={};Object.keys(STATS).forEach(k=>byStat[k]=0);
+  const d=new Date();
+  for(let i=0;i<7;i++){const dd=new Date(d);dd.setDate(d.getDate()-i);const rec=S.history[dstr(dd)];
+    if(!rec)continue;xp+=dayXp(rec);cleared+=rec.done.length;if(rec.full)perfect++;
+    if(rec.meta)Object.values(rec.meta).forEach(m=>{if(m.s)byStat[m.s]=(byStat[m.s]||0)+1;});}
+  return{xp,cleared,perfect,byStat};
+}
+function roundRect(x,a,b,w,h,r){r=Math.min(r,w/2,h/2);x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
+function drawRadar(){
+  const c=$('#radar');if(!c||!c.clientWidth)return;
+  const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientWidth;
+  c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const keys=Object.keys(STATS),n=keys.length,vals=keys.map(k=>S.stats[k]),max=Math.max(5,...vals);
+  const cx=w/2,cy=h/2,R=Math.min(w,h)/2-22,ang=i=>-Math.PI/2+i*2*Math.PI/n;
+  for(let r=1;r<=3;r++){x.strokeStyle='rgba(255,255,255,0.07)';x.lineWidth=1;x.beginPath();
+    for(let i=0;i<=n;i++){const a=ang(i%n),rr=R*r/3,px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
+  x.fillStyle='#9097ab';x.font='600 10px Space Grotesk';x.textAlign='center';x.textBaseline='middle';
+  for(let i=0;i<n;i++){const a=ang(i),ex=cx+Math.cos(a)*R,ey=cy+Math.sin(a)*R;
+    x.strokeStyle='rgba(255,255,255,0.05)';x.beginPath();x.moveTo(cx,cy);x.lineTo(ex,ey);x.stroke();
+    x.fillText(keys[i],cx+Math.cos(a)*(R+13),cy+Math.sin(a)*(R+13));}
+  x.beginPath();for(let i=0;i<=n;i++){const a=ang(i%n),rr=R*(vals[i%n]/max),px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.closePath();
+  const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(142,162,255,0.4)');g.addColorStop(1,'rgba(183,157,255,0.28)');
+  x.fillStyle=g;x.fill();x.strokeStyle='#8ea2ff';x.lineWidth=2;x.stroke();
+  x.fillStyle='#b79dff';for(let i=0;i<n;i++){const a=ang(i),rr=R*(vals[i]/max);x.beginPath();x.arc(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,2.6,0,7);x.fill();}
+}
+function drawActivity(){
+  const c=$('#activity');if(!c||!c.clientWidth)return;
+  const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=90;
+  c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const days=[];const d=new Date();d.setDate(d.getDate()-13);
+  for(let i=0;i<14;i++){const dd=new Date(d);dd.setDate(d.getDate()+i);const ds=dstr(dd);days.push({ds,xp:dayXp(S.history[ds]),full:S.history[ds]&&S.history[ds].full});}
+  const max=Math.max(60,...days.map(o=>o.xp)),gap=4,bw=(w-13*gap)/14;
+  days.forEach((o,i)=>{const bh=Math.max(2,o.xp/max*(h-16)),px=i*(bw+gap);
+    x.fillStyle=o.full?'#8ea2ff':'rgba(142,162,255,0.35)';roundRect(x,px,h-bh,bw,bh,3);x.fill();});
+}
+function dayDetail(ds){
+  const rec=S.history[ds];let body;
+  if(!rec||!rec.done.length){body='<p class="center tiny">No quests cleared this day.</p>';}
+  else{const meta=rec.meta||{};
+    const items=rec.done.map(id=>{const m=meta[id]||{};return `<div class="fixed-row"><span>${m.t||labelFor(id)} ${m.s?'<span class="tiny">'+m.s+'</span>':''}</span><span class="amt">${m.xp?'+'+m.xp+' XP':'✓'}</span></div>`;}).join('');
+    body=`<p class="center" style="margin-bottom:12px">${rec.full?'<span style="color:var(--green)">★ Perfect clear</span>':'<span style="color:var(--accent2)">'+rec.done.length+' cleared</span>'} · ${dayXp(rec)} XP</p>${items}`;}
+  sysModal(prettyDate(ds),body,'CLOSE');
+}
+
 /* ============================================================ RENDER */
 let TAB='home',CODEXTAB='os';
 function render(){
   const v=$('#view');
   v.innerHTML={home:viewHome,stats:viewStats,money:viewMoney,shop:viewShop,log:viewLog,codex:viewCodex}[TAB]();
   [...document.querySelectorAll('#nav button')].forEach(b=>b.classList.toggle('active',b.dataset.t===TAB));
-  if(TAB==='log')drawWeightChart();
+  if(TAB==='log'){drawWeightChart();drawActivity();}
+  if(TAB==='stats')drawRadar();
 }
 function heroHTML(){
   const li=levelInfo(S.totalXp),rank=rankFor(li.level),st=streakInfo(),pct=Math.round(li.into/li.need*100);
@@ -706,13 +759,21 @@ function qtap(id){const q=todaysQuests().find(x=>x.id===id);if(q)toggleQuest(q);
 function qexp(id){const e=$('#exp_'+id),b=$('#eb_'+id);if(!e)return;const h=e.classList.toggle('hidden');if(b)b.textContent=h?'▾ details':'▴ hide';}
 
 function viewStats(){
-  const li=levelInfo(S.totalXp),max=Math.max(10,...Object.values(S.stats)),st=streakInfo();
-  const bars=Object.entries(STATS).map(([k,m])=>{const v=S.stats[k];return `<div class="statrow">
-    <div class="barlabel"><b>${k} · ${m.name}</b><span class="v num">${v}</span></div>
+  const li=levelInfo(S.totalXp),max=Math.max(10,...Object.values(S.stats)),st=streakInfo(),wk=weekStats();
+  const bars=Object.entries(STATS).map(([k,m])=>{const v=S.stats[k],wg=wk.byStat[k]||0;return `<div class="statrow">
+    <div class="barlabel"><b>${k} · ${m.name}</b><span class="v num">${v}${wg?` <span style="color:var(--green);font-size:10px">+${wg} wk</span>`:''}</span></div>
     <div class="bar ${m.cls}"><i style="width:${Math.round(v/max*100)}%"></i></div>
     <div class="stat-desc">${m.desc}</div></div>`;}).join('');
-  return heroHTML()+`<div class="panel"><div class="panel-title"><span class="dot"></span>Hunter Stats</div>${bars}</div>
-    <div class="panel"><div class="panel-title"><span class="dot"></span>Records</div>
+  return heroHTML()+
+   `<div class="panel"><div class="panel-title"><span class="dot"></span>Attribute Web</div>
+     <canvas id="radar" style="width:100%;aspect-ratio:1;display:block"></canvas>
+     <p class="tiny" style="text-align:center;margin-top:6px">Your balance across all seven attributes. Fill the gaps.</p></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>This Week</div>
+     <div class="hero-stats"><div class="chip done"><b class="num">${wk.perfect}</b><span>Perfect Days</span></div>
+     <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div>
+     <div class="chip gold"><b class="num">${wk.xp}</b><span>XP Gained</span></div></div></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Hunter Stats</div>${bars}</div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>All-Time Records</div>
     <div class="hero-stats"><div class="chip"><b class="num">${li.level}</b><span>Level</span></div>
     <div class="chip"><b class="num">${S.totalCompleted}</b><span>Quests</span></div>
     <div class="chip streak"><b class="num">${st.longest}</b><span>Best Streak</span></div></div>
@@ -746,6 +807,9 @@ function viewMoney(){
   const fixedList=f.af.map(x=>`<div class="fixed-row"><span>${x.name}${x.until?` <span class="tiny">(till ${x.until})</span>`:''}${x.type==='savings'?'<span class="sv">SAVES</span>':''}</span><span class="amt">${fmt(x.amt)}</span></div>`).join('');
   const recent=(f.spends.slice(-6).reverse().map(s=>`<div class="spend-item"><span>${s.cat}${s.note?' · '+s.note:''} <span class="tiny">${s.date.slice(5)}</span></span><span class="sa">-${fmt(s.amt)}</span></div>`).join(''))||'<div class="empty">No spends logged this month.</div>';
   const monthLeft=Math.max(0,f.spendable-f.spentTotal);
+  const histMonths=[...new Set([mk,...Object.keys(S.finance.spends)])].sort().reverse().slice(0,6);
+  const hist=histMonths.map(m=>{const ff=financeSummary(m),sp=(S.finance.spends[m]||[]).reduce((a,b)=>a+b.amt,0);
+    return `<div class="fixed-row"><span>${m}${m===mk?' <span class="tiny">(now)</span>':''}</span><span class="amt">spent ${fmt(sp)} · <span style="color:var(--green)">saved ${fmt(ff.projected)}</span></span></div>`;}).join('');
   return `<div class="panel money-hero">
     <div class="tiny">PROJECTED SAVINGS · ${mk}</div>
     <div class="big-num" style="color:var(--gold)">${fmt(f.projected)}</div>
@@ -765,6 +829,7 @@ function viewMoney(){
     <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
   </div>
   <div class="panel"><div class="panel-title"><span class="dot"></span>Recent Spends</div>${recent}</div>
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Savings History</div>${hist}</div>
   <div class="panel"><button class="btn ghost sm" onclick="editMoney()">⚙ EDIT INCOME · BUDGET · INVEST</button></div>`;
 }
 let SPEND_CAT=null;
@@ -832,16 +897,18 @@ function viewLog(){
   let header=dows.map(d=>`<div class="dow">${d}</div>`).join('');
   let pre=new Date();pre.setDate(pre.getDate()-34);pre.setDate(pre.getDate()-pre.getDay());
   let cells='';
-  for(let i=0;i<42;i++){const d=new Date(pre);d.setDate(pre.getDate()+i);
-    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const rec=S.history[ds];let cls='cell';
+  for(let i=0;i<42;i++){const d=new Date(pre);d.setDate(pre.getDate()+i);const ds=dstr(d);
+    const rec=S.history[ds];let cls='cell';const future=d>today;
     if(rec&&rec.full)cls+=' full';else if(rec&&rec.done.length)cls+=' partial';
     if(ds===todayStr())cls+=' today';
-    cells+=`<div class="${cls}" style="${d>today?'opacity:.25':''}">${d.getDate()}</div>`;}
-  const lastW=S.weights.slice(-1)[0];
+    cells+=`<div class="${cls}" ${future?'':`onclick="dayDetail('${ds}')"`} style="${future?'opacity:.25':'cursor:pointer'}">${d.getDate()}</div>`;}
+  const wk=weekStats(),lastW=S.weights.slice(-1)[0];
   return `<div class="panel"><div class="panel-title"><span class="dot"></span>Quest Calendar</div>
     <div class="cal">${header}${cells}</div>
-    <p class="tiny" style="margin-top:11px"><span style="color:var(--accent)">■</span> full clear · <span style="color:var(--accent2)">■</span> partial · <span style="color:var(--gold)">▢</span> today</p></div>
+    <p class="tiny" style="margin-top:11px"><span style="color:var(--accent)">■</span> full · <span style="color:var(--accent2)">■</span> partial · <span style="color:var(--gold)">▢</span> today — <b>tap any day</b> for details</p></div>
+    <div class="panel"><div class="panel-title"><span class="dot"></span>Last 14 Days · XP</div>
+    <canvas id="activity" height="90" style="width:100%;display:block"></canvas>
+    <p class="tiny" style="margin-top:8px">This week: <b style="color:var(--green)">${wk.perfect}</b> perfect days · <b style="color:var(--accent)">${wk.cleared}</b> quests · <b style="color:var(--gold)">${wk.xp}</b> XP. Bright bars = perfect-clear days.</p></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Weight Tracker</div>
     <div class="tiny">Current: <b style="color:var(--accent)">${lastW?lastW.kg+' kg':'—'}</b> · Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
     <canvas id="wchart" height="120" style="width:100%;margin-top:10px"></canvas>
