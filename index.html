@@ -220,6 +220,8 @@ label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margi
 .leg .lk{flex:1;color:var(--txt2);}
 .leg .lv{color:var(--muted);font-size:12px;}
 .cx li b{color:var(--accent);}
+.reslink{display:inline-block;margin-top:9px;color:var(--accent);border:1px solid var(--line2);border-radius:10px;padding:7px 12px;font-size:12px;text-decoration:none;font-weight:600;}
+.reslink:active{background:rgba(141,162,255,.12);}
 </style>
 </head>
 <body>
@@ -529,7 +531,7 @@ function studyToday(){
     exp:`Sunday reset:\n• Re-read this week's "today I learned" notes — feel the progress.\n• Pick next week's study target.\n• Log your weight (LOG tab).\n• Review the VAULT — did you stay on budget?\n• Plan dates/quality time with your GF.\n• 30-60 min on a startup idea if you want.`};
   const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
   const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
-  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, phaseTag:unit.phase,
+  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
     exp:`${unit.task}\n\n📚 Resource: ${unit.res}\n⏱ Today: ~${mins} min.\n\nWhen done, write ONE "today I learned" note. That single habit, daily, is the cure for "I don't know anything" — in 90 days you'll have 90 receipts.`};
 }
 
@@ -706,6 +708,28 @@ function dayXp(rec){if(!rec)return 0;if(rec.meta)return Object.values(rec.meta).
 const QLABELS={sk_am:'Morning Skincare',physio:'Physio',protein:'Protein + Deficit',water:'Water 3L',workout:'Workout',steps:'10k Steps',work:'Deep Work + Learning',study:'Study',spend:'Track Spends',sk_pm:'Night Skincare',sleep:'Sleep On Time'};
 function labelFor(id){return QLABELS[id]||id;}
 function prettyDate(ds){return parseD(ds).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
+function resUrl(res){if(!res)return null;const r=res.toLowerCase();
+  if(r.includes('portswigger')||r.includes('web security academy'))return 'https://portswigger.net/web-security/all-topics';
+  if(r.includes('burp'))return 'https://portswigger.net/burp/documentation/desktop';
+  if(r.includes('owasp'))return 'https://owasp.org/www-project-top-10-for-large-language-model-applications/';
+  if(r.includes('hackerone')||r.includes('hacktivity'))return 'https://hackerone.com/hacktivity';
+  if(r.includes('hackthebox'))return 'https://www.hackthebox.com/';
+  if(r.includes('offsec')||r.includes('pwk')||r.includes('lab'))return 'https://portal.offsec.com/';
+  return null;}
+function recapHTML(){
+  const wk=weekStats(),sc=attrScores(),st=streakInfo(),f=financeSummary(monthKey());
+  const ent=Object.entries(sc),best=ent.reduce((a,b)=>b[1]>a[1]?b:a),worst=ent.reduce((a,b)=>b[1]<a[1]?b:a);
+  let wch='—';const ws=S.weights.slice(-8);if(ws.length>=2){const d=+(ws[ws.length-1].kg-ws[0].kg).toFixed(1);wch=(d>0?'+':'')+d+' kg';}
+  return `<div class="sys-big" style="font-size:20px">WEEK IN REVIEW</div>
+   <div class="hero-stats" style="margin-bottom:8px"><div class="chip done"><b class="num">${wk.perfect}</b><span>Perfect Days</span></div>
+   <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div><div class="chip gold"><b class="num">${wk.xp}</b><span>XP</span></div></div>
+   <p>🔥 Streak: <b>${st.cur}</b> days · ⚖️ Weight trend: <b>${wch}</b></p>
+   <p>💪 Strongest: <b style="color:var(--green)">${STATS[best[0]].name} (${best[1]}%)</b><br>🎯 Focus next week: <b style="color:var(--red)">${STATS[worst[0]].name} (${worst[1]}%)</b></p>
+   <p>💰 On track to save <b style="color:var(--gold)">${fmt(f.projected)}</b> this month.</p>
+   <p class="center tiny">Re-read your "today I learned" notes, log your weight, pick next week's targets. Onward, Hunter.</p>`;
+}
+function showRecap(){sysModal('WEEKLY RECAP',recapHTML(),"LET'S GO");}
+function quickWeight(){const v=parseFloat(prompt('Your current weight (kg)?'));if(!v)return;const d=todayStr();const ex=S.weights.find(w=>w.date===d);if(ex)ex.kg=v;else S.weights.push({date:d,kg:v});S.weights.sort((a,b)=>a.date<b.date?-1:1);save();render();toast('Weight set — milestone calibrated');}
 function weekStats(){
   let xp=0,cleared=0,perfect=0;const byStat={};Object.keys(STATS).forEach(k=>byStat[k]=0);
   const d=new Date();
@@ -805,7 +829,7 @@ function questHTML(q,rec){
         <span class="tag gold">+${q.gold} G</span>
         ${q.mand?'<span class="tag mand">CORE</span>':''}
       </div>
-      <div class="qexp hidden" id="exp_${q.id}">${q.exp||''}</div>
+      <div class="qexp hidden" id="exp_${q.id}">${q.exp||''}${q.resUrl?`<br><a href="${q.resUrl}" target="_blank" rel="noopener" class="reslink">Open resource ↗</a>`:''}</div>
       <div class="expbtn" id="eb_${q.id}">▾ details</div>
     </div></div>`;
 }
@@ -823,7 +847,8 @@ function viewHome(){
   return heroHTML()+
    `<div class="panel" style="background:linear-gradient(150deg,rgba(230,193,121,.10),transparent 70%);border-color:rgba(230,193,121,.22)">
      <div class="panel-title" style="margin-bottom:8px"><span class="dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>🎂 Birthday Milestone · 14 Sep</div>
-     <p class="tiny" style="font-size:12.5px;line-height:1.6"><b style="color:var(--gold)">${ms.days} days</b> to go. At <b>0.75 kg/wk</b> you'll hit <b style="color:var(--accent)">~${ms.proj075} kg</b>; push to <b>1 kg/wk</b> for <b style="color:var(--accent)">~${ms.proj1} kg</b>. Now ${ms.cur} kg → goal ${ms.goal} kg.</p></div>
+     <p class="tiny" style="font-size:12.5px;line-height:1.6"><b style="color:var(--gold)">${ms.days} days</b> to go. At <b>0.75 kg/wk</b> you'll hit <b style="color:var(--accent)">~${ms.proj075} kg</b>; push to <b>1 kg/wk</b> for <b style="color:var(--accent)">~${ms.proj1} kg</b>. Now ${ms.cur} kg → goal ${ms.goal} kg.</p>
+     ${!S.weights.length?`<button class="btn ghost sm" style="margin-top:10px" onclick="quickWeight()">Log your starting weight to calibrate</button>`:''}</div>
     <div class="panel">
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
      <div class="q-progress num">${doneN}/${qs.length} cleared</div></div>
@@ -851,7 +876,8 @@ function viewStats(){
     <div class="panel"><div class="panel-title"><span class="dot"></span>This Week</div>
      <div class="hero-stats"><div class="chip done"><b class="num">${wk.perfect}</b><span>Perfect Days</span></div>
      <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div>
-     <div class="chip gold"><b class="num">${wk.xp}</b><span>XP Gained</span></div></div></div>
+     <div class="chip gold"><b class="num">${wk.xp}</b><span>XP Gained</span></div></div>
+     <button class="btn ghost sm" style="margin-top:12px" onclick="showRecap()">📋 VIEW WEEKLY RECAP</button></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Hunter Stats</div>${bars}</div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>All-Time Records</div>
     <div class="hero-stats"><div class="chip"><b class="num">${li.level}</b><span>Level</span></div>
@@ -1026,7 +1052,8 @@ function phaseName(p){return {OSCP:'OSCP',FOUND:'Foundations',WEB:'Web Security'
 function roadmapHTML(){
   let n=0,study='';
   CURR_GROUPS.forEach(g=>{
-    study+=`<h4>${phaseName(g.phase)} · ${g.topic}</h4><p class="tiny" style="margin:-4px 0 6px">📚 ${g.res}</p><ul>`;
+    const ru=resUrl(g.res);
+    study+=`<h4>${phaseName(g.phase)} · ${g.topic}</h4><p class="tiny" style="margin:-4px 0 6px">📚 ${ru?`<a href="${ru}" target="_blank" rel="noopener" style="color:var(--accent)">${g.res} ↗</a>`:g.res}</p><ul>`;
     g.items.forEach(it=>{n++;study+=`<li><b>Day ${n}:</b> ${it}</li>`;});
     study+='</ul>';
   });
@@ -1237,6 +1264,7 @@ function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomput
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
 rollover();render();
 if(!S.seenIntro)intro();
+else if(dow()===0&&S.lastRecap!==todayStr()&&Object.keys(S.history).length>0){S.lastRecap=todayStr();save();showRecap();}
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>

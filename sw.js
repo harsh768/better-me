@@ -1,5 +1,5 @@
 /* THE SYSTEM — service worker (offline cache) */
-const CACHE = 'system-v5';
+const CACHE = 'system-v6';
 const ASSETS = [
   './',
   './index.html',
