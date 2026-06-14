@@ -541,8 +541,8 @@ function todaysQuests(){
      exp:`Cleanser → moisturiser → sunscreen (SPF 50). 30 seconds.\nSunscreen daily is the single highest-ROI skincare step — even indoors near windows.`},
    {id:'physio',title:'Physio — Shoulder Routine',sub:'Your prescribed exercises, 1-2× today',stat:'SEN',xp:30,gold:20,mand:true,
      exp:`Do the EXACT exercises your physio prescribed.\nConsistency here decides how fast you return to heavy lifting. Never push into sharp pain.`},
-   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~150 g protein · ~1,800-2,000 kcal',stat:'VIT',xp:45,gold:30,mand:true,
-     exp:`Target ≈ 150 g protein, ≈ 1,800-2,000 kcal (deficit ≈ 0.5 kg/week loss).\nEgg+veg sources: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nPalm of protein + half-plate veg each meal. Limit fried/sugar/sweets.`},
+   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~160 g protein · ~1,700–1,900 kcal',stat:'VIT',xp:45,gold:30,mand:true,
+     exp:`Target ≈ 160 g protein, ≈ 1,700–1,900 kcal — a ~750 kcal/day deficit ≈ 0.75 kg/week (you can safely lose ~1 kg/week early while heavier). This is the engine of your birthday transformation.\nEgg+veg protein: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nEvery meal: a palm+ of protein + half-plate veg. Cut fried food, sugar, sweets, sugary drinks & late-night snacking.`},
    {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:10,mand:false,
      exp:`Carry a 1 L bottle, refill ×3. Helps appetite, recovery and skin.`},
    {id:'workout',title:wk.key,sub:'Tap for today\'s exact exercises',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
@@ -552,12 +552,51 @@ function todaysQuests(){
      exp:`At work: one 60-90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built.`},
    studyToday(),
    {id:'spend',title:'Track Spends + Stay on Budget',sub:'Log today\'s spends in the VAULT (20s)',stat:'WLT',xp:25,gold:15,mand:false,
-     exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your ₹50k investment stays intact.`},
+     exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your investment savings stay intact.`},
    {id:'sk_pm',title:'Night Skincare',sub:'Cleanser → treatment → moisturiser',stat:'SEN',xp:15,gold:10,mand:false,
      exp:`Cleanser → (after 2-3 weeks add niacinamide + a gentle retinoid 2-3×/wk) → moisturiser.\nKeep it simple until it's automatic. Good cue to start winding down for sleep.`},
    {id:'sleep',title:'Lights Out On Time',sub:'Target this week: '+bedtimeTarget(),stat:'VIT',xp:30,gold:20,mand:true,
      exp:`This week's bedtime target: ${bedtimeTarget()}. We shift ~20 min earlier each week toward 12:30 am / 8 am wake.\nNo screens 30 min before bed. Sleep heals the shoulder and runs your fat-loss hormones.`},
   ];
+}
+
+/* ---------- bonus quests (optional, earn extra gold for bigger rewards) ---------- */
+const BONUS_POOL=[
+ {id:'b_nojunk',title:'No junk / no food delivery',sub:'Cook or eat clean today',stat:'VIT',xp:25,gold:35,exp:'Skip all delivery & junk today. Saves money AND calories — a double win toward your birthday goal.'},
+ {id:'b_steps',title:'Bonus 5,000 steps',sub:'Hit ~15k total today',stat:'AGI',xp:25,gold:35,exp:'Add ~40 min more walking on top of your 10k. A big fat-loss day with zero shoulder load.'},
+ {id:'b_cook',title:'Cook a homemade protein meal',sub:'Eggs / paneer / soya',stat:'VIT',xp:20,gold:30,exp:'Cook one protein meal yourself — controls calories and spend, builds a real skill.'},
+ {id:'b_study',title:'+30 min extra study',sub:'One more lab or topic',stat:'INT',xp:30,gold:40,exp:'Stack an extra 30 min onto your study block. This is how you pull ahead.'},
+ {id:'b_read',title:'Read 10 pages',sub:'Book or security writeup',stat:'INT',xp:18,gold:22,exp:'10 pages of a book or a disclosed report. Feeds the mind off-screen.'},
+ {id:'b_med',title:'10 min meditation / breathwork',sub:'Calm the system',stat:'SEN',xp:18,gold:22,exp:'10 minutes of breathing or meditation. Lowers stress, improves sleep and focus.'},
+ {id:'b_cold',title:'Cold shower finish',sub:'2–3 min cold',stat:'SEN',xp:18,gold:22,exp:'End your shower with 2–3 min cold. Discipline and alertness on tap.'},
+ {id:'b_tidy',title:'Tidy your space 15 min',sub:'Reset your environment',stat:'PER',xp:18,gold:22,exp:'15 min declutter. A clean space is a clearer head.'},
+ {id:'b_parents',title:'Quality time with parents',sub:'Call or sit with family',stat:'SEN',xp:25,gold:35,exp:'Call or spend real time with your parents. Matters more than you think.'},
+ {id:'b_gf',title:'Thoughtful moment with your GF',sub:'Presence over spend',stat:'SEN',xp:25,gold:35,exp:'A thoughtful message, a small plan, or undistracted time. Effort beats money.'},
+ {id:'b_noscreen',title:'No screens 1 hr before bed',sub:'Protect your sleep',stat:'VIT',xp:22,gold:28,exp:'Phone away 1 hr before lights-out. Fall asleep faster, heal better.'},
+ {id:'b_work',title:'Clear one work backlog item',sub:'Finish something nagging',stat:'PER',xp:25,gold:35,exp:'Knock out one lingering work task. Momentum and reputation compound.'},
+ {id:'b_nospend',title:'No-spend day',sub:'Zero non-essential spends',stat:'WLT',xp:25,gold:40,exp:'Spend nothing beyond essentials today. Every no-spend day funds your goals.'},
+ {id:'b_mobility',title:'Mobility / stretch 10 min',sub:'Gentle — hips, hams, shoulder',stat:'AGI',xp:18,gold:22,exp:'10 min mobility. Helps the shoulder heal and keeps you loose.'},
+ {id:'b_journal',title:'Journal 5 lines',sub:'Wins · gratitude · tomorrow',stat:'SEN',xp:18,gold:22,exp:'5 lines: today\'s wins, one gratitude, one focus for tomorrow.'},
+];
+function bonusToday(){const seed=Math.abs(daysBetween('2026-01-01',todayStr())),n=BONUS_POOL.length,out=[];for(let i=0;i<3;i++)out.push(BONUS_POOL[(seed*3+i)%n]);return out;}
+
+/* ---------- birthday milestone ---------- */
+function milestone(){
+  const bday=S.profile.bday||'2026-09-14';
+  const days=Math.max(0,daysBetween(todayStr(),bday)),weeks=days/7;
+  const cur=S.weights.slice(-1)[0]?S.weights.slice(-1)[0].kg:90,goal=S.profile.goalWeight;
+  const proj075=Math.max(goal,+(cur-0.75*weeks).toFixed(1)),proj1=Math.max(goal,+(cur-1*weeks).toFixed(1));
+  return {bday,days,weeks:weeks.toFixed(1),cur,goal,proj075,proj1};
+}
+
+/* ---------- attribute consistency (radar) ---------- */
+const ATTR_EXPECT={STR:0.5,VIT:3,AGI:1.5,INT:1,PER:1,SEN:3,WLT:1};
+function attrScores(days=14){
+  const cnt={};Object.keys(STATS).forEach(k=>cnt[k]=0);const d=new Date();
+  for(let i=0;i<days;i++){const dd=new Date(d);dd.setDate(d.getDate()-i);const rec=S.history[dstr(dd)];
+    if(rec&&rec.meta)Object.values(rec.meta).forEach(m=>{if(m.s!==undefined&&cnt[m.s]!==undefined)cnt[m.s]++;});}
+  const sc={};Object.keys(STATS).forEach(k=>{sc[k]=Math.min(100,Math.round(cnt[k]/((ATTR_EXPECT[k]||1)*days)*100));});
+  return sc;
 }
 
 /* ---------- leveling ---------- */
@@ -569,7 +608,7 @@ function titleFor(l){return l>=50?'Sovereign':l>=35?'Shadow Monarch':l>=20?'Elit
 /* ---------- state ---------- */
 let S=load();
 function defaultState(){return{
-  profile:{name:'HARSH',startDate:todayStr(),goalWeight:76,height:183},
+  profile:{name:'HARSH',startDate:todayStr(),goalWeight:76,height:183,bday:'2026-09-14'},
   totalXp:0,gold:0,
   stats:{STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0,WLT:0},
   totalCompleted:0,history:{},weights:[],
@@ -584,28 +623,36 @@ function defaultState(){return{
       {name:'Joint savings (GF)',amt:30000,type:'savings'},
       {name:'Mom savings',amt:15000,type:'savings'},
     ],
-    investTarget:50000,
+    investTarget:55000,
     budgets:[
-      {cat:'Food & groceries',amt:18000},
-      {cat:'Dates & outings',amt:22000},
+      {cat:'Food & groceries',amt:17000},
+      {cat:'Dates & outings',amt:18000},
       {cat:'Shopping & personal',amt:8000},
       {cat:'Misc & buffer',amt:8000},
     ],
     spends:{},
   },
   rewards:[
-    {id:'r1',ic:'🍔',name:'Guilt-free cheat meal',cost:200},
-    {id:'r2',ic:'🎮',name:'2 hrs gaming / Netflix',cost:120},
-    {id:'r3',ic:'😴',name:'One sleep-in morning',cost:150},
-    {id:'r4',ic:'💖',name:'Plan a nice date',cost:180},
-    {id:'r5',ic:'🛍️',name:'Buy something you want',cost:600},
+    {id:'r1',ic:'☕',name:'Coffee / dessert out',cost:150},
+    {id:'r2',ic:'🍔',name:'Guilt-free cheat meal',cost:350},
+    {id:'r3',ic:'🛵',name:'Order-in (Swiggy/Zomato)',cost:300},
+    {id:'r4',ic:'🎮',name:'2 hrs gaming / Netflix',cost:250},
+    {id:'r5',ic:'🎬',name:'Movie / night out',cost:450},
+    {id:'r6',ic:'😴',name:'Guilt-free sleep-in',cost:400},
+    {id:'r7',ic:'💖',name:'Thoughtful date',cost:550},
+    {id:'r8',ic:'👕',name:'New clothes (₹2–3k)',cost:1800},
+    {id:'r9',ic:'🎧',name:'Gadget / big buy (₹5k+)',cost:4500},
+    {id:'r10',ic:'✈️',name:'Weekend getaway / splurge',cost:7000},
   ],
+  rewardsV2:true,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
   if(!s.stats.WLT)s.stats.WLT=0;
   if(!s.finance)s.finance=defaultState().finance;
   if(s.profile&&s.profile.goalWeight===78)s.profile.goalWeight=76;
+  if(s.profile&&!s.profile.bday)s.profile.bday='2026-09-14';
+  if(!s.rewardsV2){const d=defaultState();s.rewards=d.rewards;s.finance.investTarget=d.finance.investTarget;s.finance.budgets=d.finance.budgets;s.rewardsV2=true;}
   return s;
 }
 function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
@@ -672,18 +719,19 @@ function drawRadar(){
   const c=$('#radar');if(!c||!c.clientWidth)return;
   const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientWidth;
   c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
-  const keys=Object.keys(STATS),n=keys.length,vals=keys.map(k=>S.stats[k]),max=Math.max(5,...vals);
-  const cx=w/2,cy=h/2,R=Math.min(w,h)/2-22,ang=i=>-Math.PI/2+i*2*Math.PI/n;
-  for(let r=1;r<=3;r++){x.strokeStyle='rgba(255,255,255,0.07)';x.lineWidth=1;x.beginPath();
-    for(let i=0;i<=n;i++){const a=ang(i%n),rr=R*r/3,px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
-  x.fillStyle='#9097ab';x.font='600 10px Space Grotesk';x.textAlign='center';x.textBaseline='middle';
-  for(let i=0;i<n;i++){const a=ang(i),ex=cx+Math.cos(a)*R,ey=cy+Math.sin(a)*R;
-    x.strokeStyle='rgba(255,255,255,0.05)';x.beginPath();x.moveTo(cx,cy);x.lineTo(ex,ey);x.stroke();
-    x.fillText(keys[i],cx+Math.cos(a)*(R+13),cy+Math.sin(a)*(R+13));}
+  const keys=Object.keys(STATS),n=keys.length,sc=attrScores(),vals=keys.map(k=>sc[k]),max=100;
+  const cx=w/2,cy=h/2,R=Math.min(w,h)/2-30,ang=i=>-Math.PI/2+i*2*Math.PI/n;
+  for(let r=1;r<=4;r++){x.strokeStyle='rgba(255,255,255,0.07)';x.lineWidth=1;x.beginPath();
+    for(let i=0;i<=n;i++){const a=ang(i%n),rr=R*r/4,px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
+  for(let i=0;i<n;i++){const a=ang(i);x.strokeStyle='rgba(255,255,255,0.05)';x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);x.stroke();}
   x.beginPath();for(let i=0;i<=n;i++){const a=ang(i%n),rr=R*(vals[i%n]/max),px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.closePath();
-  const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(142,162,255,0.4)');g.addColorStop(1,'rgba(183,157,255,0.28)');
+  const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(142,162,255,0.42)');g.addColorStop(1,'rgba(183,157,255,0.3)');
   x.fillStyle=g;x.fill();x.strokeStyle='#8ea2ff';x.lineWidth=2;x.stroke();
   x.fillStyle='#b79dff';for(let i=0;i<n;i++){const a=ang(i),rr=R*(vals[i]/max);x.beginPath();x.arc(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,2.6,0,7);x.fill();}
+  x.textAlign='center';x.textBaseline='middle';
+  for(let i=0;i<n;i++){const a=ang(i),lx=cx+Math.cos(a)*(R+17),ly=cy+Math.sin(a)*(R+17);
+    x.fillStyle='#c3c8da';x.font='600 10px Space Grotesk';x.fillText(keys[i],lx,ly-5);
+    x.fillStyle=vals[i]>=70?'#7fe0b0':vals[i]>=40?'#9097ab':'#ff8fa0';x.font='600 9px Space Grotesk';x.fillText(vals[i]+'%',lx,ly+6);}
 }
 function drawActivity(){
   const c=$('#activity');if(!c||!c.clientWidth)return;
@@ -771,13 +819,23 @@ function viewHome(){
   else if(doneN>=qs.length)greet='Perfect clear. You grow stronger.';
   else if(mandLeft<=2)greet=`Almost there — ${mandLeft} core quest${mandLeft>1?'s':''} left before the penalty zone closes.`;
   else greet='Each cleared quest is a step toward who you want to be.';
-  return heroHTML()+`<div class="panel">
-    <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
-    <div class="q-progress num">${doneN}/${qs.length} cleared</div></div>
-    <div class="greet">${greet}</div>
-    ${qs.map(q=>questHTML(q,rec)).join('')}</div>`;
+  const ms=milestone(),bq=bonusToday(),bonusDone=bq.filter(q=>rec.done.includes(q.id)).length;
+  return heroHTML()+
+   `<div class="panel" style="background:linear-gradient(150deg,rgba(230,193,121,.10),transparent 70%);border-color:rgba(230,193,121,.22)">
+     <div class="panel-title" style="margin-bottom:8px"><span class="dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>🎂 Birthday Milestone · 14 Sep</div>
+     <p class="tiny" style="font-size:12.5px;line-height:1.6"><b style="color:var(--gold)">${ms.days} days</b> to go. At <b>0.75 kg/wk</b> you'll hit <b style="color:var(--accent)">~${ms.proj075} kg</b>; push to <b>1 kg/wk</b> for <b style="color:var(--accent)">~${ms.proj1} kg</b>. Now ${ms.cur} kg → goal ${ms.goal} kg.</p></div>
+    <div class="panel">
+     <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
+     <div class="q-progress num">${doneN}/${qs.length} cleared</div></div>
+     <div class="greet">${greet}</div>
+     ${qs.map(q=>questHTML(q,rec)).join('')}</div>
+    <div class="panel">
+     <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></span>Bonus Quests</div>
+     <div class="q-progress num">${bonusDone}/3 · +gold</div></div>
+     <div class="greet">Optional — clear these for extra gold toward the bigger rewards. They don't affect your streak.</div>
+     ${bq.map(q=>questHTML(q,rec)).join('')}</div>`;
 }
-function qtap(id){const q=todaysQuests().find(x=>x.id===id);if(q)toggleQuest(q);}
+function qtap(id){const q=[...todaysQuests(),...bonusToday()].find(x=>x.id===id);if(q)toggleQuest(q);}
 function qexp(id){const e=$('#exp_'+id),b=$('#eb_'+id);if(!e)return;const h=e.classList.toggle('hidden');if(b)b.textContent=h?'▾ details':'▴ hide';}
 
 function viewStats(){
@@ -787,9 +845,9 @@ function viewStats(){
     <div class="bar ${m.cls}"><i style="width:${Math.round(v/max*100)}%"></i></div>
     <div class="stat-desc">${m.desc}</div></div>`;}).join('');
   return heroHTML()+
-   `<div class="panel"><div class="panel-title"><span class="dot"></span>Attribute Web</div>
+   `<div class="panel"><div class="panel-title"><span class="dot"></span>Consistency Web · last 14 days</div>
      <canvas id="radar" style="width:100%;aspect-ratio:1;display:block"></canvas>
-     <p class="tiny" style="text-align:center;margin-top:6px">Your balance across all seven attributes. Fill the gaps.</p></div>
+     <p class="tiny" style="text-align:center;margin-top:4px">How consistent you've been in each area. <b style="color:var(--green)">100%</b> = nailed it daily. A balanced shape = a balanced life — push the dented sides.</p></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>This Week</div>
      <div class="hero-stats"><div class="chip done"><b class="num">${wk.perfect}</b><span>Perfect Days</span></div>
      <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div>
@@ -862,8 +920,9 @@ function viewMoney(){
 }
 let SPEND_CAT=null;
 function logSpend(){
-  SPEND_CAT=S.finance.budgets[0]?.cat||'Misc & buffer';
-  const cats=S.finance.budgets.map(b=>`<button onclick="selCat('${b.cat.replace(/'/g,"")}')" data-c="${b.cat}" class="${b.cat===SPEND_CAT?'sel':''}">${b.cat}</button>`).join('');
+  if(!SPEND_CAT||!S.finance.budgets.find(b=>b.cat===SPEND_CAT))SPEND_CAT=S.finance.budgets[0]?.cat||'Misc & buffer';
+  const cats=S.finance.budgets.map(b=>`<button onclick="selCat('${b.cat.replace(/'/g,"")}')" data-c="${b.cat}" class="${b.cat===SPEND_CAT?'sel':''}">${b.cat}</button>`).join('')
+    +`<button onclick="addCatInline()" style="border-style:dashed;color:var(--accent)">+ New</button>`;
   sysModal('LOG A SPEND',`
     <label>Amount (₹)</label><input id="sp_amt" type="number" inputmode="numeric" placeholder="e.g. 450" autofocus>
     <label>Category</label><div class="catbtn" id="sp_cats">${cats}</div>
@@ -871,6 +930,7 @@ function logSpend(){
     <button class="btn" style="margin-top:16px" onclick="saveSpend()">ADD SPEND</button>`,'CANCEL');
 }
 function selCat(c){SPEND_CAT=c;[...document.querySelectorAll('#sp_cats button')].forEach(b=>b.classList.toggle('sel',b.dataset.c===c));}
+function addCatInline(){const name=prompt('New spend category name?');if(!name)return;const t=name.trim();if(!t)return;if(!S.finance.budgets.find(b=>b.cat===t))S.finance.budgets.push({cat:t,amt:3000});save();SPEND_CAT=t;logSpend();}
 function saveSpend(){
   const amt=parseFloat($('#sp_amt').value);if(!amt||amt<=0){toast('Enter an amount');return;}
   const note=$('#sp_note').value.trim(),mk=monthKey();
@@ -974,7 +1034,7 @@ function roadmapHTML(){
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const sess=ph=>days.map((d,i)=>`<tr><td>${d}</td><td>${WORKOUT_PHASES[ph][i].key}</td></tr>`).join('');
   let sleep='';for(let w=1;w<=8;w++){const t=Math.max(30,150-(w-1)*20),hh=Math.floor(t/60),mm=t%60,disp=hh===0?12:hh;sleep+=`<tr><td>Week ${w}</td><td>${disp}:${String(mm).padStart(2,'0')} am</td></tr>`;if(t===30)break;}
-  const cur=S.weights.slice(-1)[0]?S.weights.slice(-1)[0].kg:90,goal=S.profile.goalWeight,wks=Math.max(0,Math.ceil((cur-goal)/0.5));
+  const ms=milestone(),cur=ms.cur,goal=ms.goal,wks=Math.max(0,Math.ceil((cur-goal)/0.75));
   return `<h4>🗺️ Study Syllabus — Day by Day</h4>
    <p>Your full ~1-year path. The Home <b>Study</b> quest serves these in order (Sundays = review, so "Day N" = your Nth study session). You're currently on study day <b class="hl">${studyIndexFor()+1}</b>.</p>
    ${study}
@@ -989,10 +1049,11 @@ function roadmapHTML(){
    <p>Bedtime moves ~20 min earlier each week toward 12:30 am / 8 am wake.</p>
    <table><tr><th>Week</th><th>Lights-out target</th></tr>${sleep}</table>
    <h4>⚖️ Weight Roadmap → ${goal} kg</h4>
-   <p>From <b>${cur} kg</b> to your goal <b class="hl">${goal} kg</b> at a sustainable ~0.5 kg/week ≈ <b>${wks} weeks (~${Math.round(wks/4.3)} months)</b>. Calorie deficit (~1,800–2,000 kcal) + 150 g protein + 10k steps does it. Track the weekly trend in LOG, not the daily number.</p>
+   <p><b style="color:var(--gold)">🎂 Birthday milestone — ${ms.days} days to 14 Sep.</b> At 0.75 kg/week you'll reach <b class="hl">~${ms.proj075} kg</b>; push to 1 kg/week for <b class="hl">~${ms.proj1} kg</b>. That's a visible transformation by your birthday.</p>
+   <p>Full goal: from <b>${cur} kg</b> → <b class="hl">${goal} kg</b> at ~0.75 kg/week ≈ <b>${wks} weeks (~${Math.round(wks/4.3)} months)</b>. Engine: ~750 kcal/day deficit (≈1,700–1,900 kcal) + 160 g protein + 10k+ steps. Run ~1 kg/week early while heavier, then ease to 0.75. Track the weekly trend, not the daily number.</p>
    <h4>💰 Money Roadmap → higher savings rate</h4>
    <ul><li><b>Now – Dec 2026:</b> save ₹95k/mo (₹45k auto + ₹50k invest), spend ≤ ₹56k. First fill a 6-month emergency fund (~₹6L) in a liquid fund.</li>
-   <li><b>Jan 2027:</b> personal loan (₹10k) + phone EMI (₹17k) end → ₹27k/mo freed. Redirect all of it to investing → ~₹77k invest, savings rate ~49%.</li>
+   <li><b>Jan 2027:</b> personal loan (₹10k) + phone EMI (₹17k) end → ₹27k/mo freed. Redirect all of it to investing → ~₹82k invest, savings rate ~51%.</li>
    <li><b>Ongoing:</b> automate SIPs (index + flexicap) on salary day, use 80C (ELSS/PPF), keep the 24-hour rule on impulse buys.</li></ul>
    <p class="note">This whole roadmap adapts to your settings — change your start date, goal weight, or budget and it recalculates.</p>`;
 }
@@ -1033,10 +1094,10 @@ train:`<h4>Training — 3 phases across the year</h4>
 <li><b>10k steps daily</b> — zero shoulder cost, biggest fat-loss lever.</li></ul>`,
 
 nutri:`<h4>Nutrition — Lean Down (Egg + Veg)</h4>
-<p>At ~90 kg / 6 ft, a steady deficit melts fat without killing energy. Aim <b>~0.5 kg/week</b> — don't crash.</p>
+<p>At ~90 kg / 6 ft, a firm deficit melts fat fast. Target <b>~0.75 kg/week</b> (you can run ~1 kg/week early while heavier) to be visibly fitter by your <b class="hl">14 Sep birthday</b> — without crashing your energy or the shoulder's healing.</p>
 <table><tr><th>Target</th><th>Value</th></tr>
-<tr><td>Calories</td><td>~1,800–2,000 kcal/day</td></tr>
-<tr><td>Protein</td><td>~150 g/day</td></tr>
+<tr><td>Calories</td><td>~1,700–1,900 kcal/day (~750 kcal deficit)</td></tr>
+<tr><td>Protein</td><td>~160 g/day</td></tr>
 <tr><td>Water</td><td>3 L/day</td></tr></table>
 <p>Your two-meal pattern (12:30 + 9) is basically intermittent fasting — great for a deficit. Make both meals protein-forward.</p>
 <h4>Protein (egg + veg)</h4>
@@ -1098,13 +1159,13 @@ money:`<h4>Money — Bangalore, ₹2.5L/month</h4>
 <tr><td>Joint savings (GF)</td><td>30,000</td></tr>
 <tr><td>Mom savings</td><td>15,000</td></tr>
 <tr><td><b>Auto-savings</b></td><td><b>45,000</b></td></tr>
-<tr><td>Investment target (NEW)</td><td>50,000</td></tr>
-<tr><td><b>Spendable on life</b></td><td><b>56,000</b></td></tr></table>
-<h4>The ₹56k "spendable" split</h4>
-<ul><li>Food & groceries — 18k</li><li>Dates & outings — 22k</li><li>Shopping & personal — 8k</li><li>Misc & buffer — 8k</li></ul>
-<p>Total saved/invested = 45k + 50k = <b class="hl">₹95k/month (~38%)</b>. That's a strong rate for 24.</p>
+<tr><td>Investment target</td><td>55,000</td></tr>
+<tr><td><b>Spendable on life</b></td><td><b>51,000</b></td></tr></table>
+<h4>The ₹51k "spendable" split</h4>
+<ul><li>Food & groceries — 17k</li><li>Dates & outings — 18k</li><li>Shopping & personal — 8k</li><li>Misc & buffer — 8k</li></ul>
+<p>Total saved/invested = 45k + 55k = <b class="hl">₹1,00,000/month (~40%)</b>. Strong but realistic — tightened dates/food a little vs the easy version, and the reward Shop now gates extra splurges behind earned gold so you don't overspend.</p>
 <h4>After December — the jump</h4>
-<p>Personal loan (10k) and phone EMI (17k) <b>both end in Dec 2026</b> → ₹27k/month freed. Redirect ALL of it to investments: savings rate climbs toward <b class="hl">~49%</b> without changing your lifestyle. (Bump "investment target" in the VAULT then.)</p>
+<p>Personal loan (10k) and phone EMI (17k) <b>both end in Dec 2026</b> → ₹27k/month freed. Redirect ALL of it to investments → invest ~₹82k, total savings ~₹1.27L/mo, rate <b class="hl">~51%</b> — without changing your lifestyle. (Bump "investment target" in the VAULT then.)</p>
 <h4>Where to put the ₹50k+ invest</h4>
 <ul><li>Build a 6-month <b>emergency fund</b> first (liquid fund / sweep FD) ≈ ₹6L.</li>
 <li>Then SIPs into index funds (Nifty 50 + maybe a flexicap), and use your <b>80C</b> (ELSS/PPF) for tax.</li>
@@ -1147,8 +1208,9 @@ function openSettings(){const p=S.profile;
   sysModal('SETTINGS',`<label>Hunter name</label><input id="s_name" value="${p.name||''}">
     <div class="row2"><div><label>Goal weight (kg)</label><input id="s_goal" type="number" value="${p.goalWeight}"></div>
     <div><label>Height (cm)</label><input id="s_h" type="number" value="${p.height}"></div></div>
-    <label>Program start date</label><input id="s_start" type="date" value="${p.startDate}">
-    <p class="tiny" style="margin-top:6px">Week ${programWeek()} · ${currentPhaseLetter()==='A'?'Heal phase':currentPhaseLetter()==='B'?'Reintroduction phase':'Full-training phase'}. Workout split & study units advance from this date.</p>
+    <div class="row2"><div><label>Program start</label><input id="s_start" type="date" value="${p.startDate}"></div>
+    <div><label>Birthday (milestone)</label><input id="s_bday" type="date" value="${p.bday||'2026-09-14'}"></div></div>
+    <p class="tiny" style="margin-top:6px">Week ${programWeek()} · ${currentPhaseLetter()==='A'?'Heal phase':currentPhaseLetter()==='B'?'Reintroduction phase':'Full-training phase'}. Workout split & study units advance from the start date.</p>
     <button class="btn" style="margin-top:14px" onclick="saveSettings()">SAVE</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="exportData()">EXPORT BACKUP (JSON)</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="importData()">IMPORT BACKUP</button>
@@ -1156,7 +1218,8 @@ function openSettings(){const p=S.profile;
     <p class="tiny center" style="margin-top:12px">Your data lives only on this device. Export before switching phones.</p>`,'CLOSE');}
 function saveSettings(){S.profile.name=$('#s_name').value.trim().toUpperCase()||'HUNTER';
   S.profile.goalWeight=parseFloat($('#s_goal').value)||S.profile.goalWeight;S.profile.height=parseInt($('#s_h').value)||S.profile.height;
-  S.profile.startDate=$('#s_start').value||S.profile.startDate;save();$('#modal-host').innerHTML='';render();toast('Settings saved');}
+  S.profile.startDate=$('#s_start').value||S.profile.startDate;
+  S.profile.bday=$('#s_bday').value||S.profile.bday;save();$('#modal-host').innerHTML='';render();toast('Settings saved');}
 function exportData(){const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='system-backup-'+todayStr()+'.json';a.click();}
 function importData(){const i=document.createElement('input');i.type='file';i.accept='.json';
   i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=migrate(JSON.parse(r.result));save();$('#modal-host').innerHTML='';render();toast('Backup restored');}catch(x){alert('Invalid file');}};r.readAsText(f);};i.click();}
