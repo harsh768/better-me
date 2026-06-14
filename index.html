@@ -97,6 +97,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .tag.xp{color:var(--accent);border-color:var(--line2);}
 .tag.gold{color:var(--gold);border-color:rgba(230,193,121,.3);}
 .tag.mand{color:var(--red);border-color:rgba(255,143,160,.3);}
+.tag.streak{color:var(--orange);border-color:rgba(255,178,122,.4);background:rgba(255,178,122,.08);}
 .tag.phase{color:var(--accent2);border-color:rgba(183,157,255,.3);}
 .qexp{font-size:12.5px;color:var(--txt2);margin-top:10px;line-height:1.55;padding:11px 13px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:12px;white-space:pre-line;}
 .expbtn{font-size:11px;color:var(--accent);margin-top:7px;letter-spacing:.5px;}
@@ -222,6 +223,11 @@ label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margi
 .cx li b{color:var(--accent);}
 .reslink{display:inline-block;margin-top:9px;color:var(--accent);border:1px solid var(--line2);border-radius:10px;padding:7px 12px;font-size:12px;text-decoration:none;font-weight:600;}
 .reslink:active{background:rgba(141,162,255,.12);}
+.til-row{display:flex;gap:11px;padding:9px 0;border-top:1px solid var(--line);}
+.til-row:first-child{border-top:none;}
+.til-row .td{flex:none;width:68px;font-size:11px;color:var(--muted);padding-top:1px;}
+.til-row .tt{flex:1;font-size:13px;color:var(--txt2);line-height:1.45;}
+textarea{line-height:1.45;}
 </style>
 </head>
 <body>
@@ -527,11 +533,11 @@ function studyIndexFor(){
 function studyMins(w){ if(w<=4)return [60,75,90,105][Math.min(w-1,3)]; return Math.min(75+(w-5)*5,120); }
 function studyToday(){
   if(dow()===0) return {id:'study',title:'Weekly Review & Plan',sub:'Sunday reset — re-read learnings, log weight, plan the week.',
-    stat:'INT',xp:50,gold:35,mand:true,phaseTag:'REVIEW',
+    stat:'INT',xp:50,gold:35,mand:true,key:true,phaseTag:'REVIEW',
     exp:`Sunday reset:\n• Re-read this week's "today I learned" notes — feel the progress.\n• Pick next week's study target.\n• Log your weight (LOG tab).\n• Review the VAULT — did you stay on budget?\n• Plan dates/quality time with your GF.\n• 30-60 min on a startup idea if you want.`};
   const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
   const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
-  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
+  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, key:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
     exp:`${unit.task}\n\n📚 Resource: ${unit.res}\n⏱ Today: ~${mins} min.\n\nWhen done, write ONE "today I learned" note. That single habit, daily, is the cure for "I don't know anything" — in 90 days you'll have 90 receipts.`};
 }
 
@@ -543,12 +549,12 @@ function todaysQuests(){
      exp:`Cleanser → moisturiser → sunscreen (SPF 50). 30 seconds.\nSunscreen daily is the single highest-ROI skincare step — even indoors near windows.`},
    {id:'physio',title:'Physio — Shoulder Routine',sub:'Your prescribed exercises, 1-2× today',stat:'SEN',xp:30,gold:20,mand:true,
      exp:`Do the EXACT exercises your physio prescribed.\nConsistency here decides how fast you return to heavy lifting. Never push into sharp pain.`},
-   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~160 g protein · ~1,700–1,900 kcal',stat:'VIT',xp:45,gold:30,mand:true,
+   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~160 g protein · ~1,700–1,900 kcal',stat:'VIT',xp:45,gold:30,mand:true,key:true,
      exp:`Target ≈ 160 g protein, ≈ 1,700–1,900 kcal — a ~750 kcal/day deficit ≈ 0.75 kg/week (you can safely lose ~1 kg/week early while heavier). This is the engine of your birthday transformation.\nEgg+veg protein: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nEvery meal: a palm+ of protein + half-plate veg. Cut fried food, sugar, sweets, sugary drinks & late-night snacking.`},
    {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:10,mand:false,
      exp:`Carry a 1 L bottle, refill ×3. Helps appetite, recovery and skin.`},
    {id:'workout',title:wk.key,sub:'Tap for today\'s exact exercises',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
-   {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:20,mand:true,
+   {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:20,mand:true,key:true,
      exp:`Target: 10,000 steps ≈ 70–80 min of walking total.\nEasiest split: 20-min brisk walk after your office lunch + a 30–40 min walk in the evening. Track it on your phone / Apple Health.\nSteps are the #1 fat-loss lever and put zero load on the shoulder.`},
    {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:true,
      exp:`At work: one 60-90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built.`},
@@ -668,10 +674,17 @@ function bedtimeTarget(){
 }
 
 function dayRecord(d=todayStr()){if(!S.history[d])S.history[d]={done:[],full:false};return S.history[d];}
+/* STREAK is gated by only 3 keystone quests (your 3 big goals), so missing the
+   smaller habits won't break it. "full" = all mandatory done = a perfect-clear bonus. */
+const STREAK_CORE=['protein','steps','study'];
+function dayCounts(rec){return !!rec && STREAK_CORE.every(id=>rec.done.includes(id));}
+function everyMand(rec){return !!rec && todaysQuests().filter(q=>q.mand).every(q=>rec.done.includes(q.id));}
 function toggleQuest(q){
   const rec=dayRecord(),i=rec.done.indexOf(q.id);
   if(i>=0){rec.done.splice(i,1);if(rec.meta)delete rec.meta[q.id];S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
-    S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);recomputeFull();save();render();
+    S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);
+    if(!dayCounts(rec))rec.streakBonus=false;if(!everyMand(rec))rec.bonus=false;
+    recomputeFull();save();render();
   }else{
     const before=levelInfo(S.totalXp).level;
     rec.done.push(q.id);rec.meta=rec.meta||{};rec.meta[q.id]={t:q.title,s:q.stat,xp:q.xp,g:q.gold};
@@ -682,22 +695,23 @@ function toggleQuest(q){
     checkDayComplete();
   }
 }
-function recomputeFull(){const qs=todaysQuests().filter(q=>q.mand);dayRecord().full=qs.every(q=>dayRecord().done.includes(q.id));}
+function recomputeFull(){dayRecord().full=everyMand(dayRecord());}
 function checkDayComplete(){
-  const rec=dayRecord();
-  if(rec.full&&!rec.bonus){rec.bonus=true;S.totalXp+=50;S.gold+=40;save();
-    sysModal('DAILY QUEST COMPLETE',`<div class="sys-big">ALL CLEAR</div><p class="center">Every mandatory quest cleared.<br><span class="hl">Bonus: +50 XP · +40 Gold</span></p><p class="center tiny">Streak protected. Rest well, Hunter.</p>`,'CLOSE');
-    render();}
+  const rec=dayRecord();let msg=null;
+  if(dayCounts(rec)&&!rec.streakBonus){rec.streakBonus=true;S.totalXp+=30;S.gold+=25;
+    msg={h:'STREAK SECURED',b:`<div class="sys-big">🔥 ${streakInfo().cur}-DAY STREAK</div><p class="center">Your keystone quests are done — <b>Protein · Steps · Study</b>. Streak locked in for today.<br><span class="hl">+30 XP · +25 Gold</span></p><p class="center tiny">Everything else today is a bonus.</p>`};}
+  if(rec.full&&!rec.bonus){rec.bonus=true;S.totalXp+=50;S.gold+=40;
+    msg={h:'PERFECT CLEAR',b:`<div class="sys-big">ALL CLEAR</div><p class="center">Every quest cleared — a flawless day.<br><span class="hl">Bonus: +50 XP · +40 Gold</span></p>`};}
+  if(msg){save();sysModal(msg.h,msg.b,'CLOSE');render();}
 }
 function streakInfo(){
   let cur=0,d=new Date();
-  if(!(S.history[todayStr()]&&S.history[todayStr()].full))d.setDate(d.getDate()-1);
-  while(true){const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if(S.history[ds]&&S.history[ds].full){cur++;d.setDate(d.getDate()-1);}else break;}
+  if(!dayCounts(S.history[todayStr()]))d.setDate(d.getDate()-1);
+  while(true){const ds=dstr(d);if(dayCounts(S.history[ds])){cur++;d.setDate(d.getDate()-1);}else break;}
   let longest=0,run=0,prev=null;
   for(const ds of Object.keys(S.history).sort()){
-    if(!S.history[ds].full){run=0;prev=ds;continue;}
-    if(prev&&daysBetween(prev,ds)===1&&S.history[prev].full)run++;else run=1;
+    if(!dayCounts(S.history[ds])){run=0;prev=ds;continue;}
+    if(prev&&daysBetween(prev,ds)===1&&dayCounts(S.history[prev]))run++;else run=1;
     longest=Math.max(longest,run);prev=ds;}
   return{cur,longest:Math.max(longest,cur)};
 }
@@ -734,7 +748,7 @@ function weekStats(){
   let xp=0,cleared=0,perfect=0;const byStat={};Object.keys(STATS).forEach(k=>byStat[k]=0);
   const d=new Date();
   for(let i=0;i<7;i++){const dd=new Date(d);dd.setDate(d.getDate()-i);const rec=S.history[dstr(dd)];
-    if(!rec)continue;xp+=dayXp(rec);cleared+=rec.done.length;if(rec.full)perfect++;
+    if(!rec)continue;xp+=dayXp(rec);cleared+=rec.done.length;if(dayCounts(rec))perfect++;
     if(rec.meta)Object.values(rec.meta).forEach(m=>{if(m.s)byStat[m.s]=(byStat[m.s]||0)+1;});}
   return{xp,cleared,perfect,byStat};
 }
@@ -762,7 +776,7 @@ function drawActivity(){
   const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=90;
   c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
   const days=[];const d=new Date();d.setDate(d.getDate()-13);
-  for(let i=0;i<14;i++){const dd=new Date(d);dd.setDate(d.getDate()+i);const ds=dstr(dd);days.push({ds,xp:dayXp(S.history[ds]),full:S.history[ds]&&S.history[ds].full});}
+  for(let i=0;i<14;i++){const dd=new Date(d);dd.setDate(d.getDate()+i);const ds=dstr(dd);days.push({ds,xp:dayXp(S.history[ds]),full:dayCounts(S.history[ds])});}
   const max=Math.max(60,...days.map(o=>o.xp)),gap=4,bw=(w-13*gap)/14;
   days.forEach((o,i)=>{const bh=Math.max(2,o.xp/max*(h-16)),px=i*(bw+gap);
     x.fillStyle=o.full?'#8ea2ff':'rgba(142,162,255,0.35)';roundRect(x,px,h-bh,bw,bh,3);x.fill();});
@@ -786,7 +800,9 @@ function dayDetail(ds){
   if(!rec||!rec.done.length){body='<p class="center tiny">No quests cleared this day.</p>';}
   else{const meta=rec.meta||{};
     const items=rec.done.map(id=>{const m=meta[id]||{};return `<div class="fixed-row"><span>${m.t||labelFor(id)} ${m.s?'<span class="tiny">'+m.s+'</span>':''}</span><span class="amt">${m.xp?'+'+m.xp+' XP':'✓'}</span></div>`;}).join('');
-    body=`<p class="center" style="margin-bottom:12px">${rec.full?'<span style="color:var(--green)">★ Perfect clear</span>':'<span style="color:var(--accent2)">'+rec.done.length+' cleared</span>'} · ${dayXp(rec)} XP</p>${items}`;}
+    const tag=dayCounts(rec)?'<span style="color:var(--orange)">🔥 Streak day</span>':'<span style="color:var(--accent2)">'+rec.done.length+' cleared</span>';
+    const til=rec.til?`<div class="qexp" style="margin:12px 0 0">📝 <b>Learned:</b> ${rec.til.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`:'';
+    body=`<p class="center" style="margin-bottom:12px">${tag} · ${dayXp(rec)} XP</p>${items}${til}`;}
   sysModal(prettyDate(ds),body,'CLOSE');
 }
 
@@ -827,7 +843,7 @@ function questHTML(q,rec){
         ${q.phaseTag?`<span class="tag phase">${q.phaseTag}</span>`:''}
         <span class="tag xp">+${q.xp} XP</span>
         <span class="tag gold">+${q.gold} G</span>
-        ${q.mand?'<span class="tag mand">CORE</span>':''}
+        ${q.key?'<span class="tag streak">🔥 STREAK</span>':q.mand?'<span class="tag mand">CORE</span>':''}
       </div>
       <div class="qexp hidden" id="exp_${q.id}">${q.exp||''}${q.resUrl?`<br><a href="${q.resUrl}" target="_blank" rel="noopener" class="reslink">Open resource ↗</a>`:''}</div>
       <div class="expbtn" id="eb_${q.id}">▾ details</div>
@@ -836,13 +852,12 @@ function questHTML(q,rec){
 function viewHome(){
   const qs=todaysQuests(),rec=dayRecord();
   const doneN=qs.filter(q=>rec.done.includes(q.id)).length;
-  const mandLeft=qs.filter(q=>q.mand&&!rec.done.includes(q.id)).length;
+  const keyLeft=STREAK_CORE.filter(id=>!rec.done.includes(id)).length;
   let greet;
-  if(doneN===0)greet='A new day. The System has issued your quests.';
-  else if(mandLeft===0&&doneN<qs.length)greet='All core quests cleared — bonus objectives remain.';
+  if(doneN===0)greet='A new day. Clear your 3 🔥 keystones (Protein · Steps · Study) to keep the streak alive.';
+  else if(keyLeft>0)greet=`${keyLeft} keystone${keyLeft>1?'s':''} left to lock today's streak 🔥 — Protein · Steps · Study.`;
   else if(doneN>=qs.length)greet='Perfect clear. You grow stronger.';
-  else if(mandLeft<=2)greet=`Almost there — ${mandLeft} core quest${mandLeft>1?'s':''} left before the penalty zone closes.`;
-  else greet='Each cleared quest is a step toward who you want to be.';
+  else greet='🔥 Streak secured. Everything else today is bonus XP — do what you can.';
   const ms=milestone(),bq=bonusToday(),bonusDone=bq.filter(q=>rec.done.includes(q.id)).length;
   return heroHTML()+
    `<div class="panel" style="background:linear-gradient(150deg,rgba(230,193,121,.10),transparent 70%);border-color:rgba(230,193,121,.22)">
@@ -858,10 +873,17 @@ function viewHome(){
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></span>Bonus Quests</div>
      <div class="q-progress num">${bonusDone}/3 · +gold</div></div>
      <div class="greet">Optional — clear these for extra gold toward the bigger rewards. They don't affect your streak.</div>
-     ${bq.map(q=>questHTML(q,rec)).join('')}</div>`;
+     ${bq.map(q=>questHTML(q,rec)).join('')}</div>
+    <div class="panel">
+     <div class="panel-title"><span class="dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>📝 Today I Learned</div>
+     <textarea id="til_input" rows="3" placeholder="One thing you learned today — security, work, or life…" onblur="saveTil(this.value)" style="resize:none">${(rec.til||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
+     <button class="btn ghost sm" style="margin-top:8px" onclick="saveTilBtn()">SAVE LEARNING</button>
+     <p class="tiny" style="margin-top:8px">Write one line daily — in 90 days you'll have 90 proofs you're not "behind." See them all in <b>LOG → Learning Log</b>.</p></div>`;
 }
 function qtap(id){const q=[...todaysQuests(),...bonusToday()].find(x=>x.id===id);if(q)toggleQuest(q);}
 function qexp(id){const e=$('#exp_'+id),b=$('#eb_'+id);if(!e)return;const h=e.classList.toggle('hidden');if(b)b.textContent=h?'▾ details':'▴ hide';}
+function saveTil(v){dayRecord().til=(v||'').trim();save();}
+function saveTilBtn(){saveTil($('#til_input').value);toast('Learning saved');}
 
 function viewStats(){
   const li=levelInfo(S.totalXp),max=Math.max(10,...Object.values(S.stats)),st=streakInfo(),wk=weekStats();
@@ -1010,16 +1032,19 @@ function viewLog(){
   let cells='';
   for(let i=0;i<42;i++){const d=new Date(pre);d.setDate(pre.getDate()+i);const ds=dstr(d);
     const rec=S.history[ds];let cls='cell';const future=d>today;
-    if(rec&&rec.full)cls+=' full';else if(rec&&rec.done.length)cls+=' partial';
+    if(dayCounts(rec))cls+=' full';else if(rec&&rec.done.length)cls+=' partial';
     if(ds===todayStr())cls+=' today';
     cells+=`<div class="${cls}" ${future?'':`onclick="dayDetail('${ds}')"`} style="${future?'opacity:.25':'cursor:pointer'}">${d.getDate()}</div>`;}
   const wk=weekStats(),lastW=S.weights.slice(-1)[0];
+  const tils=Object.keys(S.history).filter(k=>S.history[k].til).sort().reverse().slice(0,14)
+    .map(k=>`<div class="til-row"><div class="td">${prettyDate(k)}</div><div class="tt">${S.history[k].til.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div></div>`).join('')||'<div class="empty">No learnings logged yet. Add one on the Home tab.</div>';
   return `<div class="panel"><div class="panel-title"><span class="dot"></span>Quest Calendar</div>
     <div class="cal">${header}${cells}</div>
-    <p class="tiny" style="margin-top:11px"><span style="color:var(--accent)">■</span> full · <span style="color:var(--accent2)">■</span> partial · <span style="color:var(--gold)">▢</span> today — <b>tap any day</b> for details</p></div>
+    <p class="tiny" style="margin-top:11px"><span style="color:var(--accent)">■</span> streak day (3 keystones) · <span style="color:var(--accent2)">■</span> partial · <span style="color:var(--gold)">▢</span> today — <b>tap any day</b> for details</p></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Last 14 Days · XP</div>
     <canvas id="activity" height="90" style="width:100%;display:block"></canvas>
-    <p class="tiny" style="margin-top:8px">This week: <b style="color:var(--green)">${wk.perfect}</b> perfect days · <b style="color:var(--accent)">${wk.cleared}</b> quests · <b style="color:var(--gold)">${wk.xp}</b> XP. Bright bars = perfect-clear days.</p></div>
+    <p class="tiny" style="margin-top:8px">This week: <b style="color:var(--orange)">${wk.perfect}</b> streak days · <b style="color:var(--accent)">${wk.cleared}</b> quests · <b style="color:var(--gold)">${wk.xp}</b> XP. Bright bars = streak days.</p></div>
+    <div class="panel"><div class="panel-title"><span class="dot" style="background:var(--green)"></span>📝 Learning Log</div>${tils}</div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Weight Tracker</div>
     <div class="tiny">Current: <b style="color:var(--accent)">${lastW?lastW.kg+' kg':'—'}</b> · Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
     <canvas id="wchart" height="120" style="width:100%;margin-top:10px"></canvas>
@@ -1085,7 +1110,15 @@ function roadmapHTML(){
    <p class="note">This whole roadmap adapts to your settings — change your start date, goal weight, or budget and it recalculates.</p>`;
 }
 const CODEX={
-os:`<h4>The Operating System</h4>
+os:`<h4>How to use this app</h4>
+<ul>
+<li><b>Every morning, open HOME.</b> Tap the circle on each quest as you do it — you earn XP + gold instantly. Tap the quest text for the exact "how" (sets, the precise lab to study + a link, walking time, etc.).</li>
+<li><b>The 3 🔥 keystone quests = your streak:</b> <b>Protein</b>, <b>Steps</b>, <b>Study</b>. Clear those three and the day counts — even if you skip everything else. Other quests are <span style="color:var(--red)">CORE</span> (good habits) or bonus.</li>
+<li><b>Bonus Quests</b> = optional extra gold for the bigger rewards. <b>Today I Learned</b> = jot one line; it saves to your Learning Log (LOG tab).</li>
+<li><b>STATS</b> = your consistency web + records. <b>VAULT</b> = log spends, watch savings. <b>SHOP</b> = spend earned gold on real rewards. <b>LOG</b> = calendar (tap any day), charts, weight, learnings. <b>CODEX</b> = this manual + the full ROADMAP.</li>
+<li><b>Weekly</b>: a recap pops every Sunday; log your weight; skim the roadmap.</li>
+</ul>
+<h4>The Operating System</h4>
 <p>You're not behind. You're 24, a security engineer with 3 years shipping, about to install a system that compounds. "I don't know anything" is the absence of <b>visible progress</b> — this app manufactures that proof daily.</p>
 <p><b>Daily rhythm</b> (built on your real schedule, nudging earlier over time):</p>
 <table><tr><th>Time</th><th>Block</th></tr>
@@ -1097,7 +1130,7 @@ os:`<h4>The Operating System</h4>
 <tr><td>~22:00–00:00</td><td><b>Study block</b> — today's exact unit on Home</td></tr>
 <tr><td>Bedtime</td><td>Shifts ~20 min earlier each week toward 12:30 am</td></tr></table>
 <h4>The Laws</h4>
-<ul><li><b>Clear the CORE quests daily.</b> Miss them and the streak breaks (penalty zone).</li>
+<ul><li><b>Protect the streak with 3 keystones daily:</b> Protein, Steps, Study. That's the floor — hit those even on a bad day and you never break the chain. The other CORE quests build the body/skin/recovery, but they won't cost you the streak.</li>
 <li><b>Bonus quests are gravy</b> — do them on good-energy days; don't guilt over skipping.</li>
 <li><b>Spend your gold.</b> Earned rewards beat guilty ones.</li>
 <li><b>Compare to last month's you</b>, not to Twitter experts.</li></ul>
@@ -1256,7 +1289,7 @@ function intro(){sysModal('NOTIFICATION',
   `<div class="center" style="font-size:30px">◇</div><div class="sys-big" style="font-size:19px">YOU HAVE BEEN<br>SELECTED AS A PLAYER</div>
    <p>You alone may grow without limit. The System issues <b>Daily Quests</b> across body, fuel, conditioning, intellect, work, self & wealth.</p>
    <p>Clear them for <b style="color:var(--accent)">EXP</b>, raise your <b style="color:var(--accent2)">stats</b>, and earn <b style="color:var(--gold)">gold</b> for rewards you choose.</p>
-   <p class="center">Each day gives your <b>exact</b> workout & study task. Miss the core quests and you enter the <b style="color:var(--red)">penalty zone</b>.</p>
+   <p class="center">Each day gives your <b>exact</b> workout & study task. Keep your streak alive by clearing just <b>3 🔥 keystones</b> daily: Protein · Steps · Study.</p>
    <p class="center tiny">The full plan lives in the <b>CODEX</b> tab. The Ascent begins now, Hunter.</p>`,
   'ACCEPT THE SYSTEM',()=>{S.seenIntro=true;save();});}
 
