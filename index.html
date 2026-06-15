@@ -16,12 +16,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0b10; --bg2:#0e1018; --surface:rgba(255,255,255,0.038); --surface2:rgba(255,255,255,0.055);
-  --line:rgba(255,255,255,0.085); --line2:rgba(141,162,255,0.22);
-  --accent:#8ea2ff; --accent2:#b79dff; --accent-d:#5a6bce;
-  --gold:#e6c179; --green:#7fe0b0; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0;
-  --txt:#eceef5; --txt2:#c3c8da; --muted:#888fa6;
-  --glow:0 0 0 1px rgba(141,162,255,.15), 0 8px 30px rgba(90,107,206,.18);
+  --bg:#08090e; --bg2:#0c0e15; --surface:rgba(255,255,255,0.042); --surface2:rgba(255,255,255,0.062);
+  --line:rgba(255,255,255,0.09); --line2:rgba(148,166,255,0.24);
+  --accent:#94a6ff; --accent2:#c1a8ff; --accent-d:#5d6ed6;
+  --gold:#ecc77e; --green:#7fe6b4; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0;
+  --txt:#eef0f7; --txt2:#c4c9db; --muted:#868da4;
+  --glow:0 0 0 1px rgba(148,166,255,.16), 0 10px 34px rgba(80,96,200,.20);
   --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -29,8 +29,9 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
   font-family:'Sora',-apple-system,system-ui,sans-serif;overscroll-behavior-y:contain;font-size:15px;}
 body{min-height:100vh;line-height:1.45;
   background:
-   radial-gradient(900px 520px at 50% -8%, rgba(141,162,255,.10), transparent 60%),
-   radial-gradient(700px 420px at 88% 108%, rgba(183,157,255,.08), transparent 60%),
+   radial-gradient(1000px 560px at 50% -10%, rgba(148,166,255,.13), transparent 62%),
+   radial-gradient(760px 460px at 92% 112%, rgba(193,168,255,.10), transparent 60%),
+   radial-gradient(600px 600px at 8% 30%, rgba(116,220,208,.04), transparent 60%),
    var(--bg);
   background-attachment:fixed;}
 h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;}
@@ -279,34 +280,34 @@ const STATS={
 const REST={key:'Rest + Weekly Reset',stat:'SEN',xp:30,gold:20,
   ex:`Full rest from training. Light walk + stretch if you like.\nDo your weekly review (CODEX → Operating System): re-read learnings, log weight, plan next week, money check, gentle physio.`};
 const WORKOUT_PHASES={
- /* Phase A — weeks 1-8 — HEAL: lower body + core + cardio, NO shoulder load */
+ /* Phase A — weeks 1-8 — HEAL & LEAN: beginner, lower body + core + cardio, ZERO shoulder load */
  A:{
-  1:{key:'Lower A — Quads',stat:'STR',xp:55,gold:35,ex:`Leg Press 4×10\nHack / Machine Squat 3×12\nLeg Extension 3×15\nWalking Lunges (DBs at sides) 3×12/leg\nSeated Calf Raise 4×15\n\n⚠ Machines only. No bar on upper back / no overhead. Stop if the shoulder pulls.`},
-  2:{key:'Core + Zone-2 Cardio',stat:'AGI',xp:50,gold:30,ex:`Cardio 35 min easy: incline walk, bike, OR easy jog ~20 min (jogging is fine for the shoulder — keep it relaxed, nose-breathing pace)\nLying Leg Raises 3×15\nDead Bug 3×12/side\nMachine Crunch 3×15\nBicycle Crunch 3×20\n\n⚠ No planks / hanging — they load the shoulder.`},
-  3:{key:'Lower B — Posterior',stat:'STR',xp:55,gold:35,ex:`Hip Thrust (machine) 4×10\nSeated Leg Curl 4×12\nMachine RDL / light DB RDL 3×12\nGlute Kickback 3×15/leg\nStanding Calf Raise 4×15`},
-  4:{key:'Cardio + Mobility',stat:'AGI',xp:45,gold:30,ex:`Pick one, 35–40 min: incline treadmill walk (incline 8–12), bike, OR easy jog 20–25 min\nLower-body mobility / stretch 10 min\nActive recovery — keep it light, protect the shoulder.`},
-  5:{key:'Lower C — Full Legs',stat:'STR',xp:55,gold:35,ex:`Leg Press 4×12\nBulgarian Split Squat (DBs at sides) 3×10/leg\nLeg Curl 3×12\nLeg Extension 3×15\nCalf Raise 4×20`},
-  6:{key:'Long Walk / Active Recovery',stat:'AGI',xp:40,gold:25,ex:`Outdoor walk or easy cycle 45-60 min.\nFull lower-body stretch. Get some sunlight.`},
+  1:{key:'Legs — Quads & Glutes',stat:'STR',xp:55,gold:48,ex:`Beginner pace — leave 2 reps in the tank, rest 60–90s, focus on form.\nLeg Press 3×12\nLeg Extension 3×15\nSeated Leg Curl 3×12\nGlute Bridge (bodyweight or band) 3×15\nLeg-Press Calf Raise 3×20\n\n✅ All seated/lying machines — zero weight on the shoulder. No barbell on the back, no shoulder pads.`},
+  2:{key:'Core + Cardio (abs)',stat:'AGI',xp:50,gold:44,ex:`Cardio 30 min: incline walk, bike, OR easy jog (relaxed, can-talk pace).\nThen core (this builds the abs; the deficit reveals them):\nLying Leg Raise 3×12\nReverse Crunch 3×15\nDead Bug 3×10/side\nBicycle Crunch 3×20\n\n✅ No planks, push-ups or hanging — they load the shoulder.`},
+  3:{key:'Legs — Hamstrings & Glutes',stat:'STR',xp:55,gold:48,ex:`Leg Press (feet high on platform) 3×12\nLying Leg Curl 3×15\nMachine Hip Thrust OR Glute Bridge 3×12\nCable / Machine Glute Kickback 3×15/leg\nSeated Calf Raise 3×20\n\n✅ Hips/legs only — nothing held on the shoulders.`},
+  4:{key:'Cardio + Mobility',stat:'AGI',xp:45,gold:40,ex:`Pick one, 35–40 min: incline treadmill walk (incline 8–12), cycle, OR easy jog 20–25 min.\nGentle lower-body mobility / stretch 10 min.\nEasy day — keep the heart rate moderate.`},
+  5:{key:'Legs — Full (light)',stat:'STR',xp:55,gold:48,ex:`Leg Press 3×12\nLeg Extension 3×15\nSeated Leg Curl 3×12\nBodyweight Reverse Lunge (hold a rail for balance) 3×10/leg\nLeg-Press Calf Raise 3×20`},
+  6:{key:'Core + Long Walk (abs)',stat:'AGI',xp:45,gold:40,ex:`45–60 min walk or easy cycle.\nAb finisher:\nAb-Machine Crunch (or floor crunch) 3×15\nLying Leg Raise 3×15\nRussian Twist (bodyweight) 3×20\n\n✅ No weight overhead or on shoulders.`},
   0:REST,
  },
- /* Phase B — weeks 9-16 — REINTRODUCE upper body LIGHT (physio-cleared) */
+ /* Phase B — weeks 9-16 — REINTRODUCE upper body LIGHT (only when physio-cleared) */
  B:{
-  1:{key:'Lower — Quads',stat:'STR',xp:60,gold:38,ex:`Leg Press 4×10\nHack Squat 3×12\nLeg Extension 3×15\nWalking Lunges 3×12/leg\nCalf Raise 4×15`},
-  2:{key:'Upper — Light (rebuild)',stat:'STR',xp:60,gold:38,ex:`⚠ Only if physio-cleared & pain-free. Start LIGHT.\nMachine Chest Press 3×12 (light)\nSeated Cable Row 3×12\nLat Pulldown 3×12\nBand External Rotation 3×15 (shoulder health)\nFace Pulls 3×15\nBiceps Curl + Triceps Pushdown 2×15`},
-  3:{key:'Lower — Posterior',stat:'STR',xp:60,gold:38,ex:`Hip Thrust 4×10\nSeated Leg Curl 4×12\nRDL (moderate) 3×10\nGlute Kickback 3×15/leg\nCalf Raise 4×15`},
-  4:{key:'Cardio + Core',stat:'AGI',xp:45,gold:30,ex:`Cardio 35 min: incline walk, bike, OR jog 25 min\nDead Bug 3×12 · Leg Raises 3×15 · Cable Crunch 3×15\nCan re-test a light front plank if the shoulder is solid.`},
-  5:{key:'Upper — Light v2',stat:'STR',xp:60,gold:38,ex:`Incline Machine Press 3×12 (light)\nChest-Supported Row 3×12\nLat Pulldown 3×12\nLateral Raise (light) 3×15\nRear-Delt Fly 3×15 · Face Pulls 3×15`},
-  6:{key:'Long Walk / Recovery',stat:'AGI',xp:40,gold:25,ex:`45-60 min walk or cycle + full stretch.`},
+  1:{key:'Legs — Quads & Glutes',stat:'STR',xp:60,gold:50,ex:`Leg Press 4×10\nLeg Extension 3×15\nSeated Leg Curl 3×12\nMachine Hip Thrust / Glute Bridge 3×12\nSeated Calf Raise 3×15`},
+  2:{key:'Upper — Light Rebuild',stat:'STR',xp:60,gold:50,ex:`⚠ Only once your physio clears upper-body work, and only pain-free. Start very light.\nMachine Chest Press 3×12 (light)\nSeated Cable Row 3×12\nLat Pulldown 3×12\nBand External Rotation 3×15 (rotator-cuff health)\nFace Pulls 3×15\nBiceps Curl + Triceps Pushdown 2×15`},
+  3:{key:'Legs — Hamstrings & Glutes',stat:'STR',xp:60,gold:50,ex:`Lying Leg Curl 4×12\nLeg Press (feet high) 3×12\nMachine Hip Thrust 3×10\nGlute Kickback 3×15/leg\nSeated Calf Raise 3×15`},
+  4:{key:'Cardio + Core',stat:'AGI',xp:45,gold:42,ex:`Cardio 35 min: incline walk, bike, OR jog 25 min.\nDead Bug 3×12 · Lying Leg Raise 3×15 · Ab-Machine Crunch 3×15\n(Still skipping planks until the shoulder is fully solid.)`},
+  5:{key:'Upper — Light v2',stat:'STR',xp:60,gold:50,ex:`Incline Machine Press 3×12 (light)\nChest-Supported Row 3×12\nLat Pulldown 3×12\nLateral Raise (light) 3×15\nRear-Delt Fly 3×15 · Face Pulls 3×15`},
+  6:{key:'Core + Long Walk',stat:'AGI',xp:45,gold:40,ex:`45–60 min walk or cycle.\nReverse Crunch 3×15 · Bicycle Crunch 3×20 · Dead Bug 3×12.`},
   0:REST,
  },
- /* Phase C — weeks 17+ — FULL training (Push/Pull/Legs) */
+ /* Phase C — weeks 17+ — FULL training (shoulder healed): Push/Pull/Legs */
  C:{
-  1:{key:'Push — Chest/Shoulders/Tri',stat:'STR',xp:65,gold:42,ex:`Chest Press / Bench 4×8\nIncline DB Press 3×10\nShoulder Press 3×10\nLateral Raise 3×15\nTriceps Pushdown 3×12 · Overhead Triceps 3×12`},
-  2:{key:'Pull — Back/Biceps',stat:'STR',xp:65,gold:42,ex:`Pull-ups / Lat Pulldown 4×8-10\nBarbell / Machine Row 4×10\nSeated Cable Row 3×12\nRear-Delt Fly 3×15 · Face Pulls 3×15\nBiceps Curl 3×12 · Hammer Curl 3×12`},
-  3:{key:'Legs',stat:'STR',xp:65,gold:42,ex:`Squat / Leg Press 4×8\nRDL 3×10\nLeg Curl 3×12\nLeg Extension 3×15\nCalf Raise 4×15`},
-  4:{key:'Cardio + Core + Mobility',stat:'AGI',xp:50,gold:32,ex:`Zone-2 cardio 30–40 min: brisk incline walk, cycle, OR easy 4–5 km jog (~25–30 min)\nHanging Leg Raise 3×12 · Cable Crunch 3×15 · Plank 3×45s\nFull mobility flow 10 min`},
-  5:{key:'Upper — Full',stat:'STR',xp:65,gold:42,ex:`Bench 4×8 · Row 4×10\nOverhead Press 3×10 · Lat Pulldown 3×12\nLateral Raise 3×15 · Arms superset 3×12`},
-  6:{key:'Legs / Glutes or Long Run',stat:'AGI',xp:55,gold:35,ex:`Hip Thrust 4×10 · Bulgarian Split Squat 3×10/leg · Leg Curl 3×12 · Calves 4×20\nOR a 5-6 km run if you prefer cardio.`},
+  1:{key:'Push — Chest/Shoulders/Tri',stat:'STR',xp:65,gold:55,ex:`(Shoulder cleared by now — build it back smart.)\nMachine/DB Chest Press 4×8\nIncline DB Press 3×10\nShoulder Press 3×10\nLateral Raise 3×15\nTriceps Pushdown 3×12`},
+  2:{key:'Pull — Back/Biceps',stat:'STR',xp:65,gold:55,ex:`Lat Pulldown 4×10\nSeated / Chest-Supported Row 4×10\nRear-Delt Fly 3×15 · Face Pulls 3×15\nBiceps Curl 3×12 · Hammer Curl 3×12`},
+  3:{key:'Legs',stat:'STR',xp:65,gold:55,ex:`Leg Press 4×8\nRomanian Deadlift 3×10\nLeg Curl 3×12 · Leg Extension 3×15\nSeated Calf Raise 4×15`},
+  4:{key:'Cardio + Core + Mobility',stat:'AGI',xp:50,gold:45,ex:`Zone-2 cardio 30–40 min: brisk incline walk, cycle, OR 4–5 km jog.\nHanging Leg Raise 3×12 · Cable Crunch 3×15 · Plank 3×45s\nMobility flow 10 min`},
+  5:{key:'Upper — Full',stat:'STR',xp:65,gold:55,ex:`Chest Press 4×8 · Row 4×10\nShoulder Press 3×10 · Lat Pulldown 3×12\nLateral Raise 3×15 · Arms superset 3×12`},
+  6:{key:'Legs / Glutes or Long Run',stat:'AGI',xp:55,gold:48,ex:`Hip Thrust 4×10 · Reverse Lunge 3×10/leg · Leg Curl 3×12 · Calves 4×20\nOR a 5-6 km run if you prefer cardio.`},
   0:REST,
  },
 };
@@ -533,11 +534,11 @@ function studyIndexFor(){
 function studyMins(w){ if(w<=4)return [60,75,90,105][Math.min(w-1,3)]; return Math.min(75+(w-5)*5,120); }
 function studyToday(){
   if(dow()===0) return {id:'study',title:'Weekly Review & Plan',sub:'Sunday reset — re-read learnings, log weight, plan the week.',
-    stat:'INT',xp:50,gold:35,mand:true,key:true,phaseTag:'REVIEW',
+    stat:'INT',xp:50,gold:40,mand:true,key:true,phaseTag:'REVIEW',
     exp:`Sunday reset:\n• Re-read this week's "today I learned" notes — feel the progress.\n• Pick next week's study target.\n• Log your weight (LOG tab).\n• Review the VAULT — did you stay on budget?\n• Plan dates/quality time with your GF.\n• 30-60 min on a startup idea if you want.`};
   const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
   const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
-  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:45, mand:true, key:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
+  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:50, mand:true, key:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
     exp:`${unit.task}\n\n📚 Resource: ${unit.res}\n⏱ Today: ~${mins} min.\n\nWhen done, write ONE "today I learned" note. That single habit, daily, is the cure for "I don't know anything" — in 90 days you'll have 90 receipts.`};
 }
 
@@ -545,25 +546,25 @@ function studyToday(){
 function todaysQuests(){
   const wk=currentWorkout();
   return [
-   {id:'sk_am',title:'Morning Skincare + SPF',sub:'Cleanser → moisturiser → SPF 50',stat:'SEN',xp:15,gold:10,mand:false,
+   {id:'sk_am',title:'Morning Skincare + SPF',sub:'Cleanser → moisturiser → SPF 50',stat:'SEN',xp:15,gold:8,mand:false,
      exp:`Cleanser → moisturiser → sunscreen (SPF 50). 30 seconds.\nSunscreen daily is the single highest-ROI skincare step — even indoors near windows.`},
    {id:'physio',title:'Physio — Shoulder Routine',sub:'Your prescribed exercises, 1-2× today',stat:'SEN',xp:30,gold:20,mand:true,
      exp:`Do the EXACT exercises your physio prescribed.\nConsistency here decides how fast you return to heavy lifting. Never push into sharp pain.`},
-   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~160 g protein · ~1,700–1,900 kcal',stat:'VIT',xp:45,gold:30,mand:true,key:true,
+   {id:'protein',title:'Hit Protein + Stay in Deficit',sub:'~160 g protein · ~1,700–1,900 kcal',stat:'VIT',xp:45,gold:35,mand:true,key:true,
      exp:`Target ≈ 160 g protein, ≈ 1,700–1,900 kcal — a ~750 kcal/day deficit ≈ 0.75 kg/week (you can safely lose ~1 kg/week early while heavier). This is the engine of your birthday transformation.\nEgg+veg protein: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nEvery meal: a palm+ of protein + half-plate veg. Cut fried food, sugar, sweets, sugary drinks & late-night snacking.`},
-   {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:10,mand:false,
+   {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:8,mand:false,
      exp:`Carry a 1 L bottle, refill ×3. Helps appetite, recovery and skin.`},
    {id:'workout',title:wk.key,sub:'Tap for today\'s exact exercises',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
-   {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:20,mand:true,key:true,
+   {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:30,mand:true,key:true,
      exp:`Target: 10,000 steps ≈ 70–80 min of walking total.\nEasiest split: 20-min brisk walk after your office lunch + a 30–40 min walk in the evening. Track it on your phone / Apple Health.\nSteps are the #1 fat-loss lever and put zero load on the shoulder.`},
    {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:true,
      exp:`At work: one 60-90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built.`},
    studyToday(),
    {id:'spend',title:'Track Spends + Stay on Budget',sub:'Log today\'s spends in the VAULT (20s)',stat:'WLT',xp:25,gold:15,mand:false,
      exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your investment savings stay intact.`},
-   {id:'sk_pm',title:'Night Skincare',sub:'Cleanser → treatment → moisturiser',stat:'SEN',xp:15,gold:10,mand:false,
+   {id:'sk_pm',title:'Night Skincare',sub:'Cleanser → treatment → moisturiser',stat:'SEN',xp:15,gold:8,mand:false,
      exp:`Cleanser → (after 2-3 weeks add niacinamide + a gentle retinoid 2-3×/wk) → moisturiser.\nKeep it simple until it's automatic. Good cue to start winding down for sleep.`},
-   {id:'sleep',title:'Lights Out On Time',sub:'Target this week: '+bedtimeTarget(),stat:'VIT',xp:30,gold:20,mand:true,
+   {id:'sleep',title:'Lights Out On Time',sub:'Target this week: '+bedtimeTarget(),stat:'VIT',xp:30,gold:15,mand:true,
      exp:`This week's bedtime target: ${bedtimeTarget()}. We shift ~20 min earlier each week toward 12:30 am / 8 am wake.\nNo screens 30 min before bed. Sleep heals the shoulder and runs your fat-loss hormones.`},
   ];
 }
@@ -641,18 +642,18 @@ function defaultState(){return{
     spends:{},
   },
   rewards:[
-    {id:'r1',ic:'☕',name:'Coffee / dessert out',cost:150},
-    {id:'r2',ic:'🍔',name:'Guilt-free cheat meal',cost:350},
-    {id:'r3',ic:'🛵',name:'Order-in (Swiggy/Zomato)',cost:300},
-    {id:'r4',ic:'🎮',name:'2 hrs gaming / Netflix',cost:250},
-    {id:'r5',ic:'🎬',name:'Movie / night out',cost:450},
-    {id:'r6',ic:'😴',name:'Guilt-free sleep-in',cost:400},
-    {id:'r7',ic:'💖',name:'Thoughtful date',cost:550},
-    {id:'r8',ic:'👕',name:'New clothes (₹2–3k)',cost:1800},
-    {id:'r9',ic:'🎧',name:'Gadget / big buy (₹5k+)',cost:4500},
-    {id:'r10',ic:'✈️',name:'Weekend getaway / splurge',cost:7000},
+    {id:'r1',ic:'☕',name:'Coffee / dessert out',cost:250},
+    {id:'r2',ic:'🍔',name:'Guilt-free cheat meal',cost:550},
+    {id:'r3',ic:'🛵',name:'Order-in (Swiggy/Zomato)',cost:500},
+    {id:'r4',ic:'🎮',name:'2 hrs gaming / Netflix',cost:400},
+    {id:'r5',ic:'🎬',name:'Movie / night out',cost:750},
+    {id:'r6',ic:'😴',name:'Guilt-free sleep-in',cost:600},
+    {id:'r7',ic:'💖',name:'Thoughtful date',cost:800},
+    {id:'r8',ic:'👕',name:'New clothes (₹2–3k)',cost:3000},
+    {id:'r9',ic:'🎧',name:'Gadget / big buy (₹5k+)',cost:7000},
+    {id:'r10',ic:'✈️',name:'Weekend getaway / splurge',cost:11000},
   ],
-  rewardsV2:true,
+  rewardsV3:true,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
@@ -660,7 +661,8 @@ function migrate(s){
   if(!s.finance)s.finance=defaultState().finance;
   if(s.profile&&s.profile.goalWeight===78)s.profile.goalWeight=76;
   if(s.profile&&!s.profile.bday)s.profile.bday='2026-09-14';
-  if(!s.rewardsV2){const d=defaultState();s.rewards=d.rewards;s.finance.investTarget=d.finance.investTarget;s.finance.budgets=d.finance.budgets;s.rewardsV2=true;}
+  if(!s.rewardsV2){const d=defaultState();s.finance.investTarget=d.finance.investTarget;s.finance.budgets=d.finance.budgets;s.rewardsV2=true;}
+  if(!s.rewardsV3){s.rewards=defaultState().rewards;s.rewardsV3=true;}
   return s;
 }
 function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
@@ -1141,17 +1143,21 @@ os:`<h4>How to use this app</h4>
 <li><b>Months 9–12:</b> applied — live bug-bounty hunting, AI red-teaming, reports, CTFs.</li></ul>
 <p class="note">Strong default, not medical/financial advice. Clear shoulder loading & new exercises with your physio. Adjust the budget to your reality.</p>`,
 
-train:`<h4>Training — 3 phases across the year</h4>
-<p>The Home workout quest always shows <b>today's exact session</b> (tap "details" for the exercise list). It advances automatically by week.</p>
-<h4>Phase A · Weeks 1–8 — HEAL</h4>
-<p>Shoulder protected completely: legs, core & low-impact cardio, machines only. <b>No</b> pressing, overhead, pull-ups/hangs, planks or push-ups. You'll still lean out fast (deficit + steps do the heavy lifting).</p>
-<h4>Phase B · Weeks 9–16 — REINTRODUCE</h4>
-<p>Add <b>light</b> upper body — machine press/row, lat pulldown, and crucially <b>face pulls + band external rotation</b> for shoulder health. Upper/lower split. Only progress if pain-free and physio-cleared.</p>
+train:`<h4>Training — built for a beginner, a healing shoulder & abs</h4>
+<p>Goal: lean down to <b class="hl">76 kg</b> with a defined, athletic look and visible abs. The Home workout quest shows <b>today's exact session</b> (tap "details"). It advances automatically by week.</p>
+<h4>The golden rule right now: ZERO shoulder load</h4>
+<p>Until your physio clears you, every session avoids anything that loads the shoulder. That means <b>no</b> barbell back squats, hack-squat shoulder pads, standing calf machine (pads on shoulders), barbell hip thrusts, overhead/pressing, pull-ups/hangs, planks or push-ups. We use <b>seated & lying machines + bodyweight core</b> instead — you still build legs/glutes and carve abs with zero risk.</p>
+<h4>Phase A · Weeks 1–8 — HEAL & LEAN (you're here)</h4>
+<p>Legs + core + low-impact cardio, machines only. As a beginner: <b>leave ~2 reps in the tank, 3 sets, rest 60–90s, focus on clean form</b> over heavy weight. 5 short sessions/week; the deficit + 10k steps drive the fat loss.</p>
+<h4>Phase B · Weeks 9–16 — REINTRODUCE upper (only when cleared)</h4>
+<p>Add <b>light</b> machine chest press/row, lat pulldown, and crucially <b>face pulls + band external rotation</b> to bullet-proof the shoulder. Still no heavy pressing or planks until it's 100%.</p>
 <h4>Phase C · Weeks 17+ — FULL</h4>
-<p>Full Push / Pull / Legs with real progression — strength + hypertrophy. By now the shoulder is rebuilt; train it smart.</p>
-<h4>Two rules that beat everything</h4>
-<ul><li><b>Progressive overload:</b> add a little weight or 1–2 reps when a set feels easy.</li>
-<li><b>10k steps daily</b> — zero shoulder cost, biggest fat-loss lever.</li></ul>`,
+<p>Full Push / Pull / Legs with progression — by now the shoulder is rebuilt. This is where the aesthetic shape (shoulders, back, arms) fills in.</p>
+<h4>Three rules that beat everything</h4>
+<ul><li><b>Progressive overload:</b> add a little weight or 1–2 reps when a set feels easy. That's how a beginner grows fastest.</li>
+<li><b>Abs = low body fat + core work.</b> The crunches/leg-raises build the muscle; the deficit (below) uncovers it. They'll show in the high-70s kg for you.</li>
+<li><b>10k steps daily</b> — zero shoulder cost, the biggest fat-loss lever.</li></ul>
+<p class="note">Always clear new movements with your physio. Sharp pain = stop. Never trade form for weight as a beginner.</p>`,
 
 nutri:`<h4>Nutrition — Lean Down (Egg + Veg)</h4>
 <p>At ~90 kg / 6 ft, a firm deficit melts fat fast. Target <b>~0.75 kg/week</b> (you can run ~1 kg/week early while heavier) to be visibly fitter by your <b class="hl">14 Sep birthday</b> — without crashing your energy or the shoulder's healing.</p>
@@ -1161,12 +1167,14 @@ nutri:`<h4>Nutrition — Lean Down (Egg + Veg)</h4>
 <tr><td>Water</td><td>3 L/day</td></tr></table>
 <p>Your two-meal pattern (12:30 + 9) is basically intermittent fasting — great for a deficit. Make both meals protein-forward.</p>
 <h4>Protein (egg + veg)</h4>
-<p>Eggs & whites, paneer, tofu, Greek yogurt/curd, dal, rajma, chana, <b>soya chunks</b> (protein bomb), milk, whey. A whey scoop + soya makes 150 g easy.</p>
+<p>Eggs & whites, paneer, tofu, Greek yogurt/curd, dal, rajma, chana, <b>soya chunks</b> (protein bomb), milk, whey. A whey scoop + soya makes 160 g easy. High protein in a deficit is what keeps your muscle (and the lean look) while the fat drops.</p>
 <h4>Plate rule (no counting to start)</h4>
 <ul><li>½ plate veg/salad · ¼ protein · ¼ carbs (measured roti/rice).</li>
 <li>Protein at <b>every</b> meal. Limit fried food, sweets, sugary drinks, late snacking.</li>
-<li>One earned cheat meal/week (buy it with gold).</li></ul>
-<h4>Sample day (~1,900 kcal · ~150 g protein)</h4>
+<li>One earned cheat meal/week (buy it with gold — you have to work it off first).</li></ul>
+<h4>Abs note</h4>
+<p>You can't out-train a bad diet — abs are revealed in the kitchen. Stay in the deficit, hit protein, and your core work + steps do the rest. Expect them to appear as you drop into the high-70s kg.</p>
+<h4>Sample day (~1,850 kcal · ~160 g protein)</h4>
 <ul><li><b>12:30:</b> 3 eggs + 100 g paneer bhurji, 2 roti, big salad, bowl of curd.</li>
 <li><b>Snack:</b> whey shake + handful of nuts.</li>
 <li><b>9 pm:</b> 150 g soya/paneer or 4-egg dish + dal + 1 cup rice/2 roti + sabzi.</li></ul>
