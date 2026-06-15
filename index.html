@@ -256,6 +256,8 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
+const APP_VERSION='10';
+function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
@@ -539,7 +541,7 @@ function studyToday(){
   const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
   const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
   return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:50, mand:true, key:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
-    exp:`${unit.task}\n\n📚 Resource: ${unit.res}\n⏱ Today: ~${mins} min.\n\nWhen done, write ONE "today I learned" note. That single habit, daily, is the cure for "I don't know anything" — in 90 days you'll have 90 receipts.`};
+    exp:`${unit.task}\n\n📚 Where: tap "Open resource" below — it teaches this topic from zero.\n⏱ Today: ~${mins} min.\n\n🆕 New terms are EXPECTED — don't be intimidated. Flow: read the short material first → do the lab/exercise hands-on → jot a one-line TIL note (Home). Stuck >15 min? Read the lab's solution, understand it, move on.\nThat daily loop is the cure for "I don't know anything" — 90 days = 90 receipts.`};
 }
 
 /* ---------- daily quests ---------- */
@@ -1111,6 +1113,36 @@ function roadmapHTML(){
    <li><b>Ongoing:</b> automate SIPs (index + flexicap) on salary day, use 80C (ELSS/PPF), keep the 24-hour rule on impulse buys.</li></ul>
    <p class="note">This whole roadmap adapts to your settings — change your start date, goal weight, or budget and it recalculates.</p>`;
 }
+const EXG=[
+ ['Legs & Glutes',[
+  ['Leg Press','Feet shoulder-width on the platform. Lower until knees ~90°, push through your heels. Don\'t slam knees straight at the top.'],
+  ['Leg Extension','Sit, pad on your shins. Straighten legs, squeeze quads 1s at the top, lower slowly.'],
+  ['Seated / Lying Leg Curl','Bend your knees to curl the pad toward you, squeeze hamstrings, control it back. Don\'t swing.'],
+  ['Glute Bridge','On your back, feet flat. Drive hips up, squeeze glutes hard at the top, lower slow.'],
+  ['Machine Hip Thrust','Back on the pad, push hips up through your heels, squeeze glutes, control down.'],
+  ['Glute Kickback (cable/machine)','Push one leg straight back, squeeze the glute, no arching your lower back.'],
+  ['Reverse Lunge (bodyweight)','Step one foot back, drop the back knee toward the floor, push through the front heel to stand. Hold a rail for balance.'],
+  ['Leg-Press / Seated Calf Raise','Push through the balls of your feet, full stretch at the bottom, big squeeze at the top.'],
+ ]],
+ ['Core (builds the abs)',[
+  ['Lying Leg Raise','On your back, legs straight, lift them to ~90° using your lower abs, lower slow without arching.'],
+  ['Reverse Crunch','Knees bent, curl your hips/knees toward your chest, lower with control. Small, controlled reps.'],
+  ['Dead Bug','On your back, arms up. Slowly lower opposite arm + leg, keep your lower back glued to the floor.'],
+  ['Bicycle Crunch','Elbow toward opposite knee, alternate slowly — quality twist, not speed.'],
+  ['Ab-Machine Crunch','Grip the handles, crunch your ribs toward your hips, squeeze, control back.'],
+  ['Russian Twist (bodyweight)','Lean back slightly, rotate your torso side to side under control. Keep chest up.'],
+ ]],
+ ['Upper — Phase B+ (only when physio-cleared)',[
+  ['Machine Chest Press','Sit tall, press the handles forward, don\'t lock out hard. Start very light.'],
+  ['Seated Cable / Chest-Supported Row','Pull elbows back, squeeze shoulder blades together, control the return.'],
+  ['Lat Pulldown','Pull the bar to your upper chest, lead with elbows, slow on the way up.'],
+  ['Band External Rotation','Elbow at your side, rotate forearm outward against the band. Light — this heals the shoulder.'],
+  ['Face Pulls','Pull a rope toward your face, elbows high, squeeze rear delts. Great for shoulder health.'],
+  ['Lateral Raise','Raise dumbbells out to the sides to shoulder height, slight bend, lower slow. Light weight.'],
+  ['Biceps Curl / Triceps Pushdown','Curl: elbows pinned, squeeze. Pushdown: elbows pinned, straighten, squeeze triceps.'],
+ ]],
+];
+function exGuideHTML(){return EXG.map(g=>`<h4>${g[0]}</h4><ul>`+g[1].map(e=>`<li><b>${e[0]}</b> — ${e[1]} <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(e[0]+' exercise form')}" target="_blank" rel="noopener" style="color:var(--accent)">▶ demo</a></li>`).join('')+'</ul>').join('');}
 const CODEX={
 os:`<h4>How to use this app</h4>
 <ul>
@@ -1157,7 +1189,10 @@ train:`<h4>Training — built for a beginner, a healing shoulder & abs</h4>
 <ul><li><b>Progressive overload:</b> add a little weight or 1–2 reps when a set feels easy. That's how a beginner grows fastest.</li>
 <li><b>Abs = low body fat + core work.</b> The crunches/leg-raises build the muscle; the deficit (below) uncovers it. They'll show in the high-70s kg for you.</li>
 <li><b>10k steps daily</b> — zero shoulder cost, the biggest fat-loss lever.</li></ul>
-<p class="note">Always clear new movements with your physio. Sharp pain = stop. Never trade form for weight as a beginner.</p>`,
+<p class="note">Always clear new movements with your physio. Sharp pain = stop. Never trade form for weight as a beginner.</p>
+<h4>📖 Exercise Guide — how to do each move</h4>
+<p>New to the gym? Here's every movement in your current plan in one line, with a demo video. Watch each once and you're set.</p>
+${exGuideHTML()}`,
 
 nutri:`<h4>Nutrition — Lean Down (Egg + Veg)</h4>
 <p>At ~90 kg / 6 ft, a firm deficit melts fat fast. Target <b>~0.75 kg/week</b> (you can run ~1 kg/week early while heavier) to be visibly fitter by your <b class="hl">14 Sep birthday</b> — without crashing your energy or the shoulder's healing.</p>
@@ -1203,6 +1238,14 @@ skin:`<h4>Skincare — simple, daily, high-ROI</h4>
 
 study:`<h4>Study Path — the cure for "I don't know anything"</h4>
 <p>The Home study quest shows your <b>exact task every day</b> and advances through a full ~1-year curriculum. Sundays are review/plan days.</p>
+<h4>How to study each day (beginner)</h4>
+<ol>
+<li><b>Open the resource</b> link in the study quest — every topic is taught from scratch there (mostly free PortSwigger labs). You don't need to know it beforehand.</li>
+<li><b>Read the short material</b> for that topic first (5–10 min), then <b>do the lab hands-on</b> — that's where it sticks.</li>
+<li><b>Stuck more than ~15 min?</b> Read the lab's official solution, understand <i>why</i> it works, and move on. Getting unstuck fast &gt; struggling for hours.</li>
+<li><b>Write a one-line TIL</b> on the Home tab. That's the whole secret — small, daily, compounding.</li>
+</ol>
+<p class="note">New jargon is normal and expected — every expert started exactly here. Don't aim to "understand everything," aim to finish today's one task.</p>
 <h4>Phase 1 · Month 1 — OSCP (use the live lab!)</h4>
 <p>You paid for it; ~1 month of lab access remains. That access is the expensive part — extract maximum value. You likely won't sit the exam this month, and that's fine: the goal is <b>burning through labs + building methodology</b>. Daily loop: full nmap → enum → foothold → shell → privesc (Linux & Windows) → loot, with detailed per-box notes. Areas march in order: recon → enumeration → web footholds → exploitation → buffer overflow → privesc → passwords/pivoting/AD → lab boxes. If you fall for it, extend the sub later and target the exam (~2–3 focused months).</p>
 <h4>Phase 2 · Months 2+ — Bug Bounty + AI Security (free, high-leverage)</h4>
@@ -1283,7 +1326,8 @@ function openSettings(){const p=S.profile;
     <button class="btn ghost sm" style="margin-top:8px" onclick="exportData()">EXPORT BACKUP (JSON)</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="importData()">IMPORT BACKUP</button>
     <button class="btn danger sm" style="margin-top:8px" onclick="hardReset()">RESET ALL DATA</button>
-    <p class="tiny center" style="margin-top:12px">Your data lives only on this device. Export before switching phones.</p>`,'CLOSE');}
+    <button class="btn ghost sm" style="margin-top:8px" onclick="forceUpdate()">⟳ CHECK FOR UPDATES</button>
+    <p class="tiny center" style="margin-top:12px">Your data lives only on this device. Export before switching phones.<br>The System · v${APP_VERSION}</p>`,'CLOSE');}
 function saveSettings(){S.profile.name=$('#s_name').value.trim().toUpperCase()||'HUNTER';
   S.profile.goalWeight=parseFloat($('#s_goal').value)||S.profile.goalWeight;S.profile.height=parseInt($('#s_h').value)||S.profile.height;
   S.profile.startDate=$('#s_start').value||S.profile.startDate;
@@ -1306,7 +1350,11 @@ document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.datase
 rollover();render();
 if(!S.seenIntro)intro();
 else if(dow()===0&&S.lastRecap!==todayStr()&&Object.keys(S.history).length>0){S.lastRecap=todayStr();save();showRecap();}
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{reg.update();setInterval(()=>reg.update(),60000);}).catch(()=>{});});
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});
+}
 </script>
 </body>
 </html>
