@@ -100,6 +100,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .tag.mand{color:var(--red);border-color:rgba(255,143,160,.3);}
 .tag.streak{color:var(--orange);border-color:rgba(255,178,122,.4);background:rgba(255,178,122,.08);}
 .tag.phase{color:var(--accent2);border-color:rgba(183,157,255,.3);}
+.qstreak{display:inline-block;margin-left:7px;font-size:10.5px;font-weight:600;color:var(--orange);font-family:'Space Grotesk';
+  padding:1px 7px;border-radius:20px;border:1px solid rgba(255,178,122,.4);background:rgba(255,178,122,.10);vertical-align:middle;}
 .qexp{font-size:12.5px;color:var(--txt2);margin-top:10px;line-height:1.55;padding:11px 13px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:12px;white-space:pre-line;}
 .expbtn{font-size:11px;color:var(--accent);margin-top:7px;letter-spacing:.5px;}
 
@@ -122,6 +124,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .reward .info{flex:1;min-width:0;}
 .reward .rn{font-size:14.5px;font-weight:500;}
 .reward .rc{font-size:12px;color:var(--gold);font-family:'Space Grotesk';margin-top:2px;}
+.reward .rdays{color:var(--muted);font-size:10.5px;margin-left:6px;}
+.rgroup-title{font-size:11px;letter-spacing:.6px;color:var(--accent2);font-weight:600;margin:14px 0 9px;text-transform:uppercase;}
+.rgroup-title:first-child{margin-top:4px;}
 .redeem{padding:9px 14px;border-radius:11px;font-size:11px;letter-spacing:.5px;font-weight:600;
   border:1px solid var(--line2);color:var(--accent);background:rgba(141,162,255,.08);}
 .redeem:disabled{opacity:.35;border-color:var(--line);color:var(--muted);background:none;}
@@ -256,7 +261,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='10';
+const APP_VERSION='11';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -636,26 +641,40 @@ function defaultState(){return{
     ],
     investTarget:55000,
     budgets:[
-      {cat:'Food & groceries',amt:17000},
-      {cat:'Dates & outings',amt:18000},
-      {cat:'Shopping & personal',amt:8000},
-      {cat:'Misc & buffer',amt:8000},
+      {cat:'Food & dining out',amt:14000},
+      {cat:'Groceries & home',amt:7000},
+      {cat:'Dates & outings',amt:13000},
+      {cat:'Delivery & impulse',amt:5000},
+      {cat:'Shopping & personal',amt:7000},
+      {cat:'Fun & subscriptions',amt:3000},
+      {cat:'Misc & buffer',amt:2000},
     ],
     spends:{},
   },
+  /* Rewards are priced in "days of effort": a full day of all daily tasks ≈ 330 gold,
+     so a cheat meal (~1800) takes ~5–6 clean days to earn. Tougher on purpose. */
   rewards:[
-    {id:'r1',ic:'☕',name:'Coffee / dessert out',cost:250},
-    {id:'r2',ic:'🍔',name:'Guilt-free cheat meal',cost:550},
-    {id:'r3',ic:'🛵',name:'Order-in (Swiggy/Zomato)',cost:500},
-    {id:'r4',ic:'🎮',name:'2 hrs gaming / Netflix',cost:400},
-    {id:'r5',ic:'🎬',name:'Movie / night out',cost:750},
-    {id:'r6',ic:'😴',name:'Guilt-free sleep-in',cost:600},
-    {id:'r7',ic:'💖',name:'Thoughtful date',cost:800},
-    {id:'r8',ic:'👕',name:'New clothes (₹2–3k)',cost:3000},
-    {id:'r9',ic:'🎧',name:'Gadget / big buy (₹5k+)',cost:7000},
-    {id:'r10',ic:'✈️',name:'Weekend getaway / splurge',cost:11000},
+    /* — Food & Eating Out — */
+    {id:'r1', ic:'☕', name:'Coffee / dessert out',        cost:650,   cat:'Food & Eating Out'},
+    {id:'r2', ic:'🥤', name:'Boba / snack treat',          cost:800,   cat:'Food & Eating Out'},
+    {id:'r3', ic:'🛵', name:'Order-in (Swiggy/Zomato)',    cost:1300,  cat:'Food & Eating Out'},
+    {id:'r4', ic:'🍔', name:'Guilt-free cheat meal',       cost:1800,  cat:'Food & Eating Out'},
+    {id:'r5', ic:'🍽️', name:'Restaurant dinner out',       cost:2600,  cat:'Food & Eating Out'},
+    {id:'r6', ic:'🍻', name:'Drinks / party night',        cost:3300,  cat:'Food & Eating Out'},
+    /* — Fitness, Rest & Lifestyle — */
+    {id:'r7', ic:'🎮', name:'2 hrs gaming / Netflix',      cost:1000,  cat:'Fitness, Rest & Lifestyle'},
+    {id:'r8', ic:'😴', name:'Guilt-free sleep-in',         cost:1500,  cat:'Fitness, Rest & Lifestyle'},
+    {id:'r9', ic:'🛋️', name:'Full guilt-free rest day',    cost:2000,  cat:'Fitness, Rest & Lifestyle'},
+    {id:'r10',ic:'🎧', name:'New gym gear / supplements',  cost:3500,  cat:'Fitness, Rest & Lifestyle'},
+    {id:'r11',ic:'💆', name:'Massage / recovery session',  cost:4000,  cat:'Fitness, Rest & Lifestyle'},
+    /* — Spend & Treats — */
+    {id:'r12',ic:'🎬', name:'Movie / night out',           cost:2000,  cat:'Spend & Treats'},
+    {id:'r13',ic:'💖', name:'Thoughtful date',             cost:2400,  cat:'Spend & Treats'},
+    {id:'r14',ic:'👕', name:'New clothes (₹2–3k)',         cost:5000,  cat:'Spend & Treats'},
+    {id:'r15',ic:'🎁', name:'Gadget / big buy (₹5k+)',     cost:9500,  cat:'Spend & Treats'},
+    {id:'r16',ic:'✈️', name:'Weekend getaway / splurge',   cost:16000, cat:'Spend & Treats'},
   ],
-  rewardsV3:true,
+  rewardsV4:true, budgetsV2:true,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
@@ -665,6 +684,10 @@ function migrate(s){
   if(s.profile&&!s.profile.bday)s.profile.bday='2026-09-14';
   if(!s.rewardsV2){const d=defaultState();s.finance.investTarget=d.finance.investTarget;s.finance.budgets=d.finance.budgets;s.rewardsV2=true;}
   if(!s.rewardsV3){s.rewards=defaultState().rewards;s.rewardsV3=true;}
+  /* tougher, grouped reward shop — refresh the catalog (gold balance & redeemed log untouched) */
+  if(!s.rewardsV4){s.rewards=defaultState().rewards;s.rewardsV4=true;}
+  /* refined spend-budget categories — your logged spends are preserved, only the envelopes change */
+  if(!s.budgetsV2){s.finance.budgets=defaultState().finance.budgets;s.budgetsV2=true;}
   return s;
 }
 function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
@@ -718,6 +741,15 @@ function streakInfo(){
     if(prev&&daysBetween(prev,ds)===1&&dayCounts(S.history[prev]))run++;else run=1;
     longest=Math.max(longest,run);prev=ds;}
   return{cur,longest:Math.max(longest,cur)};
+}
+/* per-task streak: consecutive days (ending today, or yesterday if not yet done today)
+   that this exact quest id was cleared. Powers the little 🔥N badge on each quest. */
+function taskStreak(id){
+  let cur=0,d=new Date();
+  const t=S.history[todayStr()];
+  if(!(t&&t.done&&t.done.includes(id)))d.setDate(d.getDate()-1);
+  while(true){const rec=S.history[dstr(d)];if(rec&&rec.done&&rec.done.includes(id)){cur++;d.setDate(d.getDate()-1);}else break;}
+  return cur;
 }
 
 /* ---------- history helpers ---------- */
@@ -837,10 +869,12 @@ function heroHTML(){
 }
 function questHTML(q,rec){
   const done=rec.done.includes(q.id);
+  const ts=taskStreak(q.id);
+  const sb=ts>=2?`<span class="qstreak" title="${ts}-day streak on this task">🔥${ts}</span>`:'';
   return `<div class="quest ${done?'done':''}">
     <button class="qcheck" onclick="qtap('${q.id}')">✓</button>
     <div class="qbody" onclick="qexp('${q.id}')">
-      <div class="qtitle">${q.title}</div>
+      <div class="qtitle">${q.title}${sb}</div>
       ${q.sub?`<div class="qsub">${q.sub}</div>`:''}
       <div class="qtags">
         <span class="tag">${q.stat}</span>
@@ -1008,17 +1042,30 @@ function delBudgetCat(i){snapMoney();S.finance.budgets.splice(i,1);save();editMo
 function saveMoney(){snapMoney();S.finance.budgets=S.finance.budgets.filter(b=>b.amt>0);save();$('#modal-host').innerHTML='';render();toast('Finances updated');}
 
 /* ============================================================ SHOP */
-function viewShop(){
-  const cards=S.rewards.map(r=>`<div class="reward"><div class="ic">${r.ic||'🎁'}</div>
-    <div class="info"><div class="rn">${r.name}</div><div class="rc num">${r.cost} GOLD</div></div>
+const REWARD_GROUPS=['Food & Eating Out','Fitness, Rest & Lifestyle','Spend & Treats'];
+function rewardCard(r){
+  const days=Math.max(1,Math.round(r.cost/330));
+  return `<div class="reward"><div class="ic">${r.ic||'🎁'}</div>
+    <div class="info"><div class="rn">${r.name}</div><div class="rc num">${r.cost} GOLD<span class="rdays">≈ ${days}d</span></div></div>
     <button class="redeem" ${S.gold<r.cost?'disabled':''} onclick="redeem('${r.id}')">REDEEM</button>
-    <button class="del" onclick="delReward('${r.id}')">✕</button></div>`).join('');
+    <button class="del" onclick="delReward('${r.id}')">✕</button></div>`;
+}
+function viewShop(){
+  const used=new Set();
+  let cards=REWARD_GROUPS.map(g=>{
+    const items=S.rewards.filter(r=>(r.cat||'Spend & Treats')===g);
+    items.forEach(r=>used.add(r.id));
+    if(!items.length)return '';
+    return `<div class="rgroup-title">${g}</div>`+items.map(rewardCard).join('');
+  }).join('');
+  const extras=S.rewards.filter(r=>!used.has(r.id)); // any custom-category rewards you add
+  if(extras.length)cards+=`<div class="rgroup-title">More</div>`+extras.map(rewardCard).join('');
   const recent=S.redeemed.slice(-5).reverse().map(r=>`<div class="tiny" style="padding:5px 0">✔ ${r.name} — ${r.cost}G <span style="float:right">${r.date.slice(5)}</span></div>`).join('')||'<div class="empty">No rewards claimed yet.</div>';
   return `<div class="panel money-hero" style="background:linear-gradient(150deg,rgba(230,193,121,.1),transparent 70%);border-color:rgba(230,193,121,.2)">
     <div class="tiny">GOLD BALANCE</div><div class="big-num" style="color:var(--gold)">${S.gold} G</div>
-    <div class="tiny">Earn gold by clearing quests. Spend it guilt-free — rewards are fuel, not cheating.</div></div>
+    <div class="tiny">Prices are tougher now — a cheat meal ≈ 5–6 clean days. The <b>≈ d</b> tag = roughly how many full days of all-tasks-done it costs. Earn it, then enjoy it guilt-free.</div></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Reward Shop</div>${cards}
-    <button class="btn ghost sm" style="margin-top:6px" onclick="addReward()">+ ADD REWARD</button></div>
+    <button class="btn ghost sm" style="margin-top:10px" onclick="addReward()">+ ADD REWARD</button></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Recently Claimed</div>${recent}</div>`;
 }
 function redeem(id){const r=S.rewards.find(x=>x.id===id);if(!r||S.gold<r.cost)return;
@@ -1026,7 +1073,10 @@ function redeem(id){const r=S.rewards.find(x=>x.id===id);if(!r||S.gold<r.cost)re
   if(navigator.vibrate)navigator.vibrate([20,40,20]);
   sysModal('REWARD UNLOCKED',`<div class="sys-big">${r.ic||'🎁'}</div><p class="center">You claimed <b>${r.name}</b> for <span class="hl">${r.cost} gold</span>.<br>Enjoy it — you earned it.</p>`,'NICE');render();}
 function delReward(id){if(confirm('Remove this reward?')){S.rewards=S.rewards.filter(x=>x.id!==id);save();render();}}
-function addReward(){const name=prompt('Reward name?');if(!name)return;const cost=parseInt(prompt('Cost in gold?','150'))||150;const ic=prompt('Emoji icon? (optional)','🎁')||'🎁';S.rewards.push({id:'r'+Date.now(),ic,name,cost});save();render();}
+function addReward(){const name=prompt('Reward name?');if(!name)return;const cost=parseInt(prompt('Cost in gold? (≈330 gold = one full day of tasks)','1000'))||1000;const ic=prompt('Emoji icon? (optional)','🎁')||'🎁';
+  let cat=(prompt('Category — Food / Fitness / Spend ?','Spend')||'').toLowerCase();
+  cat=cat.startsWith('food')?'Food & Eating Out':cat.startsWith('fit')?'Fitness, Rest & Lifestyle':'Spend & Treats';
+  S.rewards.push({id:'r'+Date.now(),ic,name,cost,cat});save();render();}
 
 /* ============================================================ LOG */
 function viewLog(){
@@ -1238,14 +1288,6 @@ skin:`<h4>Skincare — simple, daily, high-ROI</h4>
 
 study:`<h4>Study Path — the cure for "I don't know anything"</h4>
 <p>The Home study quest shows your <b>exact task every day</b> and advances through a full ~1-year curriculum. Sundays are review/plan days.</p>
-<h4>How to study each day (beginner)</h4>
-<ol>
-<li><b>Open the resource</b> link in the study quest — every topic is taught from scratch there (mostly free PortSwigger labs). You don't need to know it beforehand.</li>
-<li><b>Read the short material</b> for that topic first (5–10 min), then <b>do the lab hands-on</b> — that's where it sticks.</li>
-<li><b>Stuck more than ~15 min?</b> Read the lab's official solution, understand <i>why</i> it works, and move on. Getting unstuck fast &gt; struggling for hours.</li>
-<li><b>Write a one-line TIL</b> on the Home tab. That's the whole secret — small, daily, compounding.</li>
-</ol>
-<p class="note">New jargon is normal and expected — every expert started exactly here. Don't aim to "understand everything," aim to finish today's one task.</p>
 <h4>Phase 1 · Month 1 — OSCP (use the live lab!)</h4>
 <p>You paid for it; ~1 month of lab access remains. That access is the expensive part — extract maximum value. You likely won't sit the exam this month, and that's fine: the goal is <b>burning through labs + building methodology</b>. Daily loop: full nmap → enum → foothold → shell → privesc (Linux & Windows) → loot, with detailed per-box notes. Areas march in order: recon → enumeration → web footholds → exploitation → buffer overflow → privesc → passwords/pivoting/AD → lab boxes. If you fall for it, extend the sub later and target the exam (~2–3 focused months).</p>
 <h4>Phase 2 · Months 2+ — Bug Bounty + AI Security (free, high-leverage)</h4>
