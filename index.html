@@ -196,7 +196,10 @@ label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margi
 .nav button{flex:1;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);border-radius:14px;}
 .nav button .ni{font-size:17px;line-height:1;}
 .nav button .nl{font-size:8.5px;letter-spacing:.5px;font-weight:600;}
-.nav button.active{color:var(--accent);background:var(--surface);}
+.nav button{transition:transform .15s ease,color .15s ease;}
+.nav button:active{transform:scale(.92);}
+.nav button.active{color:#0a0b10;background:linear-gradient(150deg,var(--accent),var(--accent2));box-shadow:0 4px 16px rgba(141,162,255,.32);}
+.nav button.active .nl{color:#0a0b10;opacity:.85;}
 
 /* modal */
 .overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,12,.7);backdrop-filter:blur(6px);
@@ -234,6 +237,38 @@ label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margi
 .til-row .td{flex:none;width:68px;font-size:11px;color:var(--muted);padding-top:1px;}
 .til-row .tt{flex:1;font-size:13px;color:var(--txt2);line-height:1.45;}
 textarea{line-height:1.45;}
+
+/* ---- daily progress ring (gamified) ---- */
+.ring{position:relative;width:46px;height:46px;border-radius:50%;flex:none;
+  background:conic-gradient(var(--accent) calc(var(--p)*3.6deg), rgba(255,255,255,.08) 0);
+  transition:background .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset;}
+.ring.full{background:conic-gradient(var(--green) 360deg, var(--green) 0);box-shadow:0 0 14px rgba(127,230,180,.4);}
+.ring-in{position:absolute;inset:4px;border-radius:50%;background:#0c0e15;display:grid;place-items:center;
+  font-family:'Space Grotesk';font-size:11px;font-weight:600;color:var(--txt);letter-spacing:.3px;}
+.ring.full .ring-in{color:var(--green);}
+
+/* ---- weight panel ---- */
+.wgrid{display:flex;gap:9px;margin:2px 0 13px;}
+.wcard{flex:1;background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;}
+.wcard b{display:block;font-family:'Space Grotesk';font-size:18px;line-height:1.1;}
+.wcard span{font-size:9px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;display:block;margin-top:4px;line-height:1.3;}
+.wbar-line{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:6px;font-family:'Space Grotesk';}
+.wpill-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.wpill{font-size:11px;color:var(--txt2);background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:20px;padding:4px 11px;}
+.wpill b{font-family:'Space Grotesk';}
+
+/* ---- gamified micro-interactions ---- */
+.qcheck:active{transform:scale(.86);}
+.quest.done .qcheck{animation:pop .3s cubic-bezier(.2,1.4,.4,1);}
+.chip b{background:linear-gradient(180deg,#fff,rgba(255,255,255,.72));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.chip.gold b{background:linear-gradient(180deg,#f5d98f,#d9aa54);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.chip.streak b{background:linear-gradient(180deg,#ffc79a,#ff9b63);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.chip.done b{background:linear-gradient(180deg,#a6f0cf,#6fdcaa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.xpwrap .bar>i{position:relative;overflow:hidden;}
+.xpwrap .bar>i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);
+  transform:translateX(-100%);animation:shimmer 2.8s ease-in-out infinite;}
+@keyframes shimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(200%)}}
+.btn:active{transform:scale(.985);}
 </style>
 </head>
 <body>
@@ -261,7 +296,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='11';
+const APP_VERSION='12';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -600,7 +635,7 @@ function bonusToday(){const seed=Math.abs(daysBetween('2026-01-01',todayStr())),
 function milestone(){
   const bday=S.profile.bday||'2026-09-14';
   const days=Math.max(0,daysBetween(todayStr(),bday)),weeks=days/7;
-  const cur=S.weights.slice(-1)[0]?S.weights.slice(-1)[0].kg:90,goal=S.profile.goalWeight;
+  const cur=S.weights.length?weightStats().cur:90,goal=S.profile.goalWeight;
   const proj075=Math.max(goal,+(cur-0.75*weeks).toFixed(1)),proj1=Math.max(goal,+(cur-1*weeks).toFixed(1));
   return {bday,days,weeks:weeks.toFixed(1),cur,goal,proj075,proj1};
 }
@@ -688,6 +723,12 @@ function migrate(s){
   if(!s.rewardsV4){s.rewards=defaultState().rewards;s.rewardsV4=true;}
   /* refined spend-budget categories — your logged spends are preserved, only the envelopes change */
   if(!s.budgetsV2){s.finance.budgets=defaultState().finance.budgets;s.budgetsV2=true;}
+  /* point old spend entries at the closest new budget envelope so they map to a bar again */
+  if(!s.spendRemapV1){
+    const remap={'Food & groceries':'Food & dining out','Food':'Food & dining out','Groceries':'Groceries & home','Dates':'Dates & outings','Outings':'Dates & outings','Shopping':'Shopping & personal','Misc':'Misc & buffer'};
+    Object.values(s.finance.spends||{}).forEach(arr=>(arr||[]).forEach(sp=>{if(remap[sp.cat])sp.cat=remap[sp.cat];}));
+    s.spendRemapV1=true;
+  }
   return s;
 }
 function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
@@ -752,6 +793,30 @@ function taskStreak(id){
   return cur;
 }
 
+/* ---------- weight model ----------
+   Daily weight bounces ±0.5–1 kg from water/food/salt, so a single reading is noise.
+   We denoise into a "trend" (avg of the last few logs) and derive the numbers that
+   actually matter: total lost, weekly rate, % to goal, and an ETA. */
+function weightStats(){
+  const ws=S.weights.slice().sort((a,b)=>a.date<b.date?-1:1);
+  const goal=S.profile.goalWeight;
+  if(!ws.length)return{has:false,goal,start:null,cur:null,last:null,trend:null,lost:0,toGoal:null,pct:0,rate:0,etaWeeks:null,count:0};
+  const start=ws[0].kg,last=ws[ws.length-1].kg;
+  const recent=ws.slice(-5).map(w=>w.kg);
+  const trend=+(recent.reduce((a,b)=>a+b,0)/recent.length).toFixed(1); // denoised "current"
+  const lost=+(start-trend).toFixed(1);
+  const toGoal=+(trend-goal).toFixed(1);
+  const totalToLose=Math.max(0.1,start-goal);
+  const pct=Math.max(0,Math.min(100,Math.round((start-trend)/totalToLose*100)));
+  let rate=0,etaWeeks=null;
+  if(ws.length>=2){
+    const span=Math.max(1,daysBetween(ws[0].date,ws[ws.length-1].date));
+    rate=+((start-last)/span*7).toFixed(2); // kg/week, positive = losing
+    if(rate>0.05&&toGoal>0)etaWeeks=Math.ceil(toGoal/rate);
+  }
+  return{has:true,goal,start,last,trend,cur:trend,lost,toGoal,pct,rate,etaWeeks,count:ws.length};
+}
+
 /* ---------- history helpers ---------- */
 function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayXp(rec){if(!rec)return 0;if(rec.meta)return Object.values(rec.meta).reduce((a,b)=>a+(b.xp||0),0);return (rec.done?rec.done.length:0)*30;}
@@ -769,11 +834,12 @@ function resUrl(res){if(!res)return null;const r=res.toLowerCase();
 function recapHTML(){
   const wk=weekStats(),sc=attrScores(),st=streakInfo(),f=financeSummary(monthKey());
   const ent=Object.entries(sc),best=ent.reduce((a,b)=>b[1]>a[1]?b:a),worst=ent.reduce((a,b)=>b[1]<a[1]?b:a);
-  let wch='—';const ws=S.weights.slice(-8);if(ws.length>=2){const d=+(ws[ws.length-1].kg-ws[0].kg).toFixed(1);wch=(d>0?'+':'')+d+' kg';}
+  const W=weightStats();
+  const wch=W.has?(W.count>=2?`${W.cur} kg · ${W.rate>0?'−':'+'}${Math.abs(W.rate)} kg/wk`:`${W.cur} kg`):'—';
   return `<div class="sys-big" style="font-size:20px">WEEK IN REVIEW</div>
    <div class="hero-stats" style="margin-bottom:8px"><div class="chip done"><b class="num">${wk.perfect}</b><span>Perfect Days</span></div>
    <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div><div class="chip gold"><b class="num">${wk.xp}</b><span>XP</span></div></div>
-   <p>🔥 Streak: <b>${st.cur}</b> days · ⚖️ Weight trend: <b>${wch}</b></p>
+   <p>🔥 Streak: <b>${st.cur}</b> days · ⚖️ Weight: <b>${wch}</b></p>
    <p>💪 Strongest: <b style="color:var(--green)">${STATS[best[0]].name} (${best[1]}%)</b><br>🎯 Focus next week: <b style="color:var(--red)">${STATS[worst[0]].name} (${worst[1]}%)</b></p>
    <p>💰 On track to save <b style="color:var(--gold)">${fmt(f.projected)}</b> this month.</p>
    <p class="center tiny">Re-read your "today I learned" notes, log your weight, pick next week's targets. Onward, Hunter.</p>`;
@@ -897,14 +963,21 @@ function viewHome(){
   else if(doneN>=qs.length)greet='Perfect clear. You grow stronger.';
   else greet='🔥 Streak secured. Everything else today is bonus XP — do what you can.';
   const ms=milestone(),bq=bonusToday(),bonusDone=bq.filter(q=>rec.done.includes(q.id)).length;
+  const W=weightStats(),dpct=Math.round(doneN/qs.length*100);
+  const wline=W.has?`<div class="wpill-row">
+     <span class="wpill"><b style="color:var(--accent)">${W.cur} kg</b> now</span>
+     <span class="wpill"><b style="color:${W.lost>=0?'var(--green)':'var(--red)'}">${W.lost>=0?'▼':'▲'} ${Math.abs(W.lost)} kg</b> lost</span>
+     ${W.count>=2?`<span class="wpill"><b style="color:${W.rate>0?'var(--green)':'var(--red)'}">${W.rate>0?'−':'+'}${Math.abs(W.rate)}</b> kg/wk</span>`:''}
+     </div>`:'';
   return heroHTML()+
    `<div class="panel" style="background:linear-gradient(150deg,rgba(230,193,121,.10),transparent 70%);border-color:rgba(230,193,121,.22)">
      <div class="panel-title" style="margin-bottom:8px"><span class="dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>🎂 Birthday Milestone · 14 Sep</div>
      <p class="tiny" style="font-size:12.5px;line-height:1.6"><b style="color:var(--gold)">${ms.days} days</b> to go. At <b>0.75 kg/wk</b> you'll hit <b style="color:var(--accent)">~${ms.proj075} kg</b>; push to <b>1 kg/wk</b> for <b style="color:var(--accent)">~${ms.proj1} kg</b>. Now ${ms.cur} kg → goal ${ms.goal} kg.</p>
+     ${wline}
      ${!S.weights.length?`<button class="btn ghost sm" style="margin-top:10px" onclick="quickWeight()">Log your starting weight to calibrate</button>`:''}</div>
     <div class="panel">
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
-     <div class="q-progress num">${doneN}/${qs.length} cleared</div></div>
+     <div class="ring ${doneN>=qs.length?'full':''}" style="--p:${dpct}"><span class="ring-in">${doneN}/${qs.length}</span></div></div>
      <div class="greet">${greet}</div>
      ${qs.map(q=>questHTML(q,rec)).join('')}</div>
     <div class="panel">
@@ -1100,24 +1173,49 @@ function viewLog(){
     <p class="tiny" style="margin-top:8px">This week: <b style="color:var(--orange)">${wk.perfect}</b> streak days · <b style="color:var(--accent)">${wk.cleared}</b> quests · <b style="color:var(--gold)">${wk.xp}</b> XP. Bright bars = streak days.</p></div>
     <div class="panel"><div class="panel-title"><span class="dot" style="background:var(--green)"></span>📝 Learning Log</div>${tils}</div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Weight Tracker</div>
-    <div class="tiny">Current: <b style="color:var(--accent)">${lastW?lastW.kg+' kg':'—'}</b> · Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b></div>
-    <canvas id="wchart" height="120" style="width:100%;margin-top:10px"></canvas>
+    ${weightPanelHTML()}
+    <canvas id="wchart" height="120" style="width:100%;margin-top:12px"></canvas>
     <div class="wlog"><input id="wkg" type="number" inputmode="decimal" step="0.1" placeholder="today's weight (kg)">
-    <button class="btn sm" style="width:auto;padding:12px 18px" onclick="logWeight()">LOG</button></div></div>`;
+    <button class="btn sm" style="width:auto;padding:12px 18px" onclick="logWeight()">LOG</button></div>
+    <p class="tiny" style="margin-top:9px">Weigh in first thing each morning — after the toilet, before eating/drinking. Same time daily makes the trend honest.</p></div>`;
 }
 function logWeight(){const v=parseFloat($('#wkg').value);if(!v)return;const d=todayStr();
   const ex=S.weights.find(w=>w.date===d);if(ex)ex.kg=v;else S.weights.push({date:d,kg:v});
   S.weights.sort((a,b)=>a.date<b.date?-1:1);save();toast('Weight logged');render();}
+function weightPanelHTML(){
+  const W=weightStats();
+  if(!W.has)return `<div class="tiny">Goal: <b style="color:var(--gold)">${S.profile.goalWeight} kg</b>. Log your weight below to start tracking — your first entry sets the baseline.</div>`;
+  const dir=W.lost>=0?'▼':'▲',dcol=W.lost>=0?'var(--green)':'var(--red)';
+  const goalSub=W.toGoal>0?`${W.toGoal} kg to go`:'reached 🎉';
+  const rateTxt=W.count>=2
+    ? `Trend: <b style="color:${W.rate>0?'var(--green)':'var(--red)'}">${W.rate>0?'−':'+'}${Math.abs(W.rate)} kg/week</b>${W.etaWeeks?` · on this pace, <b style="color:var(--gold)">~${W.etaWeeks} weeks</b> to goal`:''}. Judge the <b>weekly trend</b>, not the daily wobble.`
+    : `Log a few more mornings and your weekly rate appears here.`;
+  return `<div class="wgrid">
+      <div class="wcard"><b class="num" style="color:var(--accent)">${W.cur}</b><span>Now · trend</span></div>
+      <div class="wcard"><b class="num" style="color:${dcol}">${dir} ${Math.abs(W.lost)}</b><span>kg lost</span></div>
+      <div class="wcard"><b class="num" style="color:var(--gold)">${W.goal}</b><span>${goalSub}</span></div>
+    </div>
+    <div class="wbar-line"><span>Start ${W.start} kg</span><span style="color:var(--accent)">${W.pct}% there</span><span>Goal ${W.goal} kg</span></div>
+    <div class="bar wlt"><i style="width:${W.pct}%"></i></div>
+    <p class="tiny" style="margin-top:10px">${rateTxt}</p>`;
+}
 function drawWeightChart(){
   const c=$('#wchart');if(!c)return;const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=120;
   c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
-  const data=S.weights.slice(-30);
-  if(!data.length){x.fillStyle='#888fa6';x.font='12px Sora';x.fillText('Log your weight to see the trend.',10,60);return;}
-  const ys=data.map(d=>d.kg).concat([S.profile.goalWeight]);let mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;if(mx-mn<2){mx+=1;mn-=1;}
-  const px=i=>data.length<2?w/2:10+i*(w-20)/(data.length-1),py=v=>10+(mx-v)/(mx-mn)*(h-20);
-  x.strokeStyle='rgba(230,193,121,.5)';x.setLineDash([5,4]);x.beginPath();x.moveTo(0,py(S.profile.goalWeight));x.lineTo(w,py(S.profile.goalWeight));x.stroke();x.setLineDash([]);
-  x.strokeStyle='#8ea2ff';x.lineWidth=2;x.beginPath();data.forEach((d,i)=>{i?x.lineTo(px(i),py(d.kg)):x.moveTo(px(i),py(d.kg));});x.stroke();
-  x.fillStyle='#8ea2ff';data.forEach((d,i)=>{x.beginPath();x.arc(px(i),py(d.kg),3,0,7);x.fill();});
+  const data=S.weights.slice(-30),goal=S.profile.goalWeight;
+  if(!data.length){x.fillStyle='#868da4';x.font='12px Sora';x.textAlign='center';x.fillText('Log your weight to see the trend.',w/2,h/2);return;}
+  const ys=data.map(d=>d.kg).concat([goal]);let mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;if(mx-mn<2){mx+=1;mn-=1;}
+  const px=i=>data.length<2?w/2:10+i*(w-20)/(data.length-1),py=v=>12+(mx-v)/(mx-mn)*(h-24);
+  // goal line + label
+  x.strokeStyle='rgba(236,199,126,.55)';x.setLineDash([5,4]);x.lineWidth=1;x.beginPath();x.moveTo(0,py(goal));x.lineTo(w,py(goal));x.stroke();x.setLineDash([]);
+  x.fillStyle='rgba(236,199,126,.9)';x.font='600 9px Space Grotesk';x.textAlign='left';x.fillText('goal '+goal,4,py(goal)-4);
+  // gradient area under the line
+  if(data.length>1){const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(142,162,255,.30)');g.addColorStop(1,'rgba(142,162,255,0)');
+    x.beginPath();x.moveTo(px(0),py(data[0].kg));data.forEach((d,i)=>x.lineTo(px(i),py(d.kg)));x.lineTo(px(data.length-1),h);x.lineTo(px(0),h);x.closePath();x.fillStyle=g;x.fill();}
+  // trend line
+  x.strokeStyle='#8ea2ff';x.lineWidth=2.4;x.lineJoin='round';x.beginPath();data.forEach((d,i)=>{i?x.lineTo(px(i),py(d.kg)):x.moveTo(px(i),py(d.kg));});x.stroke();
+  // points, last one highlighted
+  data.forEach((d,i)=>{const lp=i===data.length-1;x.beginPath();x.arc(px(i),py(d.kg),lp?4:2.4,0,7);x.fillStyle=lp?'#fff':'#8ea2ff';x.fill();if(lp){x.strokeStyle='#8ea2ff';x.lineWidth=2;x.stroke();}});
 }
 
 /* ============================================================ CODEX */
