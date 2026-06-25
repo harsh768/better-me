@@ -16,12 +16,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07080d; --bg2:#0c0e15; --surface:rgba(255,255,255,0.045); --surface2:rgba(255,255,255,0.065);
-  --line:rgba(255,255,255,0.095); --line2:rgba(150,168,255,0.26);
-  --accent:#9bb0ff; --accent2:#c9aaff; --accent-d:#5d6ed6;
-  --gold:#f0cd84; --green:#7fe6b4; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0; --pink:#ff9ecb;
-  --txt:#eef0f7; --txt2:#c4c9db; --muted:#868da4;
-  --glow:0 0 0 1px rgba(150,168,255,.18), 0 12px 38px rgba(86,102,210,.24);
+  --bg:#060711; --bg2:#0b0d18; --surface:rgba(255,255,255,0.052); --surface2:rgba(255,255,255,0.075);
+  --line:rgba(255,255,255,0.10); --line2:rgba(124,148,255,0.32);
+  --accent:#6e8bff; --accent2:#b873ff; --accent-d:#465ce0;
+  --gold:#ffce6e; --green:#52f0ac; --red:#ff7a93; --orange:#ffb15c; --teal:#4fe3d2; --cyan:#4fe3d2; --pink:#ff74c3;
+  --txt:#eff1fb; --txt2:#c2c8e2; --muted:#888fae;
+  /* the signature AI gradient — electric blue → violet → magenta */
+  --grad:linear-gradient(135deg,#6e8bff 0%,#b873ff 52%,#ff74c3 100%);
+  --grad2:linear-gradient(135deg,#4fe3d2,#6e8bff 55%,#b873ff);
+  --glow:0 0 0 1px rgba(124,148,255,.24), 0 14px 44px rgba(120,86,240,.32);
   --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -29,10 +32,10 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
   font-family:'Sora',-apple-system,system-ui,sans-serif;overscroll-behavior-y:contain;font-size:15px;}
 body{min-height:100vh;line-height:1.45;
   background:
-   radial-gradient(1100px 600px at 50% -12%, rgba(155,176,255,.17), transparent 60%),
-   radial-gradient(820px 520px at 95% 8%, rgba(255,158,203,.07), transparent 58%),
-   radial-gradient(760px 480px at 88% 114%, rgba(201,170,255,.13), transparent 60%),
-   radial-gradient(620px 620px at 4% 32%, rgba(116,220,208,.05), transparent 60%),
+   radial-gradient(1150px 620px at 50% -12%, rgba(110,139,255,.24), transparent 60%),
+   radial-gradient(880px 560px at 96% 4%, rgba(255,116,195,.13), transparent 56%),
+   radial-gradient(820px 520px at 86% 116%, rgba(184,115,255,.20), transparent 60%),
+   radial-gradient(720px 700px at 2% 34%, rgba(79,227,210,.10), transparent 58%),
    var(--bg);
   background-attachment:fixed;}
 h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;}
@@ -45,7 +48,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .brand{display:flex;align-items:center;gap:10px;}
 .brand .mark{width:26px;height:26px;border-radius:7px;filter:drop-shadow(0 0 5px rgba(141,162,255,.5));}
-.brand b{font-family:'Space Grotesk';font-size:14px;letter-spacing:4px;color:#f3f4fa;font-weight:600;}
+.brand b{font-family:'Space Grotesk';font-size:14px;letter-spacing:4px;font-weight:700;
+  background:linear-gradient(90deg,#6e8bff,#b873ff,#ff74c3,#4fe3d2,#6e8bff);background-size:280% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:hueflow 8s linear infinite;}
+@keyframes hueflow{to{background-position:280% 0;}}
 .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
   background:var(--surface);display:grid;place-items:center;font-size:17px;color:var(--txt2);}
 
@@ -56,13 +62,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .panel-title .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
 
 /* hero */
-.hero{background:linear-gradient(150deg, rgba(141,162,255,.10), rgba(183,157,255,.05) 60%, transparent);
+.hero{background:linear-gradient(150deg, rgba(110,139,255,.16), rgba(184,115,255,.10) 52%, rgba(255,116,195,.05) 90%);
   border-color:var(--line2);}
 .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 .rankbadge{flex:none;text-align:center;}
 .rankbadge .r{font-family:'Space Grotesk';font-weight:700;font-size:26px;line-height:1;
   width:54px;height:54px;border-radius:15px;display:grid;place-items:center;
-  border:1px solid var(--line2);color:#fff;background:linear-gradient(160deg, rgba(141,162,255,.28), rgba(183,157,255,.12));
+  border:1px solid var(--line2);color:#fff;background:linear-gradient(155deg, rgba(110,139,255,.40), rgba(184,115,255,.22) 55%, rgba(255,116,195,.14));
   box-shadow:var(--glow);}
 .rankbadge small{font-size:9px;letter-spacing:2px;color:var(--muted);display:block;margin-top:5px;}
 .hero-name{font-family:'Space Grotesk';font-size:19px;color:#fff;margin:0;font-weight:600;}
@@ -72,7 +78,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .xpwrap{margin-top:15px;}
 .barlabel{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.5px;}
 .bar{height:8px;border-radius:6px;background:rgba(0,0,0,.28);overflow:hidden;position:relative;}
-.bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent-d),var(--accent));transition:width .5s cubic-bezier(.2,.8,.2,1);}
+.bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#6e8bff,#b873ff,#ff74c3);transition:width .5s cubic-bezier(.2,.8,.2,1);}
 .hero-stats{display:flex;gap:9px;margin-top:15px;}
 .chip{flex:1;text-align:center;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:13px;padding:10px 4px;}
 .chip b{display:block;font-family:'Space Grotesk';font-size:18px;font-weight:600;}
@@ -87,7 +93,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .quest:first-of-type{border-top:none;}
 .qcheck{flex:none;width:25px;height:25px;border-radius:8px;border:1.5px solid var(--line2);
   background:rgba(0,0,0,.2);display:grid;place-items:center;font-size:14px;color:transparent;transition:.18s;margin-top:1px;}
-.quest.done .qcheck{background:linear-gradient(150deg,var(--accent),var(--accent2));border-color:transparent;color:#0a0b10;box-shadow:0 4px 14px rgba(141,162,255,.35);}
+.quest.done .qcheck{background:var(--grad);border-color:transparent;color:#0a0b10;box-shadow:0 4px 16px rgba(140,110,250,.45);}
 .qbody{flex:1;min-width:0;}
 .qtitle{font-size:15px;font-weight:500;line-height:1.3;}
 .quest.done .qtitle{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(136,143,166,.5);}
@@ -135,8 +141,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
 /* buttons */
 .btn{display:block;width:100%;text-align:center;padding:14px;border-radius:14px;font-family:'Space Grotesk';
-  font-size:13px;letter-spacing:.5px;font-weight:600;border:1px solid transparent;color:#0a0b10;
-  background:linear-gradient(150deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(141,162,255,.25);}
+  font-size:13px;letter-spacing:.5px;font-weight:700;border:1px solid transparent;color:#0a0b10;
+  background:var(--grad);box-shadow:0 8px 24px rgba(120,90,240,.34);}
 .btn.ghost{background:var(--surface);color:var(--accent);border-color:var(--line2);box-shadow:none;}
 .btn.danger{background:rgba(255,143,160,.08);color:var(--red);border-color:rgba(255,143,160,.3);box-shadow:none;}
 .btn.sm{padding:11px;font-size:11px;}
@@ -199,7 +205,7 @@ label{font-size:10.5px;color:var(--muted);letter-spacing:1px;display:block;margi
 .nav button .nl{font-size:8.5px;letter-spacing:.5px;font-weight:600;}
 .nav button{transition:transform .15s ease,color .15s ease;}
 .nav button:active{transform:scale(.92);}
-.nav button.active{color:#0a0b10;background:linear-gradient(150deg,var(--accent),var(--accent2));box-shadow:0 4px 16px rgba(141,162,255,.32);}
+.nav button.active{color:#0a0b10;background:var(--grad);box-shadow:0 4px 18px rgba(120,90,240,.42);}
 .nav button.active .nl{color:#0a0b10;opacity:.85;}
 
 /* modal */
@@ -306,7 +312,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='15';
+const APP_VERSION='16';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
