@@ -312,7 +312,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='18';
+const APP_VERSION='19';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -769,6 +769,7 @@ function defaultState(){return{
     spends:{},
     investments:[],
     goals:[{id:'g_ef',ic:'🛟',name:'Emergency Fund',target:600000,saved:0}],
+    recurring:[],
   },
   customQuests:[],
   gmailUrl:'',
@@ -825,6 +826,7 @@ function migrate(s){
   if(typeof s.shields!=='number')s.shields=0;
   if(!s.finance.investments)s.finance.investments=[];
   if(!s.finance.goals)s.finance.goals=defaultState().finance.goals;
+  if(!s.finance.recurring)s.finance.recurring=[];
   if(!s.customQuests)s.customQuests=[];
   if(typeof s.gmailUrl!=='string')s.gmailUrl='';
   if(!s._imported)s._imported=[];
@@ -1273,7 +1275,8 @@ function viewMoney(){
   ${insPanel}
   <div class="panel"><div class="panel-title"><span class="dot"></span>Quick Add</div>
     <div class="catbtn">${QUICK_SPENDS.map(([c,a])=>`<button onclick="quickSpend('${c.replace(/'/g,'')}',${a})">${c} ₹${a}</button>`).join('')}</div>
-    <p class="tiny" style="margin-top:8px">One tap logs a common spend instantly. Your iOS Shortcut bank-email import drops spends here too.</p></div>
+    <p class="tiny" style="margin-top:8px">One tap logs a common spend instantly. Your iOS Shortcut bank-email import drops spends here too.</p>
+    <button class="btn ghost sm" style="margin-top:8px" onclick="manageRecurring()">🔁 RECURRING SPENDS (auto-log monthly)</button></div>
   ${invPanel}
   ${goalsPanel}
   ${donutPanel}
@@ -1281,7 +1284,8 @@ function viewMoney(){
     <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
   </div>
   <div class="panel"><div class="panel-title"><span class="dot"></span>Recent Spends</div>${recent}
-    <p class="tiny" style="margin-top:8px">Tap any spend to <b>edit</b>, <b>÷ split</b> with friends, or delete it.</p></div>
+    <p class="tiny" style="margin-top:8px">Tap any spend to <b>edit</b>, <b>÷ split</b> with friends, or delete it.</p>
+    <button class="btn ghost sm" style="margin-top:8px" onclick="spendHistoryModal()">🔍 ALL SPENDS & SEARCH</button></div>
   <div class="panel"><div class="panel-title"><span class="dot"></span>Savings History</div>${hist}</div>
   <div class="panel"><button class="btn ghost sm" onclick="editMoney()">⚙ EDIT INCOME · BUDGET · INVEST</button></div>`;
 }
@@ -1418,6 +1422,59 @@ function splitSpend(id){const f=findSpend(id);if(!f)return;
   save();$('#modal-host').innerHTML='';render();toast(`Split ÷${n} → your share ${fmt(each)}`);}
 function delSpend(id){if(!confirm('Delete this spend?'))return;const f=findSpend(id);if(!f)return;
   f.arr.splice(f.index,1);save();$('#modal-host').innerHTML='';render();toast('Spend deleted');}
+
+/* ---------- searchable full spend history ---------- */
+let SPEND_SEARCH={q:'',cat:''};
+function allSpends(){const out=[];Object.keys(S.finance.spends||{}).forEach(m=>(S.finance.spends[m]||[]).forEach(s=>out.push(s)));out.sort((a,b)=>a.date<b.date?1:-1);return out;}
+function spendListHTML(){
+  const q=(SPEND_SEARCH.q||'').toLowerCase(),cat=SPEND_SEARCH.cat;
+  const list=allSpends().filter(s=>(!cat||s.cat===cat)&&(!q||(s.note||'').toLowerCase().includes(q)||(s.cat||'').toLowerCase().includes(q)||String(s.amt).includes(q)));
+  if(!list.length)return '<div class="empty">No matching spends.</div>';
+  const total=list.reduce((a,b)=>a+b.amt,0);
+  return `<p class="tiny" style="margin-bottom:6px">${list.length} spend${list.length>1?'s':''} · ${fmt(total)}</p>`+
+    list.map(s=>`<div class="spend-item" style="cursor:pointer" onclick="editSpend('${s.id}')"><span>${s.cat}${s.note?' · '+s.note:''} <span class="tiny">${s.date.slice(5)}</span></span><span class="sa">-${fmt(s.amt)} ›</span></div>`).join('');
+}
+function renderSpendList(){const el=$('#sh_list');if(el)el.innerHTML=spendListHTML();}
+function filterSpendCat(c){SPEND_SEARCH.cat=c;[...document.querySelectorAll('#sh_cats button')].forEach(b=>b.classList.toggle('sel',b.dataset.c===c));renderSpendList();}
+function spendHistoryModal(){
+  SPEND_SEARCH={q:'',cat:''};
+  const chips=['All',...S.finance.budgets.map(b=>b.cat)].map(c=>{const v=c==='All'?'':c;return `<button data-c="${v}" class="${v===''?'sel':''}" onclick="filterSpendCat('${v.replace(/'/g,"")}')">${c}</button>`;}).join('');
+  sysModal('ALL SPENDS',`
+    <input id="sh_q" placeholder="Search note, category or amount…" oninput="SPEND_SEARCH.q=this.value;renderSpendList()">
+    <div class="catbtn" id="sh_cats" style="margin-top:8px">${chips}</div>
+    <div id="sh_list" style="margin-top:12px;max-height:46vh;overflow-y:auto">${spendListHTML()}</div>`,'DONE');
+}
+
+/* ---------- recurring spends (auto-logged monthly) ---------- */
+function applyRecurring(){
+  const mk=monthKey(),dom=new Date().getDate();let n=0;
+  (S.finance.recurring||[]).forEach(r=>{
+    if(r.lastMonth!==mk && dom>=r.day){
+      if(!S.finance.spends[mk])S.finance.spends[mk]=[];
+      S.finance.spends[mk].push({id:newSpendId(),date:todayStr(),cat:r.cat,amt:r.amt,note:r.name+' (recurring)'});
+      r.lastMonth=mk;n++;
+    }
+  });
+  if(n>0)save();
+  return n;
+}
+function manageRecurring(){
+  const list=(S.finance.recurring||[]).map(r=>`<div class="fixed-row"><span>${r.name} <span class="tiny">${r.cat} · ₹${r.amt} · day ${r.day}</span></span><button class="del" style="background:none;font-size:16px" onclick="delRecurring('${r.id}')">✕</button></div>`).join('')||'<div class="empty">No recurring spends yet.</div>';
+  const cats=S.finance.budgets.map(b=>`<option value="${b.cat}">${b.cat}</option>`).join('');
+  sysModal('RECURRING SPENDS',`<p class="tiny">Auto-logged each month so you never forget — subscriptions, rent-share, gym, classes, etc.</p>
+    <div style="margin:10px 0">${list}</div>
+    <label>Name</label><input id="rc_n" placeholder="e.g. Netflix · Dance class fee">
+    <div class="row2"><div><label>Amount ₹</label><input id="rc_a" type="number" value="500"></div>
+    <div><label>Day of month</label><input id="rc_d" type="number" value="1" min="1" max="28"></div></div>
+    <label>Category</label><select id="rc_c">${cats}</select>
+    <button class="btn" style="margin-top:14px" onclick="addRecurring()">+ ADD RECURRING</button>`,'DONE');
+}
+function addRecurring(){const n=($('#rc_n').value||'').trim();if(!n){toast('Enter a name');return;}
+  const amt=parseInt($('#rc_a').value)||0;if(amt<=0){toast('Enter a valid amount');return;}
+  const day=Math.min(28,Math.max(1,parseInt($('#rc_d').value)||1)),cat=$('#rc_c').value;
+  S.finance.recurring=S.finance.recurring||[];S.finance.recurring.push({id:'rc'+Date.now(),name:n,amt,cat,day,lastMonth:''});
+  save();applyRecurring();manageRecurring();render();toast('Recurring added');}
+function delRecurring(id){S.finance.recurring=(S.finance.recurring||[]).filter(x=>x.id!==id);save();manageRecurring();render();}
 function editMoney(){
   const f=S.finance;
   const budgetInputs=f.budgets.map((b,i)=>`<div class="row2" style="align-items:center;margin-top:6px;gap:8px"><input value="${b.cat}" id="bc_${i}"><input type="number" value="${b.amt}" id="ba_${i}" style="max-width:96px"><button class="del" style="flex:none;font-size:18px;padding:0 6px" onclick="delBudgetCat(${i})">✕</button></div>`).join('');
@@ -1883,7 +1940,7 @@ function handleUrlImport(){
 }
 function cleanUrl(){try{history.replaceState({},'',location.pathname);}catch(e){}}
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
-applyShieldIfNeeded();handleUrlImport();rollover();render();
+applyShieldIfNeeded();applyRecurring();handleUrlImport();rollover();render();
 if((S.gmailUrl||'').trim())setTimeout(()=>gmailSync(true),800);
 if(S.justRestarted)restartWelcome();
 else if(!S.seenIntro)intro();
