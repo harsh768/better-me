@@ -16,10 +16,12 @@
  *  Done. The app auto-syncs ICICI spends every time you open it.
  */
 
-const ICICI_FROM   = 'credit_cards@icicibank.com'; // <-- change if your alerts come from a different address
+// Broad ICICI match (catches every ICICI sender — the parser below filters out non-spend mail).
+// If your card alerts come ONLY from one address you can narrow this, e.g. 'credit_cards@icicibank.com'.
+const ICICI_FROM   = 'icicibank.com';
 const TOKEN        = '';        // <-- optional secret; leave '' to disable
 const LOOKBACK_DAYS = 35;       // how far back to read
-const MAX_THREADS   = 80;
+const MAX_THREADS   = 100;
 
 function doGet(e){
   const cb = (e && e.parameter && e.parameter.callback) || 'callback';
@@ -27,6 +29,8 @@ function doGet(e){
   try {
     if (TOKEN && (!e || !e.parameter || e.parameter.token !== TOKEN)) {
       out = { error: 'unauthorized' };
+    } else if (e && e.parameter && e.parameter.debug) {
+      out = debugInfo();          // open .../exec?debug=1 in your browser to see what's found
     } else {
       out = getSpends();
     }
@@ -36,6 +40,24 @@ function doGet(e){
   return ContentService
     .createTextOutput(cb + '(' + JSON.stringify(out) + ')')
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+// Diagnostics: shows the senders/subjects found and whether the parser matched each.
+function debugInfo(){
+  const q = 'from:(' + ICICI_FROM + ') newer_than:' + LOOKBACK_DAYS + 'd';
+  const threads = GmailApp.search(q, 0, 12);
+  const samples = [];
+  threads.forEach(function(th){
+    th.getMessages().forEach(function(m){
+      const p = parseIcici(m.getPlainBody() || '');
+      samples.push({
+        from: m.getFrom(),
+        subject: m.getSubject(),
+        parsed: p ? ('amt=' + p.amt + ' merchant=' + (p.merchant || '(none)')) : 'NO MATCH'
+      });
+    });
+  });
+  return { query: q, threadsFound: threads.length, samples: samples };
 }
 
 function getSpends(){

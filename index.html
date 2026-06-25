@@ -312,7 +312,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='17';
+const APP_VERSION='18';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -828,6 +828,8 @@ function migrate(s){
   if(!s.customQuests)s.customQuests=[];
   if(typeof s.gmailUrl!=='string')s.gmailUrl='';
   if(!s._imported)s._imported=[];
+  /* give every existing spend a stable id so it can be edited/split/deleted */
+  Object.values(s.finance.spends||{}).forEach(arr=>(arr||[]).forEach(sp=>{if(!sp.id)sp.id='s'+Math.random().toString(36).slice(2,11);}));
   /* ===== FRESH START (you asked to restart in every sense) =====
      Backs up the old save first (recoverable), then resets the journey to today:
      XP, gold, level, streak, history, study progress & spends all zero out and the
@@ -1225,7 +1227,7 @@ function viewMoney(){
     return `<div class="catrow"><div class="cl"><span>${b.cat}</span><span class="cv num">${fmt(sp)} / ${fmt(b.amt)}</span></div>
       <div class="bar ${over?'over':''}"><i style="width:${pct}%"></i></div></div>`;}).join('');
   const fixedList=f.af.map(x=>`<div class="fixed-row"><span>${x.name}${x.until?` <span class="tiny">(till ${x.until})</span>`:''}${x.type==='savings'?'<span class="sv">SAVES</span>':''}</span><span class="amt">${fmt(x.amt)}</span></div>`).join('');
-  const recent=(f.spends.slice(-6).reverse().map(s=>`<div class="spend-item"><span>${s.cat}${s.note?' · '+s.note:''} <span class="tiny">${s.date.slice(5)}</span></span><span class="sa">-${fmt(s.amt)}</span></div>`).join(''))||'<div class="empty">No spends logged this month.</div>';
+  const recent=(f.spends.slice(-10).reverse().map(s=>`<div class="spend-item" style="cursor:pointer" onclick="editSpend('${s.id}')"><span>${s.cat}${s.note?' · '+s.note:''} <span class="tiny">${s.date.slice(5)}</span></span><span class="sa">-${fmt(s.amt)} ›</span></div>`).join(''))||'<div class="empty">No spends logged this month.</div>';
   const monthLeft=Math.max(0,f.spendable-f.spentTotal);
   const histMonths=[...new Set([mk,...Object.keys(S.finance.spends)])].sort().reverse().slice(0,6);
   const hist=histMonths.map(m=>{const ff=financeSummary(m),sp=(S.finance.spends[m]||[]).reduce((a,b)=>a+b.amt,0);
@@ -1278,14 +1280,16 @@ function viewMoney(){
   <div class="panel"><div class="panel-title"><span class="dot"></span>Fixed Commitments</div>${fixedList}
     <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
   </div>
-  <div class="panel"><div class="panel-title"><span class="dot"></span>Recent Spends</div>${recent}</div>
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Recent Spends</div>${recent}
+    <p class="tiny" style="margin-top:8px">Tap any spend to <b>edit</b>, <b>÷ split</b> with friends, or delete it.</p></div>
   <div class="panel"><div class="panel-title"><span class="dot"></span>Savings History</div>${hist}</div>
   <div class="panel"><button class="btn ghost sm" onclick="editMoney()">⚙ EDIT INCOME · BUDGET · INVEST</button></div>`;
 }
 const QUICK_SPENDS=[['Blinkit',200],['Blinkit',400],['Blinkit',700],['Zomato',250],['Zomato',500],['Dates & outings',500]];
+function newSpendId(){return 's'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);}
 function quickSpend(cat,amt){const mk=monthKey();if(!S.finance.spends[mk])S.finance.spends[mk]=[];
   const match=S.finance.budgets.find(b=>b.cat===cat);
-  S.finance.spends[mk].push({date:todayStr(),cat:match?cat:(S.finance.budgets[0]?.cat||cat),amt,note:'quick'});
+  S.finance.spends[mk].push({id:newSpendId(),date:todayStr(),cat:match?cat:(S.finance.budgets[0]?.cat||cat),amt,note:'quick'});
   save();if(navigator.vibrate)navigator.vibrate(8);toast(`${cat} −${fmt(amt)} logged`);render();}
 function logInvest(){const v=parseFloat(prompt('Amount invested this time (₹)?'));if(!v||v<=0)return;
   const note=(prompt('Where? (e.g. Nifty index SIP, flexicap, emergency fund)','SIP')||'').trim();
@@ -1332,7 +1336,7 @@ function importBankTxns(list,silent){
     if(S._imported.includes(id))return;
     const date=(t.date&&/^\d{4}-\d{2}-\d{2}$/.test(t.date))?t.date:todayStr();
     const m=date.slice(0,7);if(!S.finance.spends[m])S.finance.spends[m]=[];
-    S.finance.spends[m].push({date,cat:categorizeMerchant(t.merchant||''),amt:Math.round(amt),note:(t.merchant||'ICICI')});
+    S.finance.spends[m].push({id:newSpendId(),date,cat:categorizeMerchant(t.merchant||''),amt:Math.round(amt),note:(t.merchant||'ICICI')});
     S._imported.push(id);n++;total+=amt;
   });
   if(S._imported.length>800)S._imported=S._imported.slice(-800);
@@ -1382,9 +1386,38 @@ function saveSpend(){
   const amt=parseFloat($('#sp_amt').value);if(!amt||amt<=0){toast('Enter an amount');return;}
   const note=$('#sp_note').value.trim(),mk=monthKey();
   if(!S.finance.spends[mk])S.finance.spends[mk]=[];
-  S.finance.spends[mk].push({date:todayStr(),cat:SPEND_CAT,amt,note});
+  S.finance.spends[mk].push({id:newSpendId(),date:todayStr(),cat:SPEND_CAT,amt,note});
   save();$('#modal-host').innerHTML='';toast('Spend logged');render();
 }
+/* ---------- edit · split · delete a logged spend (works for manual, quick-add & imported) ---------- */
+function findSpend(id){for(const mk of Object.keys(S.finance.spends||{})){const arr=S.finance.spends[mk]||[];const i=arr.findIndex(s=>s.id===id);if(i>=0)return{mk,index:i,arr,spend:arr[i]};}return null;}
+let EDIT_CAT=null;
+function editSpend(id){
+  const f=findSpend(id);if(!f){toast('Spend not found');return;}
+  const sp=f.spend;EDIT_CAT=sp.cat;
+  const cats=S.finance.budgets.map(b=>`<button onclick="selEditCat('${b.cat.replace(/'/g,"")}')" data-c="${b.cat}" class="${b.cat===sp.cat?'sel':''}">${b.cat}</button>`).join('');
+  sysModal('EDIT SPEND',`
+    <label>Amount (₹)</label><input id="es_amt" type="number" inputmode="numeric" value="${sp.amt}">
+    <label>Category</label><div class="catbtn" id="es_cats">${cats}</div>
+    <label>Note</label><input id="es_note" value="${(sp.note||'').replace(/"/g,'&quot;')}">
+    <p class="tiny" style="margin-top:8px">${prettyDate(sp.date)}</p>
+    <button class="btn" style="margin-top:14px" onclick="saveSpendEdit('${id}')">SAVE CHANGES</button>
+    <button class="btn ghost sm" style="margin-top:8px" onclick="splitSpend('${id}')">÷ SPLIT WITH FRIENDS</button>
+    <button class="btn danger sm" style="margin-top:8px" onclick="delSpend('${id}')">DELETE SPEND</button>`,'CLOSE');
+}
+function selEditCat(c){EDIT_CAT=c;[...document.querySelectorAll('#es_cats button')].forEach(b=>b.classList.toggle('sel',b.dataset.c===c));}
+function saveSpendEdit(id){const f=findSpend(id);if(!f)return;
+  const amt=parseFloat($('#es_amt').value);if(!amt||amt<=0){toast('Enter a valid amount');return;}
+  f.spend.amt=Math.round(amt);f.spend.cat=EDIT_CAT||f.spend.cat;f.spend.note=$('#es_note').value.trim();
+  save();$('#modal-host').innerHTML='';render();toast('Spend updated');}
+function splitSpend(id){const f=findSpend(id);if(!f)return;
+  const n=parseInt(prompt('Split between how many people (including you)?','3'));
+  if(!n||n<1){return;}
+  const each=Math.round(f.spend.amt/n);
+  f.spend.amt=each;f.spend.note=((f.spend.note||'').replace(/\s*\(split[^)]*\)\s*$/,'').trim()+` (split ÷${n})`).trim();
+  save();$('#modal-host').innerHTML='';render();toast(`Split ÷${n} → your share ${fmt(each)}`);}
+function delSpend(id){if(!confirm('Delete this spend?'))return;const f=findSpend(id);if(!f)return;
+  f.arr.splice(f.index,1);save();$('#modal-host').innerHTML='';render();toast('Spend deleted');}
 function editMoney(){
   const f=S.finance;
   const budgetInputs=f.budgets.map((b,i)=>`<div class="row2" style="align-items:center;margin-top:6px;gap:8px"><input value="${b.cat}" id="bc_${i}"><input type="number" value="${b.amt}" id="ba_${i}" style="max-width:96px"><button class="del" style="flex:none;font-size:18px;padding:0 6px" onclick="delBudgetCat(${i})">✕</button></div>`).join('');
@@ -1844,7 +1877,7 @@ function handleUrlImport(){
   const exact=catRaw&&S.finance.budgets.find(x=>x.cat.toLowerCase()===catRaw.toLowerCase());
   const cat=exact?exact.cat:categorizeMerchant(catRaw||note);
   const mk=monthKey();if(!S.finance.spends[mk])S.finance.spends[mk]=[];
-  S.finance.spends[mk].push({date:todayStr(),cat,amt,note});
+  S.finance.spends[mk].push({id:newSpendId(),date:todayStr(),cat,amt,note});
   S._imported.push(tok);if(S._imported.length>800)S._imported=S._imported.slice(-800);
   save();cleanUrl();setTimeout(()=>toast(`Imported: ${cat} −${fmt(amt)}`),500);
 }
