@@ -16,9 +16,9 @@
  *  Done. The app auto-syncs ICICI spends every time you open it.
  */
 
-// Broad ICICI match (catches every ICICI sender — the parser below filters out non-spend mail).
-// If your card alerts come ONLY from one address you can narrow this, e.g. 'credit_cards@icicibank.com'.
-const ICICI_FROM   = 'icicibank.com';
+// ICICI card alerts come from credit_cards@icici.bank.in (also covers icicibank.com just in case).
+// The parser below filters out non-spend mail (statements, payments, OTPs).
+const ICICI_FROM   = 'icici.bank.in OR icicibank.com';
 const TOKEN        = '';        // <-- optional secret; leave '' to disable
 const LOOKBACK_DAYS = 35;       // how far back to read
 const MAX_THREADS   = 100;
@@ -86,22 +86,30 @@ function getSpends(){
  * Returns { amt, merchant } or null for non-spend emails.
  */
 function parseIcici(t){
-  // skip non-spend alerts (payments, statements, OTPs, reward summaries)
-  if (/payment received|thank you for|statement|\botp\b|reward points|e-?statement|due amount/i.test(t)) return null;
+  // must be a real spend alert
+  if (!/has been used for a transaction|transaction of (?:INR|Rs)/i.test(t)) return null;
+  // skip non-spend / informational alerts
+  if (/payment received|thank you for paying|statement is|\botp\b|reward points|e-?statement|amount due/i.test(t)) return null;
 
-  // amount: "INR 540.00" / "Rs 540" / "Rs. 1,234.56"
-  const am = t.match(/(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+  // amount: anchor on "transaction of INR 135.00"; fall back to first INR/Rs amount
+  const am = t.match(/transaction of\s+(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i)
+          || t.match(/(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
   if (!am) return null;
   const amt = parseFloat(am[1].replace(/,/g, ''));
   if (!amt || amt <= 0) return null;
 
-  // merchant: common ICICI phrasings
+  // merchant: "Info: UPI-609223681951-ZEPTO MA" → "ZEPTO MA"  (also handles "at X on", "towards X")
   let merchant = '';
-  const mm = t.match(/Info:\s*([^\n\r.]+)/i)
+  const mm = t.match(/Info:\s*([^.\n\r]+)/i)
           || t.match(/\bat\s+([A-Za-z0-9 &._\-*]{2,40}?)\s+on\b/i)
-          || t.match(/towards\s+([^\n\r.]+)/i)
-          || t.match(/spent at\s+([^\n\r.]+)/i);
-  if (mm) merchant = mm[1].trim().replace(/\s+/g, ' ');
+          || t.match(/towards\s+([^.\n\r]+)/i)
+          || t.match(/spent at\s+([^.\n\r]+)/i);
+  if (mm) {
+    merchant = mm[1].trim();
+    const upi = merchant.match(/UPI-\d+-(.+)/i);     // strip the UPI-<ref>- prefix
+    if (upi) merchant = upi[1].trim();
+    merchant = merchant.replace(/\s+/g, ' ');
+  }
 
   return { amt: amt, merchant: merchant };
 }
