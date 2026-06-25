@@ -16,12 +16,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#08090e; --bg2:#0c0e15; --surface:rgba(255,255,255,0.042); --surface2:rgba(255,255,255,0.062);
-  --line:rgba(255,255,255,0.09); --line2:rgba(148,166,255,0.24);
-  --accent:#94a6ff; --accent2:#c1a8ff; --accent-d:#5d6ed6;
-  --gold:#ecc77e; --green:#7fe6b4; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0;
+  --bg:#07080d; --bg2:#0c0e15; --surface:rgba(255,255,255,0.045); --surface2:rgba(255,255,255,0.065);
+  --line:rgba(255,255,255,0.095); --line2:rgba(150,168,255,0.26);
+  --accent:#9bb0ff; --accent2:#c9aaff; --accent-d:#5d6ed6;
+  --gold:#f0cd84; --green:#7fe6b4; --red:#ff8fa0; --orange:#ffb27a; --teal:#74dcd0; --pink:#ff9ecb;
   --txt:#eef0f7; --txt2:#c4c9db; --muted:#868da4;
-  --glow:0 0 0 1px rgba(148,166,255,.16), 0 10px 34px rgba(80,96,200,.20);
+  --glow:0 0 0 1px rgba(150,168,255,.18), 0 12px 38px rgba(86,102,210,.24);
   --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -29,9 +29,10 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
   font-family:'Sora',-apple-system,system-ui,sans-serif;overscroll-behavior-y:contain;font-size:15px;}
 body{min-height:100vh;line-height:1.45;
   background:
-   radial-gradient(1000px 560px at 50% -10%, rgba(148,166,255,.13), transparent 62%),
-   radial-gradient(760px 460px at 92% 112%, rgba(193,168,255,.10), transparent 60%),
-   radial-gradient(600px 600px at 8% 30%, rgba(116,220,208,.04), transparent 60%),
+   radial-gradient(1100px 600px at 50% -12%, rgba(155,176,255,.17), transparent 60%),
+   radial-gradient(820px 520px at 95% 8%, rgba(255,158,203,.07), transparent 58%),
+   radial-gradient(760px 480px at 88% 114%, rgba(201,170,255,.13), transparent 60%),
+   radial-gradient(620px 620px at 4% 32%, rgba(116,220,208,.05), transparent 60%),
    var(--bg);
   background-attachment:fixed;}
 h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif;letter-spacing:.2px;}
@@ -296,7 +297,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='12';
+const APP_VERSION='13';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -324,12 +325,12 @@ const REST={key:'Rest + Weekly Reset',stat:'SEN',xp:30,gold:20,
 const WORKOUT_PHASES={
  /* Phase A — weeks 1-8 — HEAL & LEAN: beginner, lower body + core + cardio, ZERO shoulder load */
  A:{
-  1:{key:'Legs — Quads & Glutes',stat:'STR',xp:55,gold:48,ex:`Beginner pace — leave 2 reps in the tank, rest 60–90s, focus on form.\nLeg Press 3×12\nLeg Extension 3×15\nSeated Leg Curl 3×12\nGlute Bridge (bodyweight or band) 3×15\nLeg-Press Calf Raise 3×20\n\n✅ All seated/lying machines — zero weight on the shoulder. No barbell on the back, no shoulder pads.`},
-  2:{key:'Core + Cardio (abs)',stat:'AGI',xp:50,gold:44,ex:`Cardio 30 min: incline walk, bike, OR easy jog (relaxed, can-talk pace).\nThen core (this builds the abs; the deficit reveals them):\nLying Leg Raise 3×12\nReverse Crunch 3×15\nDead Bug 3×10/side\nBicycle Crunch 3×20\n\n✅ No planks, push-ups or hanging — they load the shoulder.`},
-  3:{key:'Legs — Hamstrings & Glutes',stat:'STR',xp:55,gold:48,ex:`Leg Press (feet high on platform) 3×12\nLying Leg Curl 3×15\nMachine Hip Thrust OR Glute Bridge 3×12\nCable / Machine Glute Kickback 3×15/leg\nSeated Calf Raise 3×20\n\n✅ Hips/legs only — nothing held on the shoulders.`},
-  4:{key:'Cardio + Mobility',stat:'AGI',xp:45,gold:40,ex:`Pick one, 35–40 min: incline treadmill walk (incline 8–12), cycle, OR easy jog 20–25 min.\nGentle lower-body mobility / stretch 10 min.\nEasy day — keep the heart rate moderate.`},
-  5:{key:'Legs — Full (light)',stat:'STR',xp:55,gold:48,ex:`Leg Press 3×12\nLeg Extension 3×15\nSeated Leg Curl 3×12\nBodyweight Reverse Lunge (hold a rail for balance) 3×10/leg\nLeg-Press Calf Raise 3×20`},
-  6:{key:'Core + Long Walk (abs)',stat:'AGI',xp:45,gold:40,ex:`45–60 min walk or easy cycle.\nAb finisher:\nAb-Machine Crunch (or floor crunch) 3×15\nLying Leg Raise 3×15\nRussian Twist (bodyweight) 3×20\n\n✅ No weight overhead or on shoulders.`},
+  1:{key:'Legs — Light Machines',stat:'STR',xp:50,gold:44,ex:`🏢 Fits a ~40-min office break. Absolute-beginner pace: light weight, leave 3 reps in the tank, rest 60–90s, form over everything.\nLeg Press 2×12 (light)\nLeg Extension 2×15\nSeated Leg Curl 2×15\nGlute Bridge (bodyweight) 2×15\n10-min incline walk to finish\n\n✅ All seated/lying machines — zero load on the shoulder. No barbell, no shoulder pads, nothing overhead.`},
+  2:{key:'Cardio + Core',stat:'AGI',xp:48,gold:42,ex:`🏢 ~35 min. Cardio 25 min: incline treadmill walk or bike at an easy, can-talk pace.\nThen gentle core (builds the abs; the deficit reveals them):\nDead Bug 2×10/side\nReverse Crunch 2×15\nBicycle Crunch 2×20\n\n✅ No planks, push-ups or hanging — they load the shoulder.`},
+  3:{key:'Legs — Glutes & Hamstrings',stat:'STR',xp:50,gold:44,ex:`🏢 ~40 min, light & controlled.\nSeated Leg Curl 2×15\nMachine Hip Thrust OR Glute Bridge 2×15\nMachine/Cable Glute Kickback 2×15/leg\nSeated Calf Raise 2×20\n10-min walk to finish\n\n✅ Hips/legs only — nothing held on the shoulders.`},
+  4:{key:'Cardio + Mobility',stat:'AGI',xp:42,gold:38,ex:`🏢 Easy day, ~30–35 min: incline treadmill walk (incline 8–12) or cycle.\nGentle lower-body mobility / stretch 10 min.\nKeep the heart rate moderate — this is recovery that still burns fat.`},
+  5:{key:'Legs — Full (light)',stat:'STR',xp:50,gold:44,ex:`🏢 ~40 min, beginner.\nLeg Press 2×12\nLeg Extension 2×15\nSeated Leg Curl 2×15\nBodyweight Sit-to-Stand (or supported squat) 2×12\nCalf Raise 2×20`},
+  6:{key:'Long Walk + Core',stat:'AGI',xp:42,gold:38,ex:`40–60 min walk (outside or treadmill) at a brisk pace.\nAb finisher:\nLying Leg Raise 2×15\nReverse Crunch 2×15\nRussian Twist (bodyweight) 2×20\n\n✅ No weight overhead or on shoulders. A big fat-loss day with zero injury risk.`},
   0:REST,
  },
  /* Phase B — weeks 9-16 — REINTRODUCE upper body LIGHT (only when physio-cleared) */
@@ -550,6 +551,41 @@ const CURR_GROUPS=[
    'Model supply chain + poisoning + insecure plugin ecosystem. Threat-model an AI feature.',
    'Build a mini AI-app red-team checklist you can reuse at Navi and in bounties.',
  ]},
+
+ /* ---- PHASE 3: Cloud Security (huge bug-bounty + Navi overlap) ---- */
+ {phase:'CLOUD',topic:'Cloud Security · Identity & Storage',res:'AWS free tier + flaws.cloud',items:[
+   'Cloud + IAM fundamentals: shared-responsibility model, users vs roles vs policies — identity is the new perimeter. Spin up an AWS free-tier account.',
+   'S3 & storage misconfigs: public buckets, ACLs, enumeration (awscli, s3scanner). Find, exploit and fix a misconfigured bucket.',
+   'flaws.cloud / flaws2.cloud: work the guided challenges end-to-end — the fastest way to feel real cloud attack paths.',
+ ]},
+ {phase:'CLOUD',topic:'Cloud Security · Escalation & Audit',res:'Pacu, ScoutSuite, Prowler',items:[
+   'Metadata SSRF (IMDSv1) → temporary cloud creds → escalation. Reproduce the classic SSRF-to-cloud-takeover chain.',
+   'IAM privilege escalation: over-permissive policies, enumerate-iam + Pacu. Walk one full escalation path.',
+   'Cloud audit posture: run ScoutSuite / Prowler on your test account and read the findings like an auditor would.',
+   'Secrets & serverless: leaked keys in git (trufflehog/gitleaks), Lambda env vars, over-scoped functions.',
+   'Containers & K8s intro: exposed Docker/Kubernetes API, container escape basics, kube-hunter concepts.',
+ ]},
+
+ /* ---- PHASE 4: Mobile Security ---- */
+ {phase:'MOBILE',topic:'Mobile Security · Android',res:'OWASP MASTG + a vulnerable APK',items:[
+   'Android & APK fundamentals: components, AndroidManifest, the OWASP MASVS/MASTG. Set up an emulator + route it through Burp (install the CA cert).',
+   'Static analysis: decompile with jadx & apktool, read the code, hunt hardcoded secrets/endpoints. Run MobSF for an automated pass.',
+   'Dynamic analysis: intercept the app\'s traffic, then bypass SSL pinning with objection/Frida and tamper live requests.',
+   'Local storage & IPC: insecure SharedPrefs/SQLite, exported activities/providers/services, deep-link & intent abuse.',
+   'Mobile API testing: the app is just an API client — point your web bug skills (IDOR, broken auth, mass assignment) at its backend.',
+ ]},
+ {phase:'MOBILE',topic:'Mobile Security · iOS overview',res:'OWASP MASTG (iOS)',items:[
+   'iOS essentials: IPA structure, the keychain, app sandbox, Frida on a simulator/jailbroken device, and the MASTG iOS test cases. Know enough to test hybrid apps.',
+ ]},
+
+ /* ---- PHASE 5: Network Security depth ---- */
+ {phase:'NET',topic:'Network Security · Depth',res:'Wireshark + TryHackMe',items:[
+   'TCP/IP & protocols refresher: capture your own traffic in Wireshark and label the 3-way handshake, DNS, TLS hello.',
+   'Scanning deep-dive: nmap NSE scripts, version detection, and firewall/IDS evasion basics (fragmentation, decoys, timing).',
+   'MITM & spoofing: ARP/DNS spoofing theory, capture creds on a lab network with bettercap. How switches/segmentation defend.',
+   'TLS & crypto in transit: how TLS works, cert pinning, downgrade attacks; audit a host with testssl.sh.',
+   'Pivoting & tunnelling mastery: ssh -L/-R/-D, chisel, ligolo-ng, proxychains — reach a deep internal subnet.',
+ ]},
 ];
 
 const ENDGAME=[
@@ -567,21 +603,23 @@ const ENDGAME=[
 
 function buildCurriculum(){const f=[];CURR_GROUPS.forEach(g=>g.items.forEach(it=>f.push({phase:g.phase,topic:g.topic,res:g.res,task:it})));return f;}
 const CURRICULUM=buildCurriculum();
-function studyIndexFor(){
-  const start=parseD(S.profile.startDate), t=parseD(todayStr());
-  let idx=0; const d=new Date(start);
-  while(d<t){ if(d.getDay()!==0) idx++; d.setDate(d.getDate()+1); }
-  return idx;
-}
+/* Completion-based progress: the syllabus advances ONLY when you finish a lesson,
+   so a missed day never skips curriculum — you just pick up the exact next lesson. */
+function studyIndexFor(){return S.studyDone||0;}
 function studyMins(w){ if(w<=4)return [60,75,90,105][Math.min(w-1,3)]; return Math.min(75+(w-5)*5,120); }
 function studyToday(){
   if(dow()===0) return {id:'study',title:'Weekly Review & Plan',sub:'Sunday reset — re-read learnings, log weight, plan the week.',
     stat:'INT',xp:50,gold:40,mand:true,key:true,phaseTag:'REVIEW',
     exp:`Sunday reset:\n• Re-read this week's "today I learned" notes — feel the progress.\n• Pick next week's study target.\n• Log your weight (LOG tab).\n• Review the VAULT — did you stay on budget?\n• Plan dates/quality time with your GF.\n• 30-60 min on a startup idea if you want.`};
-  const w=programWeek(), mins=studyMins(w), i=studyIndexFor();
-  const unit = i<CURRICULUM.length ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
-  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:50, mand:true, key:true, phaseTag:unit.phase, resUrl:resUrl(unit.res),
-    exp:`${unit.task}\n\n📚 Where: tap "Open resource" below — it teaches this topic from zero.\n⏱ Today: ~${mins} min.\n\n🆕 New terms are EXPECTED — don't be intimidated. Flow: read the short material first → do the lab/exercise hands-on → jot a one-line TIL note (Home). Stuck >15 min? Read the lab's solution, understand it, move on.\nThat daily loop is the cure for "I don't know anything" — 90 days = 90 receipts.`};
+  const w=programWeek(), mins=studyMins(w);
+  const rec=S.history[todayStr()];
+  // if today's lesson is already done, keep showing that exact lesson; else the next one
+  const i=(rec&&rec.done&&rec.done.includes('study')&&typeof rec.studyIdx==='number')?rec.studyIdx:studyIndexFor();
+  const inCurr=i<CURRICULUM.length;
+  const unit = inCurr ? CURRICULUM[i] : ENDGAME[(i-CURRICULUM.length)%ENDGAME.length];
+  const prog = inCurr ? `Lesson ${i+1} / ${CURRICULUM.length}` : 'Applied rotation';
+  return {id:'study', title:'Study · '+unit.topic, sub:unit.task, stat:'INT', xp:65, gold:50, mand:true, key:true, lesson:true, lessonIdx:i, phaseTag:unit.phase, resUrl:resUrl(unit.res),
+    exp:`${unit.task}\n\n📍 ${prog} · phase: ${phaseName(unit.phase)}\n📚 Where: tap "Open resource" below — it teaches this topic from zero.\n⏱ Today: ~${mins} min.\n\n🆕 New terms are EXPECTED — don't be intimidated. Flow: read the short material first → do the lab/exercise hands-on → jot a one-line TIL note (Home). Stuck >15 min? Read the lab's solution, understand it, move on.\nMiss a day? Nothing is lost — you'll get this exact lesson next time. The chain only breaks on your calendar streak, never on your learning.`};
 }
 
 /* ---------- daily quests ---------- */
@@ -596,11 +634,17 @@ function todaysQuests(){
      exp:`Target ≈ 160 g protein, ≈ 1,700–1,900 kcal — a ~750 kcal/day deficit ≈ 0.75 kg/week (you can safely lose ~1 kg/week early while heavier). This is the engine of your birthday transformation.\nEgg+veg protein: eggs/whites, paneer, curd/Greek yogurt, dal, rajma, chana, soya chunks, tofu, milk, whey.\nEvery meal: a palm+ of protein + half-plate veg. Cut fried food, sugar, sweets, sugary drinks & late-night snacking.`},
    {id:'water',title:'Drink 3 L Water',sub:'1 L bottle × 3',stat:'VIT',xp:15,gold:8,mand:false,
      exp:`Carry a 1 L bottle, refill ×3. Helps appetite, recovery and skin.`},
-   {id:'workout',title:wk.key,sub:'Tap for today\'s exact exercises',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
+   {id:'workout',title:wk.key,sub:'Beginner & shoulder-safe — tap for today\'s exact session',stat:wk.stat,xp:wk.xp,gold:wk.gold,mand:dow()!==0,phaseTag:'PHASE '+currentPhaseLetter(),exp:wk.ex},
+   ...(dow()===0?[
+     {id:'dance',title:'Dance Class',sub:'Your Sunday dance session',stat:'AGI',xp:40,gold:35,mand:false,
+       exp:`Go to your Sunday dance class. Joyful cardio with zero shoulder load — it burns fat, lifts your mood for the whole week, and movement you actually enjoy is the most sustainable kind there is.`},
+     {id:'guitar',title:'Guitar Class / Practice',sub:'Your Sunday guitar session',stat:'SEN',xp:35,gold:30,mand:false,
+       exp:`Guitar class or 30+ min of focused practice. A creative skill away from the screen — it rests the analytical mind, builds patience and finger discipline, and gives the week a non-work win.`},
+   ]:[]),
    {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:30,mand:true,key:true,
      exp:`Target: 10,000 steps ≈ 70–80 min of walking total.\nEasiest split: 20-min brisk walk after your office lunch + a 30–40 min walk in the evening. Track it on your phone / Apple Health.\nSteps are the #1 fat-loss lever and put zero load on the shoulder.`},
-   {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:true,
-     exp:`At work: one 60-90 min focused block (phone away) on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built.`},
+   {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:dow()!==0,
+     exp:`At work (11am–8pm): one 60-90 min focused block, phone away, on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built. (Optional on Sundays.)`},
    studyToday(),
    {id:'spend',title:'Track Spends + Stay on Budget',sub:'Log today\'s spends in the VAULT (20s)',stat:'WLT',xp:25,gold:15,mand:false,
      exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your investment savings stay intact.`},
@@ -675,41 +719,45 @@ function defaultState(){return{
       {name:'Mom savings',amt:15000,type:'savings'},
     ],
     investTarget:55000,
+    /* Spendable ≈ ₹51k (Jul–Dec). Budgeted ≈ ₹44k → the ~₹7k you don't spend
+       sweeps into extra SIP. Envelopes match how you actually live in Bangalore. */
     budgets:[
-      {cat:'Food & dining out',amt:14000},
-      {cat:'Groceries & home',amt:7000},
-      {cat:'Dates & outings',amt:13000},
-      {cat:'Delivery & impulse',amt:5000},
-      {cat:'Shopping & personal',amt:7000},
-      {cat:'Fun & subscriptions',amt:3000},
-      {cat:'Misc & buffer',amt:2000},
+      {cat:'Blinkit',amt:8000},
+      {cat:'Zomato',amt:5000},
+      {cat:'Dates & outings',amt:9000},
+      {cat:'Health',amt:5000},
+      {cat:'Lifestyle',amt:5000},
+      {cat:'Dance & guitar',amt:4000},
+      {cat:'Clothes',amt:4000},
+      {cat:'Misc & buffer',amt:4000},
     ],
     spends:{},
   },
-  /* Rewards are priced in "days of effort": a full day of all daily tasks ≈ 330 gold,
-     so a cheat meal (~1800) takes ~5–6 clean days to earn. Tougher on purpose. */
+  /* Rewards are priced in "days of effort": a full clean day ≈ 330 gold, so a cheat
+     meal (~1800) = ~5–6 perfect days. Everything you'd splurge on, you earn first. */
   rewards:[
-    /* — Food & Eating Out — */
-    {id:'r1', ic:'☕', name:'Coffee / dessert out',        cost:650,   cat:'Food & Eating Out'},
-    {id:'r2', ic:'🥤', name:'Boba / snack treat',          cost:800,   cat:'Food & Eating Out'},
-    {id:'r3', ic:'🛵', name:'Order-in (Swiggy/Zomato)',    cost:1300,  cat:'Food & Eating Out'},
-    {id:'r4', ic:'🍔', name:'Guilt-free cheat meal',       cost:1800,  cat:'Food & Eating Out'},
-    {id:'r5', ic:'🍽️', name:'Restaurant dinner out',       cost:2600,  cat:'Food & Eating Out'},
-    {id:'r6', ic:'🍻', name:'Drinks / party night',        cost:3300,  cat:'Food & Eating Out'},
-    /* — Fitness, Rest & Lifestyle — */
-    {id:'r7', ic:'🎮', name:'2 hrs gaming / Netflix',      cost:1000,  cat:'Fitness, Rest & Lifestyle'},
-    {id:'r8', ic:'😴', name:'Guilt-free sleep-in',         cost:1500,  cat:'Fitness, Rest & Lifestyle'},
-    {id:'r9', ic:'🛋️', name:'Full guilt-free rest day',    cost:2000,  cat:'Fitness, Rest & Lifestyle'},
-    {id:'r10',ic:'🎧', name:'New gym gear / supplements',  cost:3500,  cat:'Fitness, Rest & Lifestyle'},
-    {id:'r11',ic:'💆', name:'Massage / recovery session',  cost:4000,  cat:'Fitness, Rest & Lifestyle'},
-    /* — Spend & Treats — */
-    {id:'r12',ic:'🎬', name:'Movie / night out',           cost:2000,  cat:'Spend & Treats'},
-    {id:'r13',ic:'💖', name:'Thoughtful date',             cost:2400,  cat:'Spend & Treats'},
-    {id:'r14',ic:'👕', name:'New clothes (₹2–3k)',         cost:5000,  cat:'Spend & Treats'},
-    {id:'r15',ic:'🎁', name:'Gadget / big buy (₹5k+)',     cost:9500,  cat:'Spend & Treats'},
-    {id:'r16',ic:'✈️', name:'Weekend getaway / splurge',   cost:16000, cat:'Spend & Treats'},
+    /* — Food & Treats — */
+    {id:'r1', ic:'☕', name:'Coffee / dessert out',        cost:650,   cat:'Food & Treats'},
+    {id:'r2', ic:'🛒', name:'Blinkit treat (snacks/ice-cream)', cost:700, cat:'Food & Treats'},
+    {id:'r3', ic:'🛵', name:'Zomato order-in',             cost:1300,  cat:'Food & Treats'},
+    {id:'r4', ic:'🍔', name:'Guilt-free cheat meal',       cost:1800,  cat:'Food & Treats'},
+    {id:'r5', ic:'🍽️', name:'Restaurant dinner out',       cost:2600,  cat:'Food & Treats'},
+    {id:'r6', ic:'🍻', name:'Drinks / party night',        cost:3300,  cat:'Food & Treats'},
+    /* — Rest & Fun — */
+    {id:'r7', ic:'🎮', name:'2 hrs gaming / Netflix',      cost:1000,  cat:'Rest & Fun'},
+    {id:'r8', ic:'🎸', name:'Extra jam / music session',   cost:1200,  cat:'Rest & Fun'},
+    {id:'r9', ic:'😴', name:'Guilt-free sleep-in',         cost:1500,  cat:'Rest & Fun'},
+    {id:'r10',ic:'🛋️', name:'Full guilt-free rest day',    cost:2000,  cat:'Rest & Fun'},
+    {id:'r11',ic:'💆', name:'Massage / recovery session',  cost:4000,  cat:'Rest & Fun'},
+    /* — Buy & Splurge — */
+    {id:'r12',ic:'🎬', name:'Movie / night out',           cost:2000,  cat:'Buy & Splurge'},
+    {id:'r13',ic:'💖', name:'Thoughtful date',             cost:2400,  cat:'Buy & Splurge'},
+    {id:'r14',ic:'🧴', name:'Skincare / grooming splurge', cost:2800,  cat:'Buy & Splurge'},
+    {id:'r15',ic:'👕', name:'New clothes (₹2–3k)',         cost:5000,  cat:'Buy & Splurge'},
+    {id:'r16',ic:'🎧', name:'Gadget / big buy (₹5k+)',     cost:9500,  cat:'Buy & Splurge'},
+    {id:'r17',ic:'✈️', name:'Weekend getaway',             cost:16000, cat:'Buy & Splurge'},
   ],
-  rewardsV4:true, budgetsV2:true,
+  rewardsV4:true, budgetsV2:true, studyDone:0, restartV2:true,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
@@ -728,6 +776,26 @@ function migrate(s){
     const remap={'Food & groceries':'Food & dining out','Food':'Food & dining out','Groceries':'Groceries & home','Dates':'Dates & outings','Outings':'Dates & outings','Shopping':'Shopping & personal','Misc':'Misc & buffer'};
     Object.values(s.finance.spends||{}).forEach(arr=>(arr||[]).forEach(sp=>{if(remap[sp.cat])sp.cat=remap[sp.cat];}));
     s.spendRemapV1=true;
+  }
+  if(typeof s.studyDone!=='number')s.studyDone=0;
+  /* ===== FRESH START (you asked to restart in every sense) =====
+     Backs up the old save first (recoverable), then resets the journey to today:
+     XP, gold, level, streak, history, study progress & spends all zero out and the
+     program clock restarts. KEPT: your profile (name/goal/height/birthday) and your
+     real weight logs. New budgets + reward catalog are installed. One-time only. */
+  if(!s.restartV2){
+    try{localStorage.setItem(STORE+'_backup_'+todayStr(),JSON.stringify(s));}catch(e){}
+    const d=defaultState();
+    s.profile.startDate=todayStr();
+    s.totalXp=0;s.gold=0;s.totalCompleted=0;s.studyDone=0;
+    s.stats={STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0,WLT:0};
+    s.history={};s.redeemed=[];
+    s.finance.budgets=d.finance.budgets;
+    s.finance.spends={};
+    s.rewards=d.rewards;
+    s.lastOpen=todayStr();
+    s.restartV2=true;s.budgetsV2=true;s.rewardsV4=true;
+    s.justRestarted=true;
   }
   return s;
 }
@@ -751,11 +819,15 @@ function toggleQuest(q){
   const rec=dayRecord(),i=rec.done.indexOf(q.id);
   if(i>=0){rec.done.splice(i,1);if(rec.meta)delete rec.meta[q.id];S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
     S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);
+    /* un-ticking a study lesson rewinds the curriculum pointer to exactly where it was */
+    if(q.id==='study'&&typeof rec.studyIdx==='number'){S.studyDone=rec.studyIdx;delete rec.studyIdx;}
     if(!dayCounts(rec))rec.streakBonus=false;if(!everyMand(rec))rec.bonus=false;
     recomputeFull();save();render();
   }else{
     const before=levelInfo(S.totalXp).level;
     rec.done.push(q.id);rec.meta=rec.meta||{};rec.meta[q.id]={t:q.title,s:q.stat,xp:q.xp,g:q.gold};
+    /* finishing a real curriculum lesson advances the pointer once (never on Sunday review) */
+    if(q.id==='study'&&q.lesson&&typeof rec.studyIdx!=='number'){rec.studyIdx=q.lessonIdx;S.studyDone=q.lessonIdx+1;}
     S.totalXp+=q.xp;S.gold+=q.gold;S.stats[q.stat]+=1;S.totalCompleted+=1;recomputeFull();save();
     if(navigator.vibrate)navigator.vibrate(12);
     const after=levelInfo(S.totalXp).level;
@@ -820,7 +892,7 @@ function weightStats(){
 /* ---------- history helpers ---------- */
 function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayXp(rec){if(!rec)return 0;if(rec.meta)return Object.values(rec.meta).reduce((a,b)=>a+(b.xp||0),0);return (rec.done?rec.done.length:0)*30;}
-const QLABELS={sk_am:'Morning Skincare',physio:'Physio',protein:'Protein + Deficit',water:'Water 3L',workout:'Workout',steps:'10k Steps',work:'Deep Work + Learning',study:'Study',spend:'Track Spends',sk_pm:'Night Skincare',sleep:'Sleep On Time'};
+const QLABELS={sk_am:'Morning Skincare',physio:'Physio',protein:'Protein + Deficit',water:'Water 3L',workout:'Workout',steps:'10k Steps',work:'Deep Work + Learning',study:'Study',spend:'Track Spends',sk_pm:'Night Skincare',sleep:'Sleep On Time',dance:'Dance Class',guitar:'Guitar'};
 function labelFor(id){return QLABELS[id]||id;}
 function prettyDate(ds){return parseD(ds).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
 function resUrl(res){if(!res)return null;const r=res.toLowerCase();
@@ -1115,7 +1187,7 @@ function delBudgetCat(i){snapMoney();S.finance.budgets.splice(i,1);save();editMo
 function saveMoney(){snapMoney();S.finance.budgets=S.finance.budgets.filter(b=>b.amt>0);save();$('#modal-host').innerHTML='';render();toast('Finances updated');}
 
 /* ============================================================ SHOP */
-const REWARD_GROUPS=['Food & Eating Out','Fitness, Rest & Lifestyle','Spend & Treats'];
+const REWARD_GROUPS=['Food & Treats','Rest & Fun','Buy & Splurge'];
 function rewardCard(r){
   const days=Math.max(1,Math.round(r.cost/330));
   return `<div class="reward"><div class="ic">${r.ic||'🎁'}</div>
@@ -1225,7 +1297,7 @@ function viewCodex(){
   return `<div class="codex-tabs">${tabs.map(([k,l])=>`<button class="${CODEXTAB===k?'active':''}" onclick="setCodex('${k}')">${l}</button>`).join('')}</div><div class="panel cx">${content}</div>`;
 }
 function setCodex(k){CODEXTAB=k;render();window.scrollTo(0,0);}
-function phaseName(p){return {OSCP:'OSCP',FOUND:'Foundations',WEB:'Web Security',AI:'AI / LLM Security'}[p]||p;}
+function phaseName(p){return {OSCP:'OSCP / Pentest',FOUND:'Foundations',WEB:'Web Security',AI:'AI / LLM Security',CLOUD:'Cloud Security',MOBILE:'Mobile Security',NET:'Network Security',HUNT:'Bug Hunting',READ:'Report Study',CTF:'CTF',WORK:'Apply at Work',REPORT:'Report Writing'}[p]||p;}
 function roadmapHTML(){
   let n=0,study='';
   CURR_GROUPS.forEach(g=>{
@@ -1302,25 +1374,26 @@ os:`<h4>How to use this app</h4>
 </ul>
 <h4>The Operating System</h4>
 <p>You're not behind. You're 24, a security engineer with 3 years shipping, about to install a system that compounds. "I don't know anything" is the absence of <b>visible progress</b> — this app manufactures that proof daily.</p>
-<p><b>Daily rhythm</b> (built on your real schedule, nudging earlier over time):</p>
+<p><b>Daily rhythm</b> — built on your real 11am–8pm job. Gym happens in your office break; the deep study block is at night. Just open HOME and follow the quests in order:</p>
 <table><tr><th>Time</th><th>Block</th></tr>
-<tr><td>Wake</td><td>Water · AM skincare · physio (10 min)</td></tr>
-<tr><td>11:00–19:00</td><td>Office. Meal ~12:30 (protein). 1 deep-work block. Walk after lunch. Log 1 learning.</td></tr>
-<tr><td>~19:30–20:30</td><td>Gym (today's session) or cardio</td></tr>
-<tr><td>~21:00</td><td>Dinner (high protein)</td></tr>
-<tr><td>~21:30</td><td>Night skincare · physio · log spends</td></tr>
-<tr><td>~22:00–00:00</td><td><b>Study block</b> — today's exact unit on Home</td></tr>
-<tr><td>Bedtime</td><td>Shifts ~20 min earlier each week toward 12:30 am</td></tr></table>
+<tr><td>~08:00 wake</td><td>Water · AM skincare + SPF · physio (10 min) · protein breakfast</td></tr>
+<tr><td>11:00–20:00</td><td>Office. Protein lunch ~13:00. <b>Gym in your break (~40 min, beginner & shoulder-safe)</b>. 20-min walk after lunch. 1 deep-work block + log 1 learning.</td></tr>
+<tr><td>~20:30</td><td>Evening walk to finish 10k steps</td></tr>
+<tr><td>~21:00</td><td>Dinner (high protein) · night skincare · physio · log spends</td></tr>
+<tr><td>~21:45–23:30</td><td><b>Study block</b> — today's exact lesson on HOME (your main learning)</td></tr>
+<tr><td>Bedtime</td><td>Shifts ~20 min earlier each week toward 12:30 am</td></tr>
+<tr><td><b>Sunday</b></td><td>No gym. <b>Dance + guitar classes</b>, weekly review, plan the week, lighter day.</td></tr></table>
 <h4>The Laws</h4>
 <ul><li><b>Protect the streak with 3 keystones daily:</b> Protein, Steps, Study. That's the floor — hit those even on a bad day and you never break the chain. The other CORE quests build the body/skin/recovery, but they won't cost you the streak.</li>
 <li><b>Bonus quests are gravy</b> — do them on good-energy days; don't guilt over skipping.</li>
 <li><b>Spend your gold.</b> Earned rewards beat guilty ones.</li>
 <li><b>Compare to last month's you</b>, not to Twitter experts.</li></ul>
 <h4>The Year, mapped</h4>
-<ul><li><b>Months 1–2:</b> heal the shoulder (lower/core/cardio), build the habit loop, OSCP month-1.</li>
-<li><b>Months 3–4:</b> reintroduce upper-body training; deep into web security (PortSwigger).</li>
-<li><b>Months 5–8:</b> full training; finish the web curriculum + AI security track.</li>
-<li><b>Months 9–12:</b> applied — live bug-bounty hunting, AI red-teaming, reports, CTFs.</li></ul>
+<ul><li><b>Now → July 15 (OSCP sprint):</b> your lab access expires — burn through it. Hands-on machines, enumeration, web footholds, privesc (Linux + Windows), Active Directory. This is the practical base under everything else.</li>
+<li><b>July 15 → Sept (Web mastery):</b> the full PortSwigger Web Security Academy in order + recon toolkit + AI/LLM security. Reintroduce light upper-body once the physio clears it.</li>
+<li><b>Sept → Dec (Specialise):</b> Cloud security, Mobile security, Network depth — the breadth you asked for. Start real bug-bounty hunting on live programs.</li>
+<li><b>Ongoing applied loop:</b> recon sweeps, focused hunts, reading disclosed reports, CTFs, AI red-teaming, report writing — how a working hunter actually spends their days.</li></ul>
+<p class="tiny">The study quest is <b>completion-based</b>: it only moves forward when you finish a lesson, so a missed day never skips curriculum — you always resume on the exact next one.</p>
 <p class="note">Strong default, not medical/financial advice. Clear shoulder loading & new exercises with your physio. Adjust the budget to your reality.</p>`,
 
 train:`<h4>Training — built for a beginner, a healing shoulder & abs</h4>
@@ -1385,16 +1458,20 @@ skin:`<h4>Skincare — simple, daily, high-ROI</h4>
 <li>Sleep + less sugar visibly improve skin — your other quests do double duty here.</li></ul>`,
 
 study:`<h4>Study Path — the cure for "I don't know anything"</h4>
-<p>The Home study quest shows your <b>exact task every day</b> and advances through a full ~1-year curriculum. Sundays are review/plan days.</p>
-<h4>Phase 1 · Month 1 — OSCP (use the live lab!)</h4>
-<p>You paid for it; ~1 month of lab access remains. That access is the expensive part — extract maximum value. You likely won't sit the exam this month, and that's fine: the goal is <b>burning through labs + building methodology</b>. Daily loop: full nmap → enum → foothold → shell → privesc (Linux & Windows) → loot, with detailed per-box notes. Areas march in order: recon → enumeration → web footholds → exploitation → buffer overflow → privesc → passwords/pivoting/AD → lab boxes. If you fall for it, extend the sub later and target the exam (~2–3 focused months).</p>
-<h4>Phase 2 · Months 2+ — Bug Bounty + AI Security (free, high-leverage)</h4>
+<p>The Home study quest hands you the <b>exact next lesson</b> with a resource link. It's <b>completion-based</b>: it only advances when you finish a lesson, so missing a day never skips curriculum — you resume on the same one. Sundays are review/plan days. The full ordered syllabus lives in <b>ROADMAP</b>.</p>
+<h4>Phase 1 · Now → July 15 — OSCP labs sprint (use the live lab!)</h4>
+<p>Your lab access expires <b class="hl">July 15</b> — that access is the expensive part, so front-load it. No exam this round (your call) — the goal is <b>burning through labs + building methodology</b>. Daily loop: full nmap → enum → foothold → shell → privesc (Linux & Windows) → loot, with detailed per-box notes. Areas march in order: recon → enumeration → web footholds → exploitation → privesc → passwords/pivoting/Active Directory → lab boxes. This practical base makes every later track easier.</p>
+<h4>Phase 2 · After July 15 — Web mastery + AI security (free, high-leverage)</h4>
 <ul><li><b>PortSwigger Web Security Academy</b> — every topic in order (SQLi → auth → access control → XSS → SSRF → deserialization → SSTI → request smuggling → OAuth → JWT → API → GraphQL → race conditions → …). Do the labs, don't just read.</li>
-<li><b>Recon + real hunting:</b> subdomain enum, content discovery, Burp; hunt public HackerOne/Bugcrowd programs; read disclosed reports.</li>
-<li><b>AI / LLM security (your edge):</b> OWASP LLM Top 10, prompt injection (direct + indirect), jailbreaks, insecure output handling, agent/tool abuse, RAG leakage. A fast-growing niche where you can stand out at Navi and in bounties.</li></ul>
-<h4>Applied months — hunting for real</h4>
-<p>Once you've worked through the structured curriculum (go at your own depth — a hard lab can take more than a day), the study quest rotates through real practitioner work: recon sweeps, focused hunts, reading disclosed reports, AI red-teaming, CTFs, automation, and report writing. That rotation <i>is</i> how a working bug-bounty hunter spends their days — so every day of the year still hands you a concrete task.</p>
-<p class="note">The one habit that beats talent: write ONE "today I learned" note every single day. 90 days → 90 concrete proofs you didn't have before.</p>`,
+<li><b>Recon toolkit:</b> subfinder/amass, httpx, ffuf, nuclei — a repeatable recon one-liner you own.</li>
+<li><b>AI / LLM security (your edge):</b> OWASP LLM Top 10, prompt injection (direct + indirect), jailbreaks, insecure output handling, agent/tool abuse, RAG leakage. A fast-growing niche to stand out at Navi and in bounties.</li></ul>
+<h4>Phase 3 · Specialise — the breadth you asked for</h4>
+<ul><li><b>Cloud security:</b> IAM, S3 misconfigs, metadata-SSRF → cred takeover, IAM privesc (Pacu), ScoutSuite/Prowler audits, secrets in git, containers/K8s. (flaws.cloud is gold.)</li>
+<li><b>Mobile security:</b> Android APK static (jadx/MobSF) + dynamic (Frida/objection, SSL-pin bypass), insecure storage/IPC, mobile API testing; iOS overview. Follow OWASP MASTG.</li>
+<li><b>Network security:</b> Wireshark, advanced nmap + evasion, MITM/spoofing, TLS attacks, deep pivoting/tunnelling.</li></ul>
+<h4>Applied loop — hunting for real</h4>
+<p>After the structured syllabus, the study quest rotates through real practitioner work: recon sweeps, focused hunts on live programs, reading disclosed reports (HackerOne hacktivity), AI red-teaming, CTFs, automation, and report writing — plus your <b>Real-World Bug Hunting</b> (Yaworski) chapters mapped alongside. That rotation <i>is</i> a working hunter's day.</p>
+<p class="note">Buying a course is fine, but you don't need to: PortSwigger WSA, OWASP (LLM/MASTG), flaws.cloud and HackerOne hacktivity are free and best-in-class. If you do buy, OffSec PEN-200 (you have it) and a good mobile/cloud course are the highest-leverage. The one habit that beats talent: write ONE "today I learned" note every single day.</p>`,
 
 money:`<h4>Money — Bangalore, ₹2.5L/month</h4>
 <p>Good income. The leaks are lifestyle creep, food delivery, impulse buys and unplanned dates. The VAULT tab tracks it; here's the plan it's built on.</p>
@@ -1412,9 +1489,19 @@ money:`<h4>Money — Bangalore, ₹2.5L/month</h4>
 <tr><td><b>Auto-savings</b></td><td><b>45,000</b></td></tr>
 <tr><td>Investment target</td><td>55,000</td></tr>
 <tr><td><b>Spendable on life</b></td><td><b>51,000</b></td></tr></table>
-<h4>The ₹51k "spendable" split</h4>
-<ul><li>Food & groceries — 17k</li><li>Dates & outings — 18k</li><li>Shopping & personal — 8k</li><li>Misc & buffer — 8k</li></ul>
-<p>Total saved/invested = 45k + 55k = <b class="hl">₹1,00,000/month (~40%)</b>. Strong but realistic — tightened dates/food a little vs the easy version, and the reward Shop now gates extra splurges behind earned gold so you don't overspend.</p>
+<h4>The ₹51k "spendable" split (your real categories)</h4>
+<table><tr><th>Envelope</th><th>₹/mo</th></tr>
+<tr><td>Blinkit (groceries/essentials)</td><td>8,000</td></tr>
+<tr><td>Zomato (delivery — kept lean)</td><td>5,000</td></tr>
+<tr><td>Dates & outings</td><td>9,000</td></tr>
+<tr><td>Health (gym, supplements, physio, meds)</td><td>5,000</td></tr>
+<tr><td>Lifestyle (grooming, subscriptions, wants)</td><td>5,000</td></tr>
+<tr><td>Dance & guitar (class fees)</td><td>4,000</td></tr>
+<tr><td>Clothes</td><td>4,000</td></tr>
+<tr><td>Misc & buffer</td><td>4,000</td></tr>
+<tr><td><b>Budgeted</b></td><td><b>44,000</b></td></tr></table>
+<p>Spendable is ~₹51k but you only <i>budget</i> ₹44k — the <b class="hl">~₹7k/month you don't spend sweeps into extra SIP</b>. That's the trick: pay your future first, then live on what's left. Edit any envelope in VAULT → Edit.</p>
+<p>Total saved/invested = 45k + 55k + ~7k sweep = <b class="hl">~₹1,07,000/month (~43%)</b>. The reward SHOP gates every splurge behind earned gold, so "treats" never quietly blow the budget.</p>
 <h4>After December — the jump</h4>
 <p>Personal loan (10k) and phone EMI (17k) <b>both end in Dec 2026</b> → ₹27k/month freed. Redirect ALL of it to investments → invest ~₹82k, total savings ~₹1.27L/mo, rate <b class="hl">~51%</b> — without changing your lifestyle. (Bump "investment target" in the VAULT then.)</p>
 <h4>Where to put the ₹50k+ invest</h4>
@@ -1485,10 +1572,18 @@ function intro(){sysModal('NOTIFICATION',
    <p class="center tiny">The full plan lives in the <b>CODEX</b> tab. The Ascent begins now, Hunter.</p>`,
   'ACCEPT THE SYSTEM',()=>{S.seenIntro=true;save();});}
 
+function restartWelcome(){sysModal('NOTIFICATION',
+  `<div class="center" style="font-size:30px">↻</div><div class="sys-big" style="font-size:19px">THE SYSTEM HAS<br>BEEN REFORGED</div>
+   <p class="center">Clean slate. Level 1, 0 gold, streak reset — the past is backed up and gone. What you build from <b>today</b> is all that counts.</p>
+   <p>Your new program: gym in your office break (beginner & shoulder-safe), the deep <b>study block at night</b>, dance + guitar on Sundays. The syllabus runs OSCP labs (use them before <b>Jul 15</b>) → web → AI → cloud → mobile → network.</p>
+   <p class="center">Keep the chain alive with <b>3 🔥 keystones</b> daily: Protein · Steps · Study. Everything's tougher to buy now — earn it.</p>
+   <p class="center tiny">Old data saved to a backup key in case you ever want it. The full plan lives in CODEX. Begin, Hunter.</p>`,
+  'BEGIN AGAIN',()=>{S.justRestarted=false;save();});}
 function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomputeFull();save();}
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
 rollover();render();
-if(!S.seenIntro)intro();
+if(S.justRestarted)restartWelcome();
+else if(!S.seenIntro)intro();
 else if(dow()===0&&S.lastRecap!==todayStr()&&Object.keys(S.history).length>0){S.lastRecap=todayStr();save();showRecap();}
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{reg.update();setInterval(()=>reg.update(),60000);}).catch(()=>{});});
