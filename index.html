@@ -270,6 +270,15 @@ textarea{line-height:1.45;}
   transform:translateX(-100%);animation:shimmer 2.8s ease-in-out infinite;}
 @keyframes shimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(200%)}}
 .btn:active{transform:scale(.985);}
+
+/* ---- level-up celebration ---- */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;}
+.confetti i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;opacity:.95;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(-16px) rotate(0);opacity:1}100%{transform:translateY(108vh) rotate(620deg);opacity:.5}}
+.rankpop{font-family:'Space Grotesk';font-weight:700;font-size:64px;text-align:center;line-height:1;margin:6px 0 2px;
+  background:linear-gradient(160deg,#f5d98f,#c9aaff,#9bb0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:rankzoom .5s cubic-bezier(.2,1.3,.4,1);}
+@keyframes rankzoom{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -297,7 +306,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='14';
+const APP_VERSION='15';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -694,8 +703,10 @@ function attrScores(days=14){
   return sc;
 }
 
-/* ---------- leveling ---------- */
-function xpForLevel(l){return 80+(l-1)*60;}
+/* ---------- leveling ----------
+   ~1 level/day on a strong day early on (a full day ≈ 445 XP), tapering to ~weekly by
+   level ~20 and slower after. Steeper than before so early levels feel earned, not free. */
+function xpForLevel(l){return 350+(l-1)*75;}
 function levelInfo(t){let l=1,rem=t;while(rem>=xpForLevel(l)){rem-=xpForLevel(l);l++;}return{level:l,into:rem,need:xpForLevel(l)};}
 function rankFor(l){return l>=50?'S':l>=35?'A':l>=20?'B':l>=10?'C':l>=5?'D':'E';}
 function titleFor(l){return l>=50?'Sovereign':l>=35?'Shadow Monarch':l>=20?'Elite Hunter':l>=10?'Awakened':l>=5?'Rising Hunter':'Player';}
@@ -732,32 +743,36 @@ function defaultState(){return{
       {cat:'Misc & buffer',amt:4000},
     ],
     spends:{},
+    investments:[],
   },
-  /* Rewards are priced in "days of effort": a full clean day ≈ 330 gold, so a cheat
-     meal (~1800) = ~5–6 perfect days. Everything you'd splurge on, you earn first. */
+  /* Granular ladder — a full clean day ≈ 330 gold. Cheap entry treats keep wins frequent;
+     big splurges still take weeks. Everything you'd splurge on, you earn first. */
   rewards:[
     /* — Food & Treats — */
-    {id:'r1', ic:'☕', name:'Coffee / dessert out',        cost:650,   cat:'Food & Treats'},
-    {id:'r2', ic:'🛒', name:'Blinkit treat (snacks/ice-cream)', cost:700, cat:'Food & Treats'},
-    {id:'r3', ic:'🛵', name:'Zomato order-in',             cost:1300,  cat:'Food & Treats'},
-    {id:'r4', ic:'🍔', name:'Guilt-free cheat meal',       cost:1800,  cat:'Food & Treats'},
-    {id:'r5', ic:'🍽️', name:'Restaurant dinner out',       cost:2600,  cat:'Food & Treats'},
-    {id:'r6', ic:'🍻', name:'Drinks / party night',        cost:3300,  cat:'Food & Treats'},
+    {id:'r1', ic:'🍫', name:'Small treat (chai / chocolate)', cost:300, cat:'Food & Treats'},
+    {id:'r2', ic:'☕', name:'Coffee / dessert out',        cost:550,   cat:'Food & Treats'},
+    {id:'r3', ic:'🛒', name:'Blinkit treat',               cost:650,   cat:'Food & Treats'},
+    {id:'r4', ic:'🛵', name:'Zomato order-in',             cost:1200,  cat:'Food & Treats'},
+    {id:'r5', ic:'🍔', name:'Guilt-free cheat meal',       cost:1700,  cat:'Food & Treats'},
+    {id:'r6', ic:'🍽️', name:'Restaurant dinner out',       cost:2500,  cat:'Food & Treats'},
+    {id:'r7', ic:'🍻', name:'Drinks / party night',        cost:3200,  cat:'Food & Treats'},
     /* — Rest & Fun — */
-    {id:'r7', ic:'🎮', name:'2 hrs gaming / Netflix',      cost:1000,  cat:'Rest & Fun'},
-    {id:'r8', ic:'🎸', name:'Extra jam / music session',   cost:1200,  cat:'Rest & Fun'},
-    {id:'r9', ic:'😴', name:'Guilt-free sleep-in',         cost:1500,  cat:'Rest & Fun'},
-    {id:'r10',ic:'🛋️', name:'Full guilt-free rest day',    cost:2000,  cat:'Rest & Fun'},
-    {id:'r11',ic:'💆', name:'Massage / recovery session',  cost:4000,  cat:'Rest & Fun'},
+    {id:'r8', ic:'📱', name:'1 hr guilt-free scroll/game', cost:450,   cat:'Rest & Fun'},
+    {id:'r9', ic:'🎮', name:'2 hrs gaming / Netflix',      cost:900,   cat:'Rest & Fun'},
+    {id:'r10',ic:'🎸', name:'Extra jam / music session',   cost:1100,  cat:'Rest & Fun'},
+    {id:'r11',ic:'😴', name:'Guilt-free sleep-in',         cost:1400,  cat:'Rest & Fun'},
+    {id:'r12',ic:'🛋️', name:'Full guilt-free rest day',    cost:2000,  cat:'Rest & Fun'},
+    {id:'r13',ic:'💆', name:'Massage / recovery session',  cost:3500,  cat:'Rest & Fun'},
     /* — Buy & Splurge — */
-    {id:'r12',ic:'🎬', name:'Movie / night out',           cost:2000,  cat:'Buy & Splurge'},
-    {id:'r13',ic:'💖', name:'Thoughtful date',             cost:2400,  cat:'Buy & Splurge'},
-    {id:'r14',ic:'🧴', name:'Skincare / grooming splurge', cost:2800,  cat:'Buy & Splurge'},
-    {id:'r15',ic:'👕', name:'New clothes (₹2–3k)',         cost:5000,  cat:'Buy & Splurge'},
-    {id:'r16',ic:'🎧', name:'Gadget / big buy (₹5k+)',     cost:9500,  cat:'Buy & Splurge'},
-    {id:'r17',ic:'✈️', name:'Weekend getaway',             cost:16000, cat:'Buy & Splurge'},
+    {id:'r14',ic:'🧴', name:'Skincare / grooming item',    cost:1500,  cat:'Buy & Splurge'},
+    {id:'r15',ic:'🎬', name:'Movie / night out',           cost:1900,  cat:'Buy & Splurge'},
+    {id:'r16',ic:'💖', name:'Thoughtful date',             cost:2200,  cat:'Buy & Splurge'},
+    {id:'r17',ic:'👕', name:'New clothes (₹2–3k)',         cost:4500,  cat:'Buy & Splurge'},
+    {id:'r18',ic:'🎧', name:'Gadget / big buy (₹5k+)',     cost:9000,  cat:'Buy & Splurge'},
+    {id:'r19',ic:'✈️', name:'Weekend getaway',             cost:15000, cat:'Buy & Splurge'},
   ],
-  rewardsV4:true, budgetsV2:true, studyDone:0, restartV2:true,
+  rewardsV4:true, rewardsV5:true, budgetsV2:true, studyDone:0, restartV2:true,
+  shields:0, lastShieldBuy:null,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
@@ -778,6 +793,11 @@ function migrate(s){
     s.spendRemapV1=true;
   }
   if(typeof s.studyDone!=='number')s.studyDone=0;
+  /* new fields for the final round: granular rewards, streak shields, investment tracker, import-dedupe */
+  if(!s.rewardsV5){s.rewards=defaultState().rewards;s.rewardsV5=true;}
+  if(typeof s.shields!=='number')s.shields=0;
+  if(!s.finance.investments)s.finance.investments=[];
+  if(!s._imported)s._imported=[];
   /* ===== FRESH START (you asked to restart in every sense) =====
      Backs up the old save first (recoverable), then resets the journey to today:
      XP, gold, level, streak, history, study progress & spends all zero out and the
@@ -792,9 +812,11 @@ function migrate(s){
     s.history={};s.redeemed=[];
     s.finance.budgets=d.finance.budgets;
     s.finance.spends={};
+    s.finance.investments=[];
     s.rewards=d.rewards;
+    s.shields=0;s.lastShieldBuy=null;
     s.lastOpen=todayStr();
-    s.restartV2=true;s.budgetsV2=true;s.rewardsV4=true;
+    s.restartV2=true;s.budgetsV2=true;s.rewardsV4=true;s.rewardsV5=true;
     s.justRestarted=true;
   }
   return s;
@@ -814,13 +836,18 @@ function dayRecord(d=todayStr()){if(!S.history[d])S.history[d]={done:[],full:fal
    smaller habits won't break it. "full" = all mandatory done = a perfect-clear bonus. */
 const STREAK_CORE=['protein','steps','study'];
 function dayCounts(rec){return !!rec && STREAK_CORE.every(id=>rec.done.includes(id));}
+/* a day keeps the streak alive if its keystones were cleared OR a Streak Shield absorbed it */
+function streakDay(rec){return dayCounts(rec) || !!(rec&&rec.shielded);}
 function everyMand(rec){return !!rec && todaysQuests().filter(q=>q.mand).every(q=>rec.done.includes(q.id));}
 function toggleQuest(q){
   const rec=dayRecord(),i=rec.done.indexOf(q.id);
   if(i>=0){rec.done.splice(i,1);if(rec.meta)delete rec.meta[q.id];S.totalXp=Math.max(0,S.totalXp-q.xp);S.gold=Math.max(0,S.gold-q.gold);
     S.stats[q.stat]=Math.max(0,S.stats[q.stat]-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);
-    /* un-ticking a study lesson rewinds the curriculum pointer to exactly where it was */
-    if(q.id==='study'&&typeof rec.studyIdx==='number'){S.studyDone=rec.studyIdx;delete rec.studyIdx;}
+    /* un-ticking study rewinds the curriculum pointer + refunds any extra "study one more" lessons */
+    if(q.id==='study'){
+      if(rec.extra){rec.extra.forEach((_,k)=>{const xk='xstudy'+k;if(rec.meta&&rec.meta[xk]){S.totalXp=Math.max(0,S.totalXp-rec.meta[xk].xp);S.gold=Math.max(0,S.gold-rec.meta[xk].g);S.stats.INT=Math.max(0,S.stats.INT-1);S.totalCompleted=Math.max(0,S.totalCompleted-1);delete rec.meta[xk];}});delete rec.extra;}
+      if(typeof rec.studyIdx==='number'){S.studyDone=rec.studyIdx;delete rec.studyIdx;}
+    }
     if(!dayCounts(rec))rec.streakBonus=false;if(!everyMand(rec))rec.bonus=false;
     recomputeFull();save();render();
   }else{
@@ -846,14 +873,62 @@ function checkDayComplete(){
 }
 function streakInfo(){
   let cur=0,d=new Date();
-  if(!dayCounts(S.history[todayStr()]))d.setDate(d.getDate()-1);
-  while(true){const ds=dstr(d);if(dayCounts(S.history[ds])){cur++;d.setDate(d.getDate()-1);}else break;}
+  if(!streakDay(S.history[todayStr()]))d.setDate(d.getDate()-1);
+  while(true){const ds=dstr(d);if(streakDay(S.history[ds])){cur++;d.setDate(d.getDate()-1);}else break;}
   let longest=0,run=0,prev=null;
   for(const ds of Object.keys(S.history).sort()){
-    if(!dayCounts(S.history[ds])){run=0;prev=ds;continue;}
-    if(prev&&daysBetween(prev,ds)===1&&dayCounts(S.history[prev]))run++;else run=1;
+    if(!streakDay(S.history[ds])){run=0;prev=ds;continue;}
+    if(prev&&daysBetween(prev,ds)===1&&streakDay(S.history[prev]))run++;else run=1;
     longest=Math.max(longest,run);prev=ds;}
   return{cur,longest:Math.max(longest,cur)};
+}
+/* STUDY ONE MORE — bank ahead on strong days (great for the OSCP sprint). Max 3 lessons/day
+   total; extra lessons give gold but don't double-count the streak (the keystone is already done). */
+function studyAhead(){
+  const rec=dayRecord();
+  if(!rec.done.includes('study')){toast('Finish today’s study lesson first');return;}
+  if(dow()===0){toast('Sundays are for review — rest the brain');return;}
+  rec.extra=rec.extra||[];
+  if(rec.extra.length>=2){toast('Max 3 lessons today — come back tomorrow fresh');return;}
+  const idx=S.studyDone;
+  if(idx>=CURRICULUM.length){toast('Curriculum complete — you’re in applied rotation now');return;}
+  const unit=CURRICULUM[idx],xp=45,gold=35,k=rec.extra.length;
+  const before=levelInfo(S.totalXp).level;
+  rec.extra.push(idx);S.studyDone=idx+1;
+  rec.meta=rec.meta||{};rec.meta['xstudy'+k]={t:'Study+ · '+unit.topic,s:'INT',xp,g:gold};
+  S.totalXp+=xp;S.gold+=gold;S.stats.INT+=1;S.totalCompleted+=1;save();
+  if(navigator.vibrate)navigator.vibrate(12);
+  const after=levelInfo(S.totalXp).level;
+  if(after>before){render();levelUpMsg(after);}else{toast(`Lesson banked · +${xp} XP · +${gold} G`);render();}
+}
+/* STREAK SHIELD — buy with gold (max 1/week, hold up to 2); auto-absorbs one missed day */
+function buyShield(){
+  if(S.gold<400){toast('Need 400 gold for a Shield');return;}
+  if(S.lastShieldBuy&&daysBetween(S.lastShieldBuy,todayStr())<7){const left=7-daysBetween(S.lastShieldBuy,todayStr());toast(`One Shield per week — ${left} day${left>1?'s':''} to go`);return;}
+  if((S.shields||0)>=2){toast('You already hold the max of 2 Shields');return;}
+  S.gold-=400;S.shields=(S.shields||0)+1;S.lastShieldBuy=todayStr();save();
+  if(navigator.vibrate)navigator.vibrate([20,40,20]);
+  sysModal('SYSTEM',`<div class="center" style="font-size:36px">🛡️</div><div class="sys-big" style="font-size:18px">SHIELD ACQUIRED</div><p class="center">A Streak Shield is armed. Miss a day and it auto-absorbs the break — your streak lives on.<br><span class="tiny">Held: ${S.shields} · max 1 purchase/week</span></p>`,'NICE');render();
+}
+/* on a new day, if yesterday was missed but you had an active streak + a Shield, spend it */
+function applyShieldIfNeeded(){
+  if(!(S.shields>0))return;
+  const y=new Date();y.setDate(y.getDate()-1);const yd=dstr(y);
+  if(streakDay(S.history[yd]))return;            // yesterday already counts
+  const b=new Date();b.setDate(b.getDate()-2);
+  if(!streakDay(S.history[dstr(b)]))return;       // no live streak to protect
+  if(!S.history[yd])S.history[yd]={done:[],full:false};
+  S.history[yd].shielded=true;S.shields--;save();
+  setTimeout(()=>sysModal('NOTIFICATION',`<div class="center" style="font-size:36px">🛡️</div><div class="sys-big" style="font-size:18px">STREAK SHIELD USED</div><p class="center">You missed yesterday — a Shield absorbed it. Your <b style="color:var(--orange)">streak survives</b>.<br><span class="tiny">Shields left: ${S.shields}</span></p>`,'PHEW'),350);
+}
+function spawnConfetti(big){
+  const host=document.createElement('div');host.className='confetti';
+  const n=big?80:46,colors=['#9bb0ff','#c9aaff','#f0cd84','#7fe6b4','#ff9ecb','#ffb27a','#74dcd0'];
+  for(let i=0;i<n;i++){const s=document.createElement('i');
+    s.style.left=Math.random()*100+'%';s.style.background=colors[i%colors.length];
+    s.style.animationDelay=(Math.random()*.35)+'s';s.style.animationDuration=(1.2+Math.random()*1.3)+'s';
+    host.appendChild(s);}
+  document.body.appendChild(host);setTimeout(()=>{host.remove();},2800);
 }
 /* per-task streak: consecutive days (ending today, or yesterday if not yet done today)
    that this exact quest id was cleared. Powers the little 🔥N badge on each quest. */
@@ -1051,7 +1126,10 @@ function viewHome(){
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot"></span>Daily Quest</div>
      <div class="ring ${doneN>=qs.length?'full':''}" style="--p:${dpct}"><span class="ring-in">${doneN}/${qs.length}</span></div></div>
      <div class="greet">${greet}</div>
-     ${qs.map(q=>questHTML(q,rec)).join('')}</div>
+     ${qs.map(q=>questHTML(q,rec)).join('')}
+     ${(()=>{const ex=(rec.extra||[]).length;const can=rec.done.includes('study')&&dow()!==0&&ex<2&&S.studyDone<CURRICULUM.length;
+       return can?`<button class="btn ghost sm" style="margin-top:10px" onclick="studyAhead()">📚 STUDY ONE MORE LESSON · +45 XP · +35 G &nbsp;(${ex+1+1}/3 today)</button>
+       <p class="tiny" style="margin-top:6px;text-align:center">Banking ahead is perfect for the OSCP sprint before Jul 15 — extra lessons earn gold but don't double the streak.</p>`:'';})()}</div>
     <div class="panel">
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></span>Bonus Quests</div>
      <div class="q-progress num">${bonusDone}/3 · +gold</div></div>
@@ -1126,6 +1204,15 @@ function viewMoney(){
   const donutPanel=f.spentTotal>0?`<div class="panel"><div class="panel-title"><span class="dot"></span>Where Your Money Goes · ${mk}</div>
     <canvas id="donut" style="width:60%;max-width:210px;aspect-ratio:1;display:block;margin:2px auto 14px"></canvas>
     <div class="legend">${legend}</div></div>`:'';
+  const inv=S.finance.investments||[],invTotal=inv.reduce((a,b)=>a+b.amt,0),invMonth=inv.filter(x=>x.date.slice(0,7)===mk).reduce((a,b)=>a+b.amt,0);
+  const invRecent=inv.slice(-5).reverse().map(x=>`<div class="fixed-row"><span>${x.note||'Investment'} <span class="tiny">${x.date.slice(5)}</span></span><span class="amt" style="color:var(--green)">+${fmt(x.amt)}</span></div>`).join('')||'<div class="empty">Nothing logged yet — log your first SIP below.</div>';
+  const invPanel=`<div class="panel" style="border-color:rgba(127,230,180,.22)"><div class="panel-title"><span class="dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>📈 Investment Tracker</div>
+    <div class="mgrid"><div class="mcard"><b class="num" style="color:var(--green)">${fmt(invTotal)}</b><span>Total Invested</span></div>
+    <div class="mcard"><b class="num" style="color:${invMonth>=S.finance.investTarget?'var(--green)':'var(--txt)'}">${fmt(invMonth)}</b><span>This Month</span></div>
+    <div class="mcard"><b class="num" style="color:var(--gold)">${fmt(S.finance.investTarget)}</b><span>Monthly Target</span></div></div>
+    <button class="btn ghost sm" style="margin-top:12px" onclick="logInvest()">+ LOG AN INVESTMENT</button>
+    <div style="margin-top:10px">${invRecent}</div>
+    <p class="tiny" style="margin-top:8px">Every SIP/transfer you log grows this number — your wealth XP. Hit the monthly target, then sweep unspent budget on top. Plan: CODEX → Money.</p></div>`;
   return `<div class="panel money-hero">
     <div class="tiny">PROJECTED SAVINGS · ${mk}</div>
     <div class="big-num" style="color:var(--gold)">${fmt(f.projected)}</div>
@@ -1141,6 +1228,10 @@ function viewMoney(){
     ${cats}
     <p class="tiny">Spent ${fmt(f.spentTotal)} of ${fmt(f.spendable)} this month. Overspending eats into your ₹${(f.invest/1000)}k investment.</p>
   </div>
+  <div class="panel"><div class="panel-title"><span class="dot"></span>Quick Add</div>
+    <div class="catbtn">${QUICK_SPENDS.map(([c,a])=>`<button onclick="quickSpend('${c.replace(/'/g,'')}',${a})">${c} ₹${a}</button>`).join('')}</div>
+    <p class="tiny" style="margin-top:8px">One tap logs a common spend instantly. Your iOS Shortcut bank-email import drops spends here too.</p></div>
+  ${invPanel}
   ${donutPanel}
   <div class="panel"><div class="panel-title"><span class="dot"></span>Fixed Commitments</div>${fixedList}
     <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
@@ -1149,6 +1240,15 @@ function viewMoney(){
   <div class="panel"><div class="panel-title"><span class="dot"></span>Savings History</div>${hist}</div>
   <div class="panel"><button class="btn ghost sm" onclick="editMoney()">⚙ EDIT INCOME · BUDGET · INVEST</button></div>`;
 }
+const QUICK_SPENDS=[['Blinkit',200],['Blinkit',400],['Blinkit',700],['Zomato',250],['Zomato',500],['Dates & outings',500]];
+function quickSpend(cat,amt){const mk=monthKey();if(!S.finance.spends[mk])S.finance.spends[mk]=[];
+  const match=S.finance.budgets.find(b=>b.cat===cat);
+  S.finance.spends[mk].push({date:todayStr(),cat:match?cat:(S.finance.budgets[0]?.cat||cat),amt,note:'quick'});
+  save();if(navigator.vibrate)navigator.vibrate(8);toast(`${cat} −${fmt(amt)} logged`);render();}
+function logInvest(){const v=parseFloat(prompt('Amount invested this time (₹)?'));if(!v||v<=0)return;
+  const note=(prompt('Where? (e.g. Nifty index SIP, flexicap, emergency fund)','SIP')||'').trim();
+  S.finance.investments=S.finance.investments||[];S.finance.investments.push({date:todayStr(),amt:v,note});
+  save();if(navigator.vibrate)navigator.vibrate([15,30,15]);toast('Investment logged 📈');render();}
 let SPEND_CAT=null;
 function logSpend(){
   if(!SPEND_CAT||!S.finance.budgets.find(b=>b.cat===SPEND_CAT))SPEND_CAT=S.finance.budgets[0]?.cat||'Misc & buffer';
@@ -1206,9 +1306,17 @@ function viewShop(){
   const extras=S.rewards.filter(r=>!used.has(r.id)); // any custom-category rewards you add
   if(extras.length)cards+=`<div class="rgroup-title">More</div>`+extras.map(rewardCard).join('');
   const recent=S.redeemed.slice(-5).reverse().map(r=>`<div class="tiny" style="padding:5px 0">✔ ${r.name} — ${r.cost}G <span style="float:right">${r.date.slice(5)}</span></div>`).join('')||'<div class="empty">No rewards claimed yet.</div>';
+  const shields=S.shields||0;
+  const canBuy=S.gold>=400&&shields<2&&!(S.lastShieldBuy&&daysBetween(S.lastShieldBuy,todayStr())<7);
   return `<div class="panel money-hero" style="background:linear-gradient(150deg,rgba(230,193,121,.1),transparent 70%);border-color:rgba(230,193,121,.2)">
     <div class="tiny">GOLD BALANCE</div><div class="big-num" style="color:var(--gold)">${S.gold} G</div>
-    <div class="tiny">Prices are tougher now — a cheat meal ≈ 5–6 clean days. The <b>≈ d</b> tag = roughly how many full days of all-tasks-done it costs. Earn it, then enjoy it guilt-free.</div></div>
+    <div class="tiny">The <b>≈ d</b> tag = roughly how many full days of all-tasks-done a reward costs. Cheap treats keep wins frequent; big splurges take weeks. Earn it, then enjoy it guilt-free.</div></div>
+    <div class="panel" style="border-color:rgba(255,178,122,.25)"><div class="panel-title"><span class="dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange)"></span>🛡️ Streak Shield</div>
+    <div style="display:flex;align-items:center;gap:13px">
+      <div style="font-size:30px">🛡️</div>
+      <div style="flex:1"><div style="font-size:13.5px">Holding <b style="color:var(--orange)">${shields}</b> / 2 shields</div>
+        <div class="tiny">Auto-absorbs one missed day so your streak survives. 400 G · max 1/week.</div></div>
+      <button class="redeem" ${canBuy?'':'disabled'} onclick="buyShield()">BUY · 400</button></div></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Reward Shop</div>${cards}
     <button class="btn ghost sm" style="margin-top:10px" onclick="addReward()">+ ADD REWARD</button></div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>Recently Claimed</div>${recent}</div>`;
@@ -1371,6 +1479,8 @@ os:`<h4>How to use this app</h4>
 <li><b>Bonus Quests</b> = optional extra gold for the bigger rewards. <b>Today I Learned</b> = jot one line; it saves to your Learning Log (LOG tab).</li>
 <li><b>STATS</b> = your consistency web + records. <b>VAULT</b> = log spends, watch savings. <b>SHOP</b> = spend earned gold on real rewards. <b>LOG</b> = calendar (tap any day), charts, weight, learnings. <b>CODEX</b> = this manual + the full ROADMAP.</li>
 <li><b>Weekly</b>: a recap pops every Sunday; log your weight; skim the roadmap.</li>
+<li><b>📚 Study one more</b> (button under Daily Quest) — bank up to 3 lessons on a strong day; perfect for the OSCP sprint before Jul 15. <b>🛡️ Streak Shield</b> (SHOP) — buy with gold to auto-save your streak on a missed day. <b>📈 Investment Tracker</b> + <b>Quick Add</b> (VAULT) — log SIPs and one-tap common spends.</li>
+<li><b>Level-ups</b> now rain confetti + bonus gold, and every 5 levels you <b>RANK UP</b> (E→D→C→B→A→S). Early levels come ~daily, then stretch out.</li>
 </ul>
 <h4>The Operating System</h4>
 <p>You're not behind. You're 24, a security engineer with 3 years shipping, about to install a system that compounds. "I don't know anything" is the absence of <b>visible progress</b> — this app manufactures that proof daily.</p>
@@ -1504,10 +1614,21 @@ money:`<h4>Money — Bangalore, ₹2.5L/month</h4>
 <p>Total saved/invested = 45k + 55k + ~7k sweep = <b class="hl">~₹1,07,000/month (~43%)</b>. The reward SHOP gates every splurge behind earned gold, so "treats" never quietly blow the budget.</p>
 <h4>After December — the jump</h4>
 <p>Personal loan (10k) and phone EMI (17k) <b>both end in Dec 2026</b> → ₹27k/month freed. Redirect ALL of it to investments → invest ~₹82k, total savings ~₹1.27L/mo, rate <b class="hl">~51%</b> — without changing your lifestyle. (Bump "investment target" in the VAULT then.)</p>
-<h4>Where to put the ₹50k+ invest</h4>
-<ul><li>Build a 6-month <b>emergency fund</b> first (liquid fund / sweep FD) ≈ ₹6L.</li>
-<li>Then SIPs into index funds (Nifty 50 + maybe a flexicap), and use your <b>80C</b> (ELSS/PPF) for tax.</li>
-<li>Keep the joint + mom transfers — they're already great habits.</li></ul>
+<h4>Your investment plan — Balanced, emergency-fund first</h4>
+<p>You said you don't have an emergency fund yet, so that's <b>step zero</b> — it's the seatbelt that lets you invest in equity without panic-selling in a crash.</p>
+<p><b>Phase 1 (now → ~₹6L saved): build the safety net.</b> Park your full ₹55k invest into a <b>liquid / ultra-short debt fund</b> (or a sweep-FD) until you have <b>~6 months of expenses ≈ ₹5–6L</b>. At ₹55k/mo that's ~10–11 months. Boring on purpose — this money must be safe and instant, not growing.</p>
+<p><b>Phase 2 (after the fund is full): the Balanced 70/30 engine.</b> Split the monthly invest:</p>
+<table><tr><th>Bucket</th><th>Split</th><th>What</th></tr>
+<tr><td>Core equity</td><td>~45%</td><td>Nifty 50 index fund (low-cost, e.g. UTI/HDFC/ICICI index) — your steady compounder</td></tr>
+<tr><td>Growth equity</td><td>~25%</td><td>One good flexicap fund (broad, fund-manager-picked)</td></tr>
+<tr><td>Safer / debt</td><td>~30%</td><td>Debt fund / PPF — cushions the swings, rebalances</td></tr></table>
+<p><b>Tax:</b> use <b>80C</b> (₹1.5L/yr) via an <b>ELSS</b> fund (equity + tax-saving, only 3-yr lock-in) and/or PPF. That alone saves you ~₹46k/yr in tax at your slab.</p>
+<h4>The December step-up</h4>
+<p>When the personal loan + phone EMI end (Dec 2026), <b>₹27k/mo frees up</b> → push it into the equity buckets. Your invest jumps to ~₹82k/mo without lifestyle change. Bump "investment target" in VAULT → Edit then.</p>
+<h4>Track it</h4>
+<ul><li><b>Automate</b> every SIP on salary day (auto-debit) so you invest <i>before</i> you can spend.</li>
+<li><b>Log each investment</b> in the VAULT's 📈 Investment Tracker — watch your total invested climb like an XP bar. Sweep the ~₹7k/mo you didn't spend on top.</li>
+<li>Don't check prices daily, don't stop SIPs in a crash — that's when you're buying cheap. Time in the market &gt; timing it.</li></ul>
 <h4>The habits that actually move it</h4>
 <ul><li><b>Log every spend</b> (daily quest). Awareness alone cuts ~15%.</li>
 <li><b>24-hour rule</b> on any non-essential buy.</li>
@@ -1536,9 +1657,19 @@ function sysModal(head,html,btn='OK',onClose){
   $('#ovbtn').onclick=()=>{$('#modal-host').innerHTML='';if(onClose)onClose();};
 }
 function levelUpMsg(l){
-  sysModal('NOTIFICATION',`<div class="center" style="color:var(--gold);letter-spacing:4px;font-family:Space Grotesk;font-size:11px;font-weight:600">⟨ LEVEL UP ⟩</div>
-   <div class="sys-big">LEVEL ${l}</div><p class="center">Rank <b style="color:var(--accent)">${rankFor(l)}</b> · ${titleFor(l)}<br>You've grown stronger. The path continues.</p>`,'CONTINUE');
-  if(navigator.vibrate)navigator.vibrate([30,60,30,60,80]);
+  const rankUp=rankFor(l)!==rankFor(l-1);
+  const bonus=Math.round(20+l*4);S.gold+=bonus;save();
+  spawnConfetti(rankUp);
+  if(navigator.vibrate)navigator.vibrate(rankUp?[40,50,40,50,40,50,140]:[30,60,30,60,80]);
+  const tag=rankUp
+    ?`<div class="center" style="color:var(--gold);letter-spacing:6px;font-family:Space Grotesk;font-size:12px;font-weight:700">⟪ RANK UP ⟫</div>`
+    :`<div class="center" style="color:var(--gold);letter-spacing:4px;font-family:Space Grotesk;font-size:11px;font-weight:600">⟨ LEVEL UP ⟩</div>`;
+  const body=rankUp
+    ?`<div class="rankpop">${rankFor(l)}</div><p class="center">You ascend to <b style="color:var(--accent)">Rank ${rankFor(l)}</b> — <b>${titleFor(l)}</b>. A new tier of the System opens.</p>`
+    :`<p class="center">Rank <b style="color:var(--accent)">${rankFor(l)}</b> · ${titleFor(l)}<br>You've grown stronger. The path continues.</p>`;
+  sysModal('NOTIFICATION',`${tag}<div class="sys-big" style="font-size:32px">LEVEL ${l}</div>${body}
+   <p class="center hl" style="font-family:Space Grotesk">+${bonus} bonus gold</p>`,'CONTINUE');
+  render();
 }
 function toast(msg){const h=$('#notif-host');const el=document.createElement('div');el.className='notif';el.textContent='◆ '+msg;h.appendChild(el);
   setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';},1200);setTimeout(()=>el.remove(),1650);}
@@ -1580,8 +1711,24 @@ function restartWelcome(){sysModal('NOTIFICATION',
    <p class="center tiny">Old data saved to a backup key in case you ever want it. The full plan lives in CODEX. Begin, Hunter.</p>`,
   'BEGIN AGAIN',()=>{S.justRestarted=false;save();});}
 function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomputeFull();save();}
+/* iOS Shortcut → one-tap spend import. Opens .../?spend=540&cat=Zomato&note=...&t=unique
+   The Shortcut reads a bank email/notification, extracts the amount, and opens this URL. */
+function handleUrlImport(){
+  let p;try{p=new URLSearchParams(location.search);}catch(e){return;}
+  const amt=parseFloat(p.get('spend'));if(!amt||amt<=0){return;}
+  const catRaw=(p.get('cat')||'Misc & buffer').trim(),note=(p.get('note')||'auto').trim();
+  const tok=p.get('t')||(''+amt+'_'+catRaw+'_'+todayStr());
+  S._imported=S._imported||[];
+  if(S._imported.includes(tok)){cleanUrl();return;}
+  const b=S.finance.budgets.find(x=>x.cat.toLowerCase()===catRaw.toLowerCase())||S.finance.budgets.find(x=>x.cat.toLowerCase().includes(catRaw.toLowerCase()));
+  const mk=monthKey();if(!S.finance.spends[mk])S.finance.spends[mk]=[];
+  S.finance.spends[mk].push({date:todayStr(),cat:b?b.cat:catRaw,amt,note});
+  S._imported.push(tok);if(S._imported.length>200)S._imported=S._imported.slice(-200);
+  save();cleanUrl();setTimeout(()=>toast(`Imported: ${catRaw} −${fmt(amt)}`),500);
+}
+function cleanUrl(){try{history.replaceState({},'',location.pathname);}catch(e){}}
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
-rollover();render();
+applyShieldIfNeeded();handleUrlImport();rollover();render();
 if(S.justRestarted)restartWelcome();
 else if(!S.seenIntro)intro();
 else if(dow()===0&&S.lastRecap!==todayStr()&&Object.keys(S.history).length>0){S.lastRecap=todayStr();save();showRecap();}
