@@ -312,7 +312,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='16';
+const APP_VERSION='17';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -667,8 +667,26 @@ function todaysQuests(){
      exp:`Cleanser → (after 2-3 weeks add niacinamide + a gentle retinoid 2-3×/wk) → moisturiser.\nKeep it simple until it's automatic. Good cue to start winding down for sleep.`},
    {id:'sleep',title:'Lights Out On Time',sub:'Target this week: '+bedtimeTarget(),stat:'VIT',xp:30,gold:15,mand:true,
      exp:`This week's bedtime target: ${bedtimeTarget()}. We shift ~20 min earlier each week toward 12:30 am / 8 am wake.\nNo screens 30 min before bed. Sleep heals the shoulder and runs your fat-loss hormones.`},
-  ];
+  ].concat((S.customQuests||[]).map(q=>({...q,stat:STATS[q.stat]?q.stat:'PER'})));
 }
+function manageQuests(){
+  const list=(S.customQuests||[]).map(q=>`<div class="fixed-row"><span>${q.title} <span class="tiny">${q.stat} · +${q.xp}XP · +${q.gold}G${q.mand?' · CORE':''}</span></span><button class="del" style="background:none;font-size:16px" onclick="delCustomQuest('${q.id}')">✕</button></div>`).join('')||'<div class="empty">No custom quests yet.</div>';
+  sysModal('CUSTOM QUESTS',`<p class="tiny">Add your own daily quests — they appear on HOME every day and earn XP + gold like the rest. Mark one CORE to require it for a "perfect clear".</p>
+    <div style="margin:10px 0">${list}</div>
+    <label>New quest title</label><input id="cq_t" placeholder="e.g. Meditate 10 min · Read 10 pages">
+    <div class="row2"><div><label>Stat</label><select id="cq_s">${Object.keys(STATS).map(k=>`<option value="${k}">${k} · ${STATS[k].name}</option>`).join('')}</select></div>
+    <div><label>XP</label><input id="cq_xp" type="number" value="20"></div></div>
+    <div class="row2"><div><label>Gold</label><input id="cq_g" type="number" value="15"></div>
+    <div><label>Type</label><select id="cq_m"><option value="0">Bonus</option><option value="1">CORE (mandatory)</option></select></div></div>
+    <button class="btn" style="margin-top:14px" onclick="addCustomQuest()">+ ADD QUEST</button>`,'DONE');
+}
+function addCustomQuest(){const t=($('#cq_t').value||'').trim();if(!t){toast('Enter a title');return;}
+  const stat=$('#cq_s').value,xp=parseInt($('#cq_xp').value)||15,gold=parseInt($('#cq_g').value)||10,mand=$('#cq_m').value==='1';
+  S.customQuests=S.customQuests||[];
+  S.customQuests.push({id:'cq'+Date.now(),title:t,sub:'Your custom quest',stat,xp,gold,mand,custom:true,
+    exp:'A quest you set for yourself. Showing up here daily is how you bend the System to your own goals.'});
+  save();manageQuests();render();}
+function delCustomQuest(id){S.customQuests=(S.customQuests||[]).filter(x=>x.id!==id);save();manageQuests();render();}
 
 /* ---------- bonus quests (optional, earn extra gold for bigger rewards) ---------- */
 const BONUS_POOL=[
@@ -750,7 +768,10 @@ function defaultState(){return{
     ],
     spends:{},
     investments:[],
+    goals:[{id:'g_ef',ic:'🛟',name:'Emergency Fund',target:600000,saved:0}],
   },
+  customQuests:[],
+  gmailUrl:'',
   /* Granular ladder — a full clean day ≈ 330 gold. Cheap entry treats keep wins frequent;
      big splurges still take weeks. Everything you'd splurge on, you earn first. */
   rewards:[
@@ -803,6 +824,9 @@ function migrate(s){
   if(!s.rewardsV5){s.rewards=defaultState().rewards;s.rewardsV5=true;}
   if(typeof s.shields!=='number')s.shields=0;
   if(!s.finance.investments)s.finance.investments=[];
+  if(!s.finance.goals)s.finance.goals=defaultState().finance.goals;
+  if(!s.customQuests)s.customQuests=[];
+  if(typeof s.gmailUrl!=='string')s.gmailUrl='';
   if(!s._imported)s._imported=[];
   /* ===== FRESH START (you asked to restart in every sense) =====
      Backs up the old save first (recoverable), then resets the journey to today:
@@ -1135,7 +1159,8 @@ function viewHome(){
      ${qs.map(q=>questHTML(q,rec)).join('')}
      ${(()=>{const ex=(rec.extra||[]).length;const can=rec.done.includes('study')&&dow()!==0&&ex<2&&S.studyDone<CURRICULUM.length;
        return can?`<button class="btn ghost sm" style="margin-top:10px" onclick="studyAhead()">📚 STUDY ONE MORE LESSON · +45 XP · +35 G &nbsp;(${ex+1+1}/3 today)</button>
-       <p class="tiny" style="margin-top:6px;text-align:center">Banking ahead is perfect for the OSCP sprint before Jul 15 — extra lessons earn gold but don't double the streak.</p>`:'';})()}</div>
+       <p class="tiny" style="margin-top:6px;text-align:center">Banking ahead is perfect for the OSCP sprint before Jul 15 — extra lessons earn gold but don't double the streak.</p>`:'';})()}
+     <button class="btn ghost sm" style="margin-top:10px" onclick="manageQuests()">✎ CUSTOMIZE DAILY QUESTS</button></div>
     <div class="panel">
      <div class="q-head"><div class="panel-title" style="margin:0"><span class="dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2)"></span>Bonus Quests</div>
      <div class="q-progress num">${bonusDone}/3 · +gold</div></div>
@@ -1219,6 +1244,15 @@ function viewMoney(){
     <button class="btn ghost sm" style="margin-top:12px" onclick="logInvest()">+ LOG AN INVESTMENT</button>
     <div style="margin-top:10px">${invRecent}</div>
     <p class="tiny" style="margin-top:8px">Every SIP/transfer you log grows this number — your wealth XP. Hit the monthly target, then sweep unspent budget on top. Plan: CODEX → Money.</p></div>`;
+  const goals=S.finance.goals||[];
+  const goalsHtml=goals.map(g=>{const pct=Math.min(100,Math.round(g.saved/g.target*100));
+    return `<div class="catrow"><div class="cl"><span>${g.ic||'🎯'} ${g.name} <button class="del" style="background:none;font-size:13px;padding:0 4px" onclick="delGoal('${g.id}')">✕</button></span><span class="cv num">${fmt(g.saved)} / ${fmt(g.target)} · ${pct}%</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <button class="btn ghost sm" style="margin-top:7px" onclick="contributeGoal('${g.id}')">+ Add to ${g.name}</button></div>`;}).join('')||'<div class="empty">No goals yet — add your first.</div>';
+  const goalsPanel=`<div class="panel" style="border-color:rgba(79,227,210,.22)"><div class="panel-title"><span class="dot" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></span>🎯 Savings Goals</div>${goalsHtml}
+    <button class="btn ghost sm" style="margin-top:6px" onclick="addGoal()">+ ADD GOAL</button></div>`;
+  const ins=spendInsights(f);
+  const insPanel=ins.length?`<div class="panel" style="border-color:rgba(255,177,92,.20)"><div class="panel-title"><span class="dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange)"></span>💡 Insights</div>${ins.map(x=>`<p class="tiny" style="margin:7px 0">• ${x}</p>`).join('')}</div>`:'';
   return `<div class="panel money-hero">
     <div class="tiny">PROJECTED SAVINGS · ${mk}</div>
     <div class="big-num" style="color:var(--gold)">${fmt(f.projected)}</div>
@@ -1234,10 +1268,12 @@ function viewMoney(){
     ${cats}
     <p class="tiny">Spent ${fmt(f.spentTotal)} of ${fmt(f.spendable)} this month. Overspending eats into your ₹${(f.invest/1000)}k investment.</p>
   </div>
+  ${insPanel}
   <div class="panel"><div class="panel-title"><span class="dot"></span>Quick Add</div>
     <div class="catbtn">${QUICK_SPENDS.map(([c,a])=>`<button onclick="quickSpend('${c.replace(/'/g,'')}',${a})">${c} ₹${a}</button>`).join('')}</div>
     <p class="tiny" style="margin-top:8px">One tap logs a common spend instantly. Your iOS Shortcut bank-email import drops spends here too.</p></div>
   ${invPanel}
+  ${goalsPanel}
   ${donutPanel}
   <div class="panel"><div class="panel-title"><span class="dot"></span>Fixed Commitments</div>${fixedList}
     <div class="fixed-row" style="border-top:1px solid var(--line2);margin-top:4px"><b>Income</b><b class="amt" style="color:var(--green)">${fmt(S.finance.income)}</b></div>
@@ -1255,6 +1291,80 @@ function logInvest(){const v=parseFloat(prompt('Amount invested this time (₹)?
   const note=(prompt('Where? (e.g. Nifty index SIP, flexicap, emergency fund)','SIP')||'').trim();
   S.finance.investments=S.finance.investments||[];S.finance.investments.push({date:todayStr(),amt:v,note});
   save();if(navigator.vibrate)navigator.vibrate([15,30,15]);toast('Investment logged 📈');render();}
+
+/* ---------- merchant → budget-category auto-mapping ---------- */
+const MERCHANT_MAP=[
+  [['zepto','blinkit','instamart','bigbasket','dunzo','grofers','milkbasket','swiggy instamart'],'Blinkit'],
+  [['swiggy','zomato','eatsure','dominos','mcdonald','kfc','box8','faasos','eatfit','pizza','burger'],'Zomato'],
+  [['bookmyshow','pvr','inox','cinepolis','bar ','pub ','brewery','lounge'],'Dates & outings'],
+  [['myntra','ajio','zara','h&m','nike','adidas','uniqlo','levis','tatacliq','lifestyle stores','westside','max '],'Clothes'],
+  [['pharmeasy','apollo','1mg','netmeds','tata 1mg','cult','cultfit','healthify','decathlon','practo','medplus','gym'],'Health'],
+  [['netflix','spotify','hotstar','jiocinema','prime','youtube','google play','apple.com','adobe','canva','subscription'],'Lifestyle'],
+  [['uber','ola','rapido','irctc','redbus','indigo','makemytrip','goibibo','metro','namma yatri'],'Lifestyle'],
+  [['amazon','flipkart','meesho','nykaa','croma','reliance digital'],'Lifestyle'],
+];
+function categorizeMerchant(name){
+  const n=(name||'').toLowerCase();
+  for(const [keys,cat] of MERCHANT_MAP){ if(keys.some(k=>n.includes(k))){ if(S.finance.budgets.find(b=>b.cat===cat))return cat; } }
+  return S.finance.budgets.find(b=>/misc/i.test(b.cat))?.cat || S.finance.budgets[0]?.cat || 'Misc & buffer';
+}
+
+/* ---------- Gmail (ICICI) sync via your Apps Script web app (JSONP, zero-maintenance) ---------- */
+function gmailSync(silent){
+  const url=(S.gmailUrl||'').trim();
+  if(!url){if(!silent)toast('Add your ICICI Sync URL in ⚙ Settings first');return;}
+  const cb='__gcb'+Math.abs(daysBetween('2026-01-01',todayStr()))+'_'+(S._imported||[]).length;
+  let done=false;
+  const s=document.createElement('script');
+  const cleanup=()=>{try{s.remove();}catch(e){}delete window[cb];};
+  window[cb]=function(list){done=true;importBankTxns(list,silent);cleanup();};
+  s.onerror=function(){if(done)return;cleanup();if(!silent)toast('Sync failed — check the URL in Settings');};
+  s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+  document.body.appendChild(s);
+  setTimeout(()=>{if(!done){cleanup();if(!silent)toast('Sync timed out — try again');}},12000);
+}
+function importBankTxns(list,silent){
+  if(!Array.isArray(list)){if(!silent)toast('Sync: no transactions found');return;}
+  S._imported=S._imported||[];let n=0,total=0;
+  list.forEach(t=>{
+    const amt=parseFloat(t.amt);if(!amt||amt<=0)return;
+    const id=String(t.id||(amt+'_'+(t.date||'')+'_'+(t.merchant||'')));
+    if(S._imported.includes(id))return;
+    const date=(t.date&&/^\d{4}-\d{2}-\d{2}$/.test(t.date))?t.date:todayStr();
+    const m=date.slice(0,7);if(!S.finance.spends[m])S.finance.spends[m]=[];
+    S.finance.spends[m].push({date,cat:categorizeMerchant(t.merchant||''),amt:Math.round(amt),note:(t.merchant||'ICICI')});
+    S._imported.push(id);n++;total+=amt;
+  });
+  if(S._imported.length>800)S._imported=S._imported.slice(-800);
+  if(n>0){save();if(typeof render==='function')render();toast(`Imported ${n} ICICI spend${n>1?'s':''} · ${fmt(total)}`);}
+  else if(!silent)toast('Already up to date ✓');
+}
+
+/* ---------- savings goals ---------- */
+function addGoal(){const name=(prompt('Goal name? (e.g. Goa trip, new laptop)')||'').trim();if(!name)return;
+  const t=parseFloat(prompt('Target amount (₹)?'));if(!t||t<=0)return;const ic=(prompt('Emoji? (optional)','🎯')||'🎯').trim()||'🎯';
+  S.finance.goals=S.finance.goals||[];S.finance.goals.push({id:'g'+Date.now(),ic,name,target:t,saved:0});save();render();}
+function contributeGoal(id){const g=(S.finance.goals||[]).find(x=>x.id===id);if(!g)return;
+  const v=parseFloat(prompt(`Add to "${g.name}" (₹)?  Now ${fmt(g.saved)} / ${fmt(g.target)}`));if(!v)return;
+  g.saved=Math.max(0,g.saved+v);save();
+  if(g.saved>=g.target){spawnConfetti(true);sysModal('SYSTEM',`<div class="center" style="font-size:36px">${g.ic||'🎯'}</div><div class="sys-big" style="font-size:18px">GOAL REACHED</div><p class="center">You fully funded <b>${g.name}</b> — ${fmt(g.target)}. 🎉</p>`,'YES!');}
+  else toast('Added to goal 🎯');render();}
+function delGoal(id){if(confirm('Remove this goal?')){S.finance.goals=(S.finance.goals||[]).filter(x=>x.id!==id);save();render();}}
+/* ---------- spend insights ---------- */
+function spendInsights(f){
+  const now=new Date(),dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),dom=now.getDate();
+  const out=[];
+  if(f.spentTotal>0){const proj=Math.round(f.spentTotal/dom*dim);
+    out.push(`At this pace you'll spend <b>${fmt(proj)}</b> this month vs ${fmt(f.spendable)} spendable — ${proj>f.spendable?'<b style="color:var(--red)">ease up to protect your SIP.</b>':'<b style="color:var(--green)">on track 👍</b>'}`);}
+  S.finance.budgets.forEach(b=>{const sp=f.byCat[b.cat]||0,pct=Math.round(sp/b.amt*100);
+    if(sp>b.amt)out.push(`<b style="color:var(--red)">${b.cat}</b> is over budget (${fmt(sp)}/${fmt(b.amt)}).`);
+    else if(pct>=80)out.push(`<b style="color:var(--orange)">${b.cat}</b> at ${pct}% with ${dim-dom} day${dim-dom!==1?'s':''} left.`);});
+  const entries=Object.entries(f.byCat).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  if(entries.length)out.push(`Biggest category: <b>${entries[0][0]}</b> at ${fmt(entries[0][1])}.`);
+  const todays=(f.spends||[]).filter(s=>s.date===todayStr());
+  if(todays.length===0)out.push(`<b style="color:var(--green)">No-spend day so far 🔥</b> — keep the streak clean.`);
+  return out;
+}
 let SPEND_CAT=null;
 function logSpend(){
   if(!SPEND_CAT||!S.finance.budgets.find(b=>b.cat===SPEND_CAT))SPEND_CAT=S.finance.budgets[0]?.cat||'Misc & buffer';
@@ -1686,6 +1796,8 @@ function openSettings(){const p=S.profile;
     <div class="row2"><div><label>Program start</label><input id="s_start" type="date" value="${p.startDate}"></div>
     <div><label>Birthday (milestone)</label><input id="s_bday" type="date" value="${p.bday||'2026-09-14'}"></div></div>
     <p class="tiny" style="margin-top:6px">Week ${programWeek()} · ${currentPhaseLetter()==='A'?'Heal phase':currentPhaseLetter()==='B'?'Reintroduction phase':'Full-training phase'}. Workout split & study units advance from the start date.</p>
+    <label>ICICI Sync URL (Apps Script web app)</label><input id="s_gmail" value="${(S.gmailUrl||'').replace(/"/g,'&quot;')}" placeholder="https://script.google.com/macros/s/…/exec">
+    <p class="tiny" style="margin-top:4px">Paste the deployment URL from your Apps Script. The app auto-syncs ICICI spends on open. ${(S.gmailUrl||'').trim()?'<button class="btn ghost sm" style="margin-top:8px" onclick="gmailSync(false)">⟳ SYNC ICICI NOW</button>':''}</p>
     <button class="btn" style="margin-top:14px" onclick="saveSettings()">SAVE</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="exportData()">EXPORT BACKUP (JSON)</button>
     <button class="btn ghost sm" style="margin-top:8px" onclick="importData()">IMPORT BACKUP</button>
@@ -1695,7 +1807,9 @@ function openSettings(){const p=S.profile;
 function saveSettings(){S.profile.name=$('#s_name').value.trim().toUpperCase()||'HUNTER';
   S.profile.goalWeight=parseFloat($('#s_goal').value)||S.profile.goalWeight;S.profile.height=parseInt($('#s_h').value)||S.profile.height;
   S.profile.startDate=$('#s_start').value||S.profile.startDate;
-  S.profile.bday=$('#s_bday').value||S.profile.bday;save();$('#modal-host').innerHTML='';render();toast('Settings saved');}
+  S.profile.bday=$('#s_bday').value||S.profile.bday;
+  const g=$('#s_gmail');if(g)S.gmailUrl=g.value.trim();
+  save();$('#modal-host').innerHTML='';render();toast('Settings saved');}
 function exportData(){const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='system-backup-'+todayStr()+'.json';a.click();}
 function importData(){const i=document.createElement('input');i.type='file';i.accept='.json';
   i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=migrate(JSON.parse(r.result));save();$('#modal-host').innerHTML='';render();toast('Backup restored');}catch(x){alert('Invalid file');}};r.readAsText(f);};i.click();}
@@ -1722,19 +1836,22 @@ function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomput
 function handleUrlImport(){
   let p;try{p=new URLSearchParams(location.search);}catch(e){return;}
   const amt=parseFloat(p.get('spend'));if(!amt||amt<=0){return;}
-  const catRaw=(p.get('cat')||'Misc & buffer').trim(),note=(p.get('note')||'auto').trim();
+  const catRaw=(p.get('cat')||'').trim(),note=(p.get('note')||'auto').trim();
   const tok=p.get('t')||(''+amt+'_'+catRaw+'_'+todayStr());
   S._imported=S._imported||[];
   if(S._imported.includes(tok)){cleanUrl();return;}
-  const b=S.finance.budgets.find(x=>x.cat.toLowerCase()===catRaw.toLowerCase())||S.finance.budgets.find(x=>x.cat.toLowerCase().includes(catRaw.toLowerCase()));
+  // explicit category wins; otherwise auto-categorize from the merchant/note
+  const exact=catRaw&&S.finance.budgets.find(x=>x.cat.toLowerCase()===catRaw.toLowerCase());
+  const cat=exact?exact.cat:categorizeMerchant(catRaw||note);
   const mk=monthKey();if(!S.finance.spends[mk])S.finance.spends[mk]=[];
-  S.finance.spends[mk].push({date:todayStr(),cat:b?b.cat:catRaw,amt,note});
-  S._imported.push(tok);if(S._imported.length>200)S._imported=S._imported.slice(-200);
-  save();cleanUrl();setTimeout(()=>toast(`Imported: ${catRaw} −${fmt(amt)}`),500);
+  S.finance.spends[mk].push({date:todayStr(),cat,amt,note});
+  S._imported.push(tok);if(S._imported.length>800)S._imported=S._imported.slice(-800);
+  save();cleanUrl();setTimeout(()=>toast(`Imported: ${cat} −${fmt(amt)}`),500);
 }
 function cleanUrl(){try{history.replaceState({},'',location.pathname);}catch(e){}}
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
 applyShieldIfNeeded();handleUrlImport();rollover();render();
+if((S.gmailUrl||'').trim())setTimeout(()=>gmailSync(true),800);
 if(S.justRestarted)restartWelcome();
 else if(!S.seenIntro)intro();
 else if(dow()===0&&S.lastRecap!==todayStr()&&Object.keys(S.history).length>0){S.lastRecap=todayStr();save();showRecap();}
