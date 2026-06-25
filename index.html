@@ -297,7 +297,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='13';
+const APP_VERSION='14';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -643,8 +643,8 @@ function todaysQuests(){
    ]:[]),
    {id:'steps',title:'10,000 Steps',sub:'≈70–80 min walking — split lunch + evening',stat:'AGI',xp:30,gold:30,mand:true,key:true,
      exp:`Target: 10,000 steps ≈ 70–80 min of walking total.\nEasiest split: 20-min brisk walk after your office lunch + a 30–40 min walk in the evening. Track it on your phone / Apple Health.\nSteps are the #1 fat-loss lever and put zero load on the shoulder.`},
-   {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:dow()!==0,
-     exp:`At work (11am–8pm): one 60-90 min focused block, phone away, on your hardest task.\nThen write ONE thing you learned. Daily. This is how reputation — and the feeling of competence — is built. (Optional on Sundays.)`},
+   {id:'work',title:'Deep Work + Log 1 Learning',sub:'One 60-90 min focus block · note 1 thing learned',stat:'PER',xp:45,gold:30,mand:(dow()>=1&&dow()<=5),
+     exp:`At work (Mon–Fri, 11am–8pm): one 60-90 min focused block, phone away, on your hardest task.\nThen write ONE thing you learned. This is how reputation — and the feeling of competence — is built. (Optional on weekends — Sat & Sun.)`},
    studyToday(),
    {id:'spend',title:'Track Spends + Stay on Budget',sub:'Log today\'s spends in the VAULT (20s)',stat:'WLT',xp:25,gold:15,mand:false,
      exp:`Open the VAULT tab and log what you spent (20 seconds). Awareness alone cuts spending ~15%.\nBangalore leaks: food delivery, impulse buys, unplanned dates. Before any non-essential buy, wait 24h.\nStay under this month's spendable budget → your investment savings stay intact.`},
