@@ -312,7 +312,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='19';
+const APP_VERSION='20';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -799,7 +799,7 @@ function defaultState(){return{
     {id:'r18',ic:'🎧', name:'Gadget / big buy (₹5k+)',     cost:9000,  cat:'Buy & Splurge'},
     {id:'r19',ic:'✈️', name:'Weekend getaway',             cost:15000, cat:'Buy & Splurge'},
   ],
-  rewardsV4:true, rewardsV5:true, budgetsV2:true, studyDone:0, restartV2:true,
+  rewardsV4:true, rewardsV5:true, budgetsV2:true, studyDone:0, restartV2:true, restartV3:true,
   shields:0, lastShieldBuy:null,
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
@@ -853,12 +853,29 @@ function migrate(s){
     s.restartV2=true;s.budgetsV2=true;s.rewardsV4=true;s.rewardsV5=true;
     s.justRestarted=true;
   }
+  /* ===== FRESH START for 1 JULY 2026 (asked to reset on 30 Jun, begin 1 Jul) =====
+     Wipes the journey/progress and sets the program clock to 1 Jul. KEEPS your finance
+     (spends, budgets, investments, goals, recurring, ICICI sync) and weight logs — those
+     aren't progress to reset. Backs up first. One-time. */
+  if(!s.restartV3){
+    try{localStorage.setItem(STORE+'_backup_'+todayStr()+'_v3',JSON.stringify(s));}catch(e){}
+    s.profile.startDate='2026-07-01';
+    s.totalXp=0;s.gold=0;s.totalCompleted=0;s.studyDone=0;
+    s.stats={STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0,WLT:0};
+    s.history={};s.redeemed=[];
+    s.shields=0;s.lastShieldBuy=null;
+    s.lastRecap=null;
+    s.lastOpen=todayStr();
+    s.restartV3=true;
+    s.justRestarted=true;s.freshJul1=true;
+  }
   return s;
 }
 function load(){try{const r=JSON.parse(localStorage.getItem(STORE));return r&&r.profile?migrate(r):defaultState();}catch(e){return defaultState();}}
 function save(){localStorage.setItem(STORE,JSON.stringify(S));}
 
-function programWeek(){return Math.floor(daysBetween(S.profile.startDate,todayStr())/7)+1;}
+function programWeek(){return Math.max(1,Math.floor(daysBetween(S.profile.startDate,todayStr())/7)+1);}
+function daysToStart(){return daysBetween(todayStr(),S.profile.startDate);} // >0 before the program begins
 function bedtimeTarget(){
   const w=programWeek(); const t=Math.max(30, 150-(w-1)*20); // 2:30am=150 -> floor 12:30am=30
   let h=Math.floor(t/60),m=t%60; let disp=h===0?12:h;
@@ -1150,7 +1167,11 @@ function viewHome(){
      <span class="wpill"><b style="color:${W.lost>=0?'var(--green)':'var(--red)'}">${W.lost>=0?'▼':'▲'} ${Math.abs(W.lost)} kg</b> lost</span>
      ${W.count>=2?`<span class="wpill"><b style="color:${W.rate>0?'var(--green)':'var(--red)'}">${W.rate>0?'−':'+'}${Math.abs(W.rate)}</b> kg/wk</span>`:''}
      </div>`:'';
-  return heroHTML()+
+  const _d2s=daysToStart();
+  const prestart=_d2s>0?`<div class="panel" style="background:linear-gradient(150deg,rgba(110,139,255,.16),rgba(184,115,255,.06));border-color:var(--line2);text-align:center">
+     <div class="sys-big" style="font-size:18px;margin:2px 0">☀️ New season starts 1 July</div>
+     <p class="tiny">${_d2s} day${_d2s>1?'s':''} to go. Today is a free warm-up — explore freely; your streak & study officially begin <b>1 Jul</b>. Log a fresh starting weight then.</p></div>`:'';
+  return heroHTML()+prestart+
    `<div class="panel" style="background:linear-gradient(150deg,rgba(230,193,121,.10),transparent 70%);border-color:rgba(230,193,121,.22)">
      <div class="panel-title" style="margin-bottom:8px"><span class="dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>🎂 Birthday Milestone · 14 Sep</div>
      <p class="tiny" style="font-size:12.5px;line-height:1.6"><b style="color:var(--gold)">${ms.days} days</b> to go. At <b>0.75 kg/wk</b> you'll hit <b style="color:var(--accent)">~${ms.proj075} kg</b>; push to <b>1 kg/wk</b> for <b style="color:var(--accent)">~${ms.proj1} kg</b>. Now ${ms.cur} kg → goal ${ms.goal} kg.</p>
@@ -1913,13 +1934,16 @@ function intro(){sysModal('NOTIFICATION',
    <p class="center tiny">The full plan lives in the <b>CODEX</b> tab. The Ascent begins now, Hunter.</p>`,
   'ACCEPT THE SYSTEM',()=>{S.seenIntro=true;save();});}
 
-function restartWelcome(){sysModal('NOTIFICATION',
-  `<div class="center" style="font-size:30px">↻</div><div class="sys-big" style="font-size:19px">THE SYSTEM HAS<br>BEEN REFORGED</div>
-   <p class="center">Clean slate. Level 1, 0 gold, streak reset — the past is backed up and gone. What you build from <b>today</b> is all that counts.</p>
-   <p>Your new program: gym in your office break (beginner & shoulder-safe), the deep <b>study block at night</b>, dance + guitar on Sundays. The syllabus runs OSCP labs (use them before <b>Jul 15</b>) → web → AI → cloud → mobile → network.</p>
-   <p class="center">Keep the chain alive with <b>3 🔥 keystones</b> daily: Protein · Steps · Study. Everything's tougher to buy now — earn it.</p>
-   <p class="center tiny">Old data saved to a backup key in case you ever want it. The full plan lives in CODEX. Begin, Hunter.</p>`,
-  'BEGIN AGAIN',()=>{S.justRestarted=false;save();});}
+function restartWelcome(){
+  const d=daysToStart();
+  const when=d>0?`Your program begins <b>1 July</b> — ${d} day${d>1?'s':''} away. Today's a free warm-up; the real chain starts then.`:`Your program begins <b>today</b>. Day one.`;
+  sysModal('NOTIFICATION',
+  `<div class="center" style="font-size:30px">☀️</div><div class="sys-big" style="font-size:19px">NEW SEASON<br>1 JULY</div>
+   <p class="center">Clean slate — Level 1, 0 gold, streak reset, study back to lesson 1. The past is backed up. ${when}</p>
+   <p>The plan: gym in your office break (<b>absolute-beginner, shoulder-safe</b> — legs/core/cardio, nothing overhead), deep <b>study block at night</b>, dance + guitar on Sundays. Syllabus: OSCP labs (use them before <b>Jul 15</b>) → web → AI → cloud → mobile → network.</p>
+   <p class="center">Keep the chain alive with <b>3 🔥 keystones</b> daily: Protein · Steps · Study. Log a fresh starting weight on <b>1 Jul</b> (LOG tab).</p>
+   <p class="center tiny">Your money/ICICI data & weight history are kept. Full plan in CODEX. Let's build, Hunter.</p>`,
+  'LET’S GO',()=>{S.justRestarted=false;S.freshJul1=false;save();});}
 function rollover(){const t=todayStr();if(S.lastOpen!==t){S.lastOpen=t;}recomputeFull();save();}
 /* iOS Shortcut → one-tap spend import. Opens .../?spend=540&cat=Zomato&note=...&t=unique
    The Shortcut reads a bank email/notification, extracts the amount, and opens this URL. */
