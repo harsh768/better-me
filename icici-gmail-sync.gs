@@ -42,22 +42,29 @@ function doGet(e){
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
 
-// Diagnostics: shows the senders/subjects found and whether the parser matched each.
+// Diagnostics: shows subject, body lengths, parse result AND a snippet of the actual
+// text the parser sees — so we can fix the regex precisely. Limited to a few emails.
 function debugInfo(){
   const q = 'from:(' + ICICI_FROM + ') newer_than:' + LOOKBACK_DAYS + 'd';
-  const threads = GmailApp.search(q, 0, 12);
+  const threads = GmailApp.search(q, 0, 6);
   const samples = [];
   threads.forEach(function(th){
     th.getMessages().forEach(function(m){
-      const p = parseIcici(m.getPlainBody() || m.getBody() || '');
+      if (samples.length >= 6) return;
+      const plain = m.getPlainBody() || '';
+      const raw = plain || m.getBody() || '';
+      const norm = String(raw).replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/\s+/g, ' ').trim();
+      const p = parseIcici(raw);
       samples.push({
-        from: m.getFrom(),
         subject: m.getSubject(),
-        parsed: p ? ('amt=' + p.amt + ' merchant=' + (p.merchant || '(none)')) : 'NO MATCH'
+        plainLen: plain.length,
+        rawLen: raw.length,
+        parsed: p ? ('amt=' + p.amt + ' merchant=' + (p.merchant || '(none)')) : 'NO MATCH',
+        snippet: norm.slice(0, 220)
       });
     });
   });
-  return { query: q, threadsFound: threads.length, samples: samples };
+  return { query: q, threadsFound: threads.length, codeVersion: 'v4-snippet', samples: samples };
 }
 
 function getSpends(){
