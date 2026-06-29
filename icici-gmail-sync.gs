@@ -89,10 +89,10 @@ function parseIcici(t){
   // normalise: strip HTML tags + entities, collapse ALL whitespace/newlines to single spaces
   t = String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/\s+/g, ' ').trim();
 
-  // skip non-spend alerts (payments, reversals/refunds, statements, OTPs, reward summaries)
-  if (/payment received|thank you for paying|reversal|reversed|refund|statement|\botp\b|reward points|amount due|has been credited/i.test(t)) return null;
+  // skip non-spend mail: bill repayments, reversals/refunds, statements, OTPs, reward summaries
+  if (/payment received|received payment|we have received|thank you for paying|reversal|reversed|refund|statement|\botp\b|reward points|amount due|has been credited/i.test(t)) return null;
 
-  // a spend = "...transaction of INR 135.00..."  (NOT the credit-limit figure)
+  // a spend = "...has been used for a transaction of INR 135.00..."  (NOT the credit-limit figure)
   const am = t.match(/transaction of\s+(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
   if (!am) return null;
   const amt = parseFloat(am[1].replace(/,/g, ''));
