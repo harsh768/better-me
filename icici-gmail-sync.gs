@@ -96,12 +96,14 @@ function parseIcici(t){
   // normalise: strip HTML tags + entities, collapse ALL whitespace/newlines to single spaces
   t = String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/\s+/g, ' ').trim();
 
-  // skip non-spend mail: bill repayments, reversals/refunds, statements, OTPs, reward summaries
-  if (/payment received|received payment|we have received|thank you for paying|reversal|reversed|refund|statement|\botp\b|reward points|amount due|has been credited/i.test(t)) return null;
-
-  // a spend = "...has been used for a transaction of INR 135.00..."  (NOT the credit-limit figure)
+  // A spend is identified POSITIVELY by "transaction of INR <amt>". Bill-payments,
+  // reversals and reward/statement mails don't contain this phrase — so we DON'T use a
+  // broad keyword skip (it was wrongly catching words like "statement"/"reward" that
+  // appear in every transaction email's footer boilerplate).
   const am = t.match(/transaction of\s+(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
   if (!am) return null;
+  // narrow guard: exclude reversals/refunds/repayments that might still say "transaction"
+  if (/reversal of|has been reversed|refund of|payment received|received payment/i.test(t)) return null;
   const amt = parseFloat(am[1].replace(/,/g, ''));
   if (!amt || amt <= 0) return null;
 
