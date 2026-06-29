@@ -281,6 +281,13 @@ textarea{line-height:1.45;}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;}
 .confetti i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;opacity:.95;animation:fall linear forwards;}
 @keyframes fall{0%{transform:translateY(-16px) rotate(0);opacity:1}100%{transform:translateY(108vh) rotate(620deg);opacity:.5}}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.badge{text-align:center;border:1px solid var(--line);border-radius:13px;padding:11px 5px;background:rgba(0,0,0,.18);}
+.badge.on{border-color:var(--line2);background:linear-gradient(160deg,rgba(110,139,255,.16),rgba(184,115,255,.05));}
+.badge.off{opacity:.4;}
+.badge .bic{font-size:23px;line-height:1.15;}
+.badge .bn{font-size:10.5px;font-weight:600;font-family:'Space Grotesk';margin-top:4px;color:var(--txt);}
+.badge .bd{font-size:8.5px;color:var(--muted);margin-top:2px;line-height:1.3;}
 .rankpop{font-family:'Space Grotesk';font-weight:700;font-size:64px;text-align:center;line-height:1;margin:6px 0 2px;
   background:linear-gradient(160deg,#f5d98f,#c9aaff,#9bb0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   animation:rankzoom .5s cubic-bezier(.2,1.3,.4,1);}
@@ -312,7 +319,7 @@ textarea{line-height:1.45;}
    ============================================================ */
 const $=(s,el=document)=>el.querySelector(s);
 const STORE='system_save_v2';
-const APP_VERSION='20';
+const APP_VERSION='21';
 function forceUpdate(){toast('Checking for updates…');if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.update()));}setTimeout(()=>location.reload(),700);}
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 function parseD(s){const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c);}
@@ -800,7 +807,7 @@ function defaultState(){return{
     {id:'r19',ic:'✈️', name:'Weekend getaway',             cost:15000, cat:'Buy & Splurge'},
   ],
   rewardsV4:true, rewardsV5:true, budgetsV2:true, studyDone:0, restartV2:true, restartV3:true,
-  shields:0, lastShieldBuy:null,
+  shields:0, lastShieldBuy:null, achievements:[],
   redeemed:[],seenIntro:false,lastOpen:todayStr(),
 };}
 function migrate(s){
@@ -828,6 +835,7 @@ function migrate(s){
   if(!s.finance.goals)s.finance.goals=defaultState().finance.goals;
   if(!s.finance.recurring)s.finance.recurring=[];
   if(!s.customQuests)s.customQuests=[];
+  if(!s.achievements)s.achievements=[];
   if(typeof s.gmailUrl!=='string')s.gmailUrl='';
   if(!s._imported)s._imported=[];
   /* give every existing spend a stable id so it can be edited/split/deleted */
@@ -864,6 +872,7 @@ function migrate(s){
     s.stats={STR:0,VIT:0,AGI:0,INT:0,PER:0,SEN:0,WLT:0};
     s.history={};s.redeemed=[];
     s.shields=0;s.lastShieldBuy=null;
+    s.achievements=[];
     s.lastRecap=null;
     s.lastOpen=todayStr();
     s.restartV3=true;
@@ -1015,6 +1024,69 @@ function weightStats(){
   return{has:true,goal,start,last,trend,cur:trend,lost,toGoal,pct,rate,etaWeeks,count:ws.length};
 }
 
+/* ---------- achievements / badges ---------- */
+function achStat(){
+  const st=streakInfo(),lvl=levelInfo(S.totalXp).level,W=weightStats();
+  const invTotal=(S.finance.investments||[]).reduce((a,b)=>a+b.amt,0);
+  const goalDone=(S.finance.goals||[]).some(g=>g.target>0&&g.saved>=g.target);
+  return {best:st.longest,cur:st.cur,lvl,study:S.studyDone||0,lost:W.has?W.lost:0,
+    goalW:W.has&&W.cur<=W.goal,done:S.totalCompleted,inv:invTotal,goalDone};
+}
+const ACHIEVEMENTS=[
+ {id:'streak3', ic:'🔥', name:'Spark',        desc:'3-day streak',   f:s=>s.best>=3},
+ {id:'streak7', ic:'🔥', name:'Week Warrior', desc:'7-day streak',   f:s=>s.best>=7},
+ {id:'streak14',ic:'🔥', name:'Fortnight',    desc:'14-day streak',  f:s=>s.best>=14},
+ {id:'streak30',ic:'🌋', name:'Unbroken',     desc:'30-day streak',  f:s=>s.best>=30},
+ {id:'streak100',ic:'💎',name:'Centurion',    desc:'100-day streak', f:s=>s.best>=100},
+ {id:'lvl5',  ic:'⭐', name:'Rising Hunter', desc:'Reach Level 5',  f:s=>s.lvl>=5},
+ {id:'lvl10', ic:'🌟', name:'Awakened',      desc:'Reach Level 10', f:s=>s.lvl>=10},
+ {id:'lvl20', ic:'🏅', name:'Elite Hunter',  desc:'Reach Level 20', f:s=>s.lvl>=20},
+ {id:'lvl35', ic:'👑', name:'Shadow Monarch',desc:'Reach Level 35', f:s=>s.lvl>=35},
+ {id:'study10',ic:'📘',name:'Student',       desc:'10 study lessons',f:s=>s.study>=10},
+ {id:'study30',ic:'📗',name:'Scholar',       desc:'30 study lessons',f:s=>s.study>=30},
+ {id:'oscp',  ic:'🖥️', name:'Operator',      desc:'Finish OSCP track',f:s=>s.study>=29},
+ {id:'study120',ic:'🎓',name:'Syllabus Slayer',desc:'All 120 lessons',f:s=>s.study>=120},
+ {id:'lose2', ic:'⚖️', name:'Lighter',       desc:'Lose 2 kg',      f:s=>s.lost>=2},
+ {id:'lose5', ic:'🏃', name:'Transforming',  desc:'Lose 5 kg',      f:s=>s.lost>=5},
+ {id:'goalw', ic:'🎯', name:'Goal Weight',   desc:'Hit goal weight',f:s=>s.goalW},
+ {id:'done50',ic:'✅', name:'Consistent',    desc:'50 quests cleared',f:s=>s.done>=50},
+ {id:'done200',ic:'💪',name:'Relentless',    desc:'200 quests cleared',f:s=>s.done>=200},
+ {id:'invest1',ic:'📈',name:'Investor',      desc:'Log your first SIP',f:s=>s.inv>0},
+ {id:'invest5l',ic:'💰',name:'Wealth Builder',desc:'₹5L invested',  f:s=>s.inv>=500000},
+ {id:'goalfund',ic:'🏆',name:'Goal Funded',  desc:'Fully fund a goal',f:s=>s.goalDone},
+];
+function checkAchievements(silent){
+  const s=achStat();S.achievements=S.achievements||[];const newly=[];
+  ACHIEVEMENTS.forEach(a=>{if(a.f(s)&&!S.achievements.includes(a.id)){S.achievements.push(a.id);newly.push(a);}});
+  if(newly.length){save();if(!silent){spawnConfetti(newly.length>1);const a=newly[0];
+    toast(`🏅 ${a.ic} ${a.name} unlocked${newly.length>1?` +${newly.length-1} more`:''}`);}}
+  return newly.length;
+}
+function badgesHTML(){
+  const unlocked=S.achievements||[],got=ACHIEVEMENTS.filter(a=>unlocked.includes(a.id)).length;
+  return `<div class="panel"><div class="panel-title"><span class="dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>🏆 Achievements · ${got}/${ACHIEVEMENTS.length}</div>
+    <div class="badges">${ACHIEVEMENTS.map(a=>{const on=unlocked.includes(a.id);
+      return `<div class="badge ${on?'on':'off'}"><div class="bic">${on?a.ic:'🔒'}</div><div class="bn">${a.name}</div><div class="bd">${a.desc}</div></div>`;}).join('')}</div></div>`;
+}
+
+/* ---------- trends data ---------- */
+function weeklyXP(weeks){weeks=weeks||8;const out=[];const t=new Date();
+  for(let w=weeks-1;w>=0;w--){let xp=0;for(let d=0;d<7;d++){const dd=new Date(t);dd.setDate(t.getDate()-(w*7+d));xp+=dayXp(S.history[dstr(dd)]);}out.push(xp);}
+  return out;}
+function monthlySpend(months){months=months||6;const out=[];const n=new Date();
+  for(let m=months-1;m>=0;m--){const d=new Date(n.getFullYear(),n.getMonth()-m,1);const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    out.push({mk:mk.slice(5),amt:(S.finance.spends[mk]||[]).reduce((a,b)=>a+b.amt,0)});}
+  return out;}
+function drawWeeklyXP(){const c=$('#twxp');if(!c||!c.clientWidth)return;const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=100;
+  c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const data=weeklyXP(8),max=Math.max(100,...data),gap=7,bw=(w-7*gap)/8;
+  data.forEach((v,i)=>{const bh=Math.max(2,v/max*(h-18)),px=i*(bw+gap);const g=x.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'#b873ff');g.addColorStop(1,'#6e8bff');x.fillStyle=g;roundRect(x,px,h-bh,bw,bh,3);x.fill();});}
+function drawMonthlySpend(){const c=$('#tmsp');if(!c||!c.clientWidth)return;const dpr=window.devicePixelRatio||1,w=c.clientWidth,h=100;
+  c.width=w*dpr;c.height=h*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const data=monthlySpend(6),max=Math.max(1000,...data.map(d=>d.amt)),gap=12,bw=(w-6*gap)/6;
+  x.font='9px Space Grotesk';x.textAlign='center';
+  data.forEach((d,i)=>{const bh=Math.max(2,d.amt/max*(h-26)),px=i*(bw+gap);x.fillStyle='rgba(255,116,195,.72)';roundRect(x,px,h-bh-14,bw,bh,3);x.fill();x.fillStyle='#888fae';x.fillText(d.mk,px+bw/2,h-3);});}
+
 /* ---------- history helpers ---------- */
 function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayXp(rec){if(!rec)return 0;if(rec.meta)return Object.values(rec.meta).reduce((a,b)=>a+(b.xp||0),0);return (rec.done?rec.done.length:0)*30;}
@@ -1109,11 +1181,12 @@ function dayDetail(ds){
 /* ============================================================ RENDER */
 let TAB='home',CODEXTAB='os';
 function render(){
+  if(typeof checkAchievements==='function')checkAchievements();
   const v=$('#view');
   v.innerHTML={home:viewHome,stats:viewStats,money:viewMoney,shop:viewShop,log:viewLog,codex:viewCodex}[TAB]();
   [...document.querySelectorAll('#nav button')].forEach(b=>b.classList.toggle('active',b.dataset.t===TAB));
   if(TAB==='log'){drawWeightChart();drawActivity();}
-  if(TAB==='stats')drawRadar();
+  if(TAB==='stats'){drawRadar();drawWeeklyXP();drawMonthlySpend();}
   if(TAB==='money')drawDonut();
 }
 function heroHTML(){
@@ -1217,6 +1290,12 @@ function viewStats(){
      <div class="chip"><b class="num">${wk.cleared}</b><span>Quests</span></div>
      <div class="chip gold"><b class="num">${wk.xp}</b><span>XP Gained</span></div></div>
      <button class="btn ghost sm" style="margin-top:12px" onclick="showRecap()">📋 VIEW WEEKLY RECAP</button></div>
+    <div class="panel"><div class="panel-title"><span class="dot" style="background:var(--accent2)"></span>📊 Trends</div>
+     <p class="tiny" style="margin:0 0 4px">Weekly XP · last 8 weeks</p>
+     <canvas id="twxp" height="100" style="width:100%;display:block"></canvas>
+     <p class="tiny" style="margin:12px 0 4px">Monthly spend · last 6 months</p>
+     <canvas id="tmsp" height="100" style="width:100%;display:block"></canvas></div>
+    ${badgesHTML()}
     <div class="panel"><div class="panel-title"><span class="dot"></span>Hunter Stats</div>${bars}</div>
     <div class="panel"><div class="panel-title"><span class="dot"></span>All-Time Records</div>
     <div class="hero-stats"><div class="chip"><b class="num">${li.level}</b><span>Level</span></div>
@@ -1964,7 +2043,7 @@ function handleUrlImport(){
 }
 function cleanUrl(){try{history.replaceState({},'',location.pathname);}catch(e){}}
 document.querySelectorAll('#nav button').forEach(b=>{b.onclick=()=>{TAB=b.dataset.t;render();window.scrollTo(0,0);};});
-applyShieldIfNeeded();applyRecurring();handleUrlImport();rollover();render();
+applyShieldIfNeeded();applyRecurring();handleUrlImport();rollover();checkAchievements(true);render();
 if((S.gmailUrl||'').trim())setTimeout(()=>gmailSync(true),800);
 if(S.justRestarted)restartWelcome();
 else if(!S.seenIntro)intro();
