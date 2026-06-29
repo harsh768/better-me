@@ -49,7 +49,7 @@ function debugInfo(){
   const samples = [];
   threads.forEach(function(th){
     th.getMessages().forEach(function(m){
-      const p = parseIcici(m.getPlainBody() || '');
+      const p = parseIcici(m.getPlainBody() || m.getBody() || '');
       samples.push({
         from: m.getFrom(),
         subject: m.getSubject(),
@@ -66,7 +66,7 @@ function getSpends(){
   const out = [];
   threads.forEach(function(th){
     th.getMessages().forEach(function(m){
-      const body = m.getPlainBody() || '';
+      const body = m.getPlainBody() || m.getBody() || '';
       const p = parseIcici(body);
       if (p && p.amt) {
         out.push({
@@ -86,29 +86,29 @@ function getSpends(){
  * Returns { amt, merchant } or null for non-spend emails.
  */
 function parseIcici(t){
-  // must be a real spend alert
-  if (!/has been used for a transaction|transaction of (?:INR|Rs)/i.test(t)) return null;
-  // skip non-spend / informational alerts
-  if (/payment received|thank you for paying|statement is|\botp\b|reward points|e-?statement|amount due/i.test(t)) return null;
+  // normalise: strip HTML tags + entities, collapse ALL whitespace/newlines to single spaces
+  t = String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ').replace(/\s+/g, ' ').trim();
 
-  // amount: anchor on "transaction of INR 135.00"; fall back to first INR/Rs amount
-  const am = t.match(/transaction of\s+(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i)
-          || t.match(/(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+  // skip non-spend alerts (payments, reversals/refunds, statements, OTPs, reward summaries)
+  if (/payment received|thank you for paying|reversal|reversed|refund|statement|\botp\b|reward points|amount due|has been credited/i.test(t)) return null;
+
+  // a spend = "...transaction of INR 135.00..."  (NOT the credit-limit figure)
+  const am = t.match(/transaction of\s+(?:INR|Rs\.?)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
   if (!am) return null;
   const amt = parseFloat(am[1].replace(/,/g, ''));
   if (!amt || amt <= 0) return null;
 
   // merchant: "Info: UPI-609223681951-ZEPTO MA" → "ZEPTO MA"  (also handles "at X on", "towards X")
   let merchant = '';
-  const mm = t.match(/Info:\s*([^.\n\r]+)/i)
+  const mm = t.match(/Info:\s*([^.]+)/i)
           || t.match(/\bat\s+([A-Za-z0-9 &._\-*]{2,40}?)\s+on\b/i)
-          || t.match(/towards\s+([^.\n\r]+)/i)
-          || t.match(/spent at\s+([^.\n\r]+)/i);
+          || t.match(/towards\s+([^.]+)/i)
+          || t.match(/spent at\s+([^.]+)/i);
   if (mm) {
     merchant = mm[1].trim();
     const upi = merchant.match(/UPI-\d+-(.+)/i);     // strip the UPI-<ref>- prefix
     if (upi) merchant = upi[1].trim();
-    merchant = merchant.replace(/\s+/g, ' ');
+    merchant = merchant.replace(/\s+/g, ' ').trim();
   }
 
   return { amt: amt, merchant: merchant };
